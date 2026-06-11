@@ -6,8 +6,12 @@ export default function Home() {
   return (
     <main>
       <HeroVideo />
-      <VideoGrid />
-      <ContactSection />
+      <div id="works">
+        <VideoGrid />
+      </div>
+      <div id="contact">
+        <ContactSection />
+      </div>
     </main>
   );
 }
