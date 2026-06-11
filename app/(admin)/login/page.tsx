@@ -33,14 +33,18 @@ export default function LoginPage() {
           callbackUrl: "/dashboard",
           json: "true",
         }),
+        redirect: "manual",
       });
 
-      const data = await res.json();
-
-      if (data.url) {
-        router.push(data.url);
+      if (res.status === 302 || res.status === 303) {
+        router.push("/dashboard");
       } else {
-        setError("用户名或密码错误");
+        const data = await res.json();
+        if (data.url) {
+          router.push(data.url);
+        } else {
+          setError("用户名或密码错误");
+        }
       }
     } catch {
       setError("登录失败，请稍后重试");
