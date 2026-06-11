@@ -1,3 +1,9 @@
+import { HeroVideo } from "@/components/hero-video";
+
 export default function Home() {
-  return <div className="min-h-screen">Hello</div>;
+  return (
+    <main>
+      <HeroVideo />
+    </main>
+  );
 }
