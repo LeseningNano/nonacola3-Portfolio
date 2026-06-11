@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { siteConfig } from "@/lib/config";
 
 export function HeroVideo() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -31,10 +32,10 @@ export function HeroVideo() {
       <div className="absolute inset-0 bg-black/50" />
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center">
         <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-4">
-          Your Name
+          {siteConfig.name}
         </h1>
         <p className="text-xl md:text-2xl text-zinc-400">
-          Videographer &amp; Director
+          {siteConfig.title}
         </p>
       </div>
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">

@@ -1,8 +1,8 @@
 export const siteConfig = {
-  name: "Your Name",
+  name: "nonacola3",
   title: "Video Portfolio",
   description: "Video portfolio website",
-  email: "your-email@example.com",
+  email: "lsnano@vip.qq.com",
 };
 
 export const socialLinks = [
