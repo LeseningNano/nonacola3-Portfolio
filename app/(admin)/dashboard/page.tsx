@@ -25,7 +25,7 @@ export default async function DashboardPage() {
         <HeroUpload />
       </div>
       {videos.length === 0 ? (
-        <p className="text-zinc-500">暂无视频，点击"添加视频"开始。</p>
+        <p className="text-zinc-500">暂无视频，点击添加视频开始。</p>
       ) : (
         <VideoTable videos={videos} />
       )}
