@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { VideoTable } from "@/components/admin/video-table";
+import { HeroUpload } from "@/components/admin/hero-upload";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,9 @@ export default async function DashboardPage() {
             <Button>添加视频</Button>
           </Link>
         </div>
+      </div>
+      <div className="mb-8">
+        <HeroUpload />
       </div>
       {videos.length === 0 ? (
         <p className="text-zinc-500">暂无视频，点击"添加视频"开始。</p>
