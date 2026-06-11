@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="min-h-screen p-8 max-w-6xl mx-auto">
+    <div className="min-h-screen pt-24 pb-8 px-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">后台管理</h1>
         <div className="space-x-4">
