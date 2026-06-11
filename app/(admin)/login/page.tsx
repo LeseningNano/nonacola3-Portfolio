@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,38 +20,18 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    try {
-      const csrfRes = await fetch("/api/auth/csrf");
-      const { csrfToken } = await csrfRes.json();
+    const result = await signIn("credentials", {
+      username,
+      password,
+      redirect: false,
+    });
 
-      const res = await fetch("/api/auth/callback/credentials", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          csrfToken,
-          username,
-          password,
-          callbackUrl: "/dashboard",
-          json: "true",
-        }),
-        redirect: "manual",
-      });
-
-      if (res.status === 302 || res.status === 303) {
-        router.push("/dashboard");
-      } else {
-        const data = await res.json();
-        if (data.url) {
-          router.push(data.url);
-        } else {
-          setError("用户名或密码错误");
-        }
-      }
-    } catch {
-      setError("登录失败，请稍后重试");
-    } finally {
-      setLoading(false);
+    if (result?.error) {
+      setError("用户名或密码错误");
+    } else {
+      router.push("/dashboard");
     }
+    setLoading(false);
   }
 
   return (
