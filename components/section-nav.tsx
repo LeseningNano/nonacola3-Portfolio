@@ -54,8 +54,11 @@ export function SectionNav() {
     <>
       {/* Right-side gradient overlay */}
       <div className="fixed top-0 right-0 bottom-0 w-48 md:w-64 lg:w-80 z-40 pointer-events-none bg-gradient-to-l from-black/30 via-black/10 to-transparent" />
-      <nav className="fixed right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-50 flex flex-col items-end gap-6 md:gap-7">
-        {sections.map(({ id, label }, i) => (
+      <nav className="fixed right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-50">
+        {/* Single line from first to last dot */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-[3px] bottom-[3px] w-px bg-zinc-600/50" />
+        <div className="flex flex-col items-end gap-6 md:gap-7">
+        {sections.map(({ id, label }) => (
           <button
             key={id}
             onClick={() => scrollTo(id)}
@@ -76,14 +79,6 @@ export function SectionNav() {
               {id === "hero" && active !== "hero" ? "返回顶部" : label}
             </span>
             <span className="relative flex items-center justify-center w-4">
-              {/* Line segment above dot */}
-              {i > 0 && (
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 w-px h-6 md:h-7 bg-zinc-600/50" />
-              )}
-              {/* Line segment below dot */}
-              {i < sections.length - 1 && (
-                <span className="absolute top-full left-1/2 -translate-x-1/2 w-px h-6 md:h-7 bg-zinc-600/50" />
-              )}
               <span
                 className={cn(
                   "block w-1.5 h-1.5 rounded-full transition-all duration-300 relative z-10",
@@ -95,6 +90,7 @@ export function SectionNav() {
             </span>
           </button>
         ))}
+        </div>
       </nav>
     </>
   );
