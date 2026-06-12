@@ -1,17 +1,19 @@
 import { HeroVideo } from "@/components/hero-video";
+import { ShowreelVideo } from "@/components/showreel-section";
 import { VideoGrid } from "@/components/video-grid";
 import { ContactSection } from "@/components/contact-section";
+import { SectionNav } from "@/components/section-nav";
 
 export default function Home() {
   return (
-    <main>
-      <HeroVideo />
-      <div id="works">
+    <>
+      <SectionNav />
+      <main className="h-screen overflow-y-scroll snap-y snap-proximity scroll-smooth">
+        <HeroVideo />
+        <ShowreelVideo />
         <VideoGrid />
-      </div>
-      <div id="contact">
         <ContactSection />
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

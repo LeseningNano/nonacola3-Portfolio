@@ -69,7 +69,7 @@ export function HeroUpload() {
   }
 
   return (
-    <div className="p-6 border border-zinc-800 rounded-lg bg-zinc-900/50 space-y-4">
+    <div className="p-6 border border-zinc-800 rounded-lg bg-zinc-900 space-y-4">
       <div>
         <h3 className="text-sm font-semibold text-zinc-200">Hero 背景视频</h3>
         <p className="text-xs text-zinc-500 mt-1">

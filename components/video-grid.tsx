@@ -37,28 +37,30 @@ export function VideoGrid() {
       : videos.filter((v) => v.category === selectedCategory);
 
   return (
-    <section className="py-20 px-4 max-w-7xl mx-auto">
-      <h2 className="text-3xl font-bold mb-8">作品展示</h2>
-      <CategoryFilter
-        categories={categories}
-        selected={selectedCategory}
-        onSelect={setSelectedCategory}
-      />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        {filteredVideos.map((video) => (
-          <VideoCard
-            key={video.id}
-            video={video}
-            onClick={() => setSelectedVideo(video)}
-          />
-        ))}
-      </div>
-      {selectedVideo && (
-        <VideoModal
-          video={selectedVideo}
-          onClose={() => setSelectedVideo(null)}
+    <section id="works" className="h-screen w-full snap-start overflow-y-auto bg-[#0a0a0a]">
+      <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold mb-8">作品展示</h2>
+        <CategoryFilter
+          categories={categories}
+          selected={selectedCategory}
+          onSelect={setSelectedCategory}
         />
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          {filteredVideos.map((video) => (
+            <VideoCard
+              key={video.id}
+              video={video}
+              onClick={() => setSelectedVideo(video)}
+            />
+          ))}
+        </div>
+        {selectedVideo && (
+          <VideoModal
+            video={selectedVideo}
+            onClose={() => setSelectedVideo(null)}
+          />
+        )}
+      </div>
     </section>
   );
 }

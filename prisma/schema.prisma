@@ -24,3 +24,9 @@ model HeroVideo {
   blobUrl   String
   updatedAt DateTime @updatedAt
 }
+
+model Showreel {
+  showreelId String   @id @default("showreelId")
+  showreelUrl String  @default("")
+  updatedAt  DateTime @updatedAt
+}
