@@ -66,14 +66,14 @@ export function SectionNav() {
           >
             <span
               className={cn(
-                "text-xs md:text-sm tracking-wider uppercase",
+                "text-xs md:text-sm tracking-wider uppercase w-16 text-right",
                 id === "hero"
                   ? active === "hero"
-                    ? "opacity-0 w-0 overflow-hidden"
+                    ? "opacity-0 overflow-hidden"
                     : "opacity-60 group-hover:opacity-100 text-zinc-300 transition-all duration-300"
                   : active === id
-                    ? "text-white opacity-100 translate-x-0 transition-all duration-300"
-                    : "opacity-60 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 text-zinc-300 transition-all duration-300"
+                    ? "text-white opacity-100 transition-all duration-300"
+                    : "opacity-60 group-hover:opacity-100 text-zinc-300 transition-all duration-300"
               )}
             >
               {id === "hero" && active !== "hero" ? "返回顶部" : label}
