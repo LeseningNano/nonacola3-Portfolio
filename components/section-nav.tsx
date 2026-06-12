@@ -79,8 +79,8 @@ export function SectionNav() {
             className={cn(
               "block rounded-full transition-all duration-300 origin-center",
               active === id
-                ? "w-3 h-3 md:w-3.5 md:h-3.5 bg-white shadow-[0_0_12px_rgba(255,255,255,0.6)]"
-                : "w-2 h-2 md:w-2.5 md:h-2.5 bg-zinc-400 group-hover:bg-white"
+                ? "w-2.5 h-2.5 md:w-3 md:h-3 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
+                : "w-1.5 h-1.5 md:w-2 md:h-2 bg-zinc-400 group-hover:bg-white"
             )}
           />
         </button>
