@@ -77,10 +77,10 @@ export function SectionNav() {
           </span>
           <span
             className={cn(
-              "block rounded-full transition-all duration-300 origin-center",
+              "block w-1.5 h-1.5 rounded-full transition-all duration-300",
               active === id
-                ? "w-2 h-2 bg-white shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                : "w-1 h-1 bg-zinc-400 group-hover:bg-white"
+                ? "bg-white shadow-[0_0_6px_rgba(255,255,255,0.6)]"
+                : "bg-zinc-500 group-hover:bg-zinc-300"
             )}
           />
         </button>
