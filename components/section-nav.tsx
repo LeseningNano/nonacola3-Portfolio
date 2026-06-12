@@ -66,7 +66,7 @@ export function SectionNav() {
           >
             <span
               className={cn(
-                "text-xs md:text-sm tracking-wider uppercase w-16 text-right",
+                "text-xs md:text-sm tracking-wider uppercase text-right",
                 id === "hero"
                   ? active === "hero"
                     ? "opacity-0 overflow-hidden"
