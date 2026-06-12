@@ -31,9 +31,11 @@ export function ShowreelSettings() {
     setUploading(true);
     setError("");
     try {
-      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
         method: "POST",
-        body: file,
+        body: formData,
       });
       const data = await res.json();
       if (data.url) {

@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No file" }, { status: 400 });
   }
 
-  const blob = await put(`hero-${Date.now()}.mp4`, file, {
+  const blob = await put(`upload-${Date.now()}-${file.name}`, file, {
     access: "public",
-    contentType: "video/mp4",
+    contentType: file.type,
   });
 
   return NextResponse.json({ url: blob.url });
