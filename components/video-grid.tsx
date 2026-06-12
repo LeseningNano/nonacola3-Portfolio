@@ -37,7 +37,7 @@ export function VideoGrid() {
       : videos.filter((v) => v.category === selectedCategory);
 
   return (
-    <section id="works" className="h-screen w-full snap-start overflow-y-auto bg-[#0a0a0a]">
+    <section id="works" className="h-screen w-full overflow-y-auto bg-[#0a0a0a]">
       <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold mb-8">作品展示</h2>
         <CategoryFilter
