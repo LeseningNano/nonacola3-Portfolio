@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <>
       <SectionNav />
-      <main className="h-screen overflow-y-scroll">
+      <main className="h-screen overflow-y-scroll snap-y snap-mandatory [scroll-behavior:auto]">
         <HeroVideo />
         <ShowreelVideo />
         <VideoGrid />

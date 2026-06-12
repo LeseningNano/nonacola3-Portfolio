@@ -73,7 +73,7 @@ export function HeroVideo() {
         </div>
       )}
 
-      <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]">
+      <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#0a0a0a] snap-start snap-always">
         {/* Background / Video Layer */}
         <div className="absolute inset-0 z-0">
           {videoUrl ? (

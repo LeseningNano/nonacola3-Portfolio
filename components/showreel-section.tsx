@@ -19,7 +19,7 @@ export function ShowreelVideo() {
 
   if (loading) {
     return (
-      <section id="showreel" className="w-full h-screen pt-20 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] flex items-center justify-center">
+      <section id="showreel" className="w-full h-screen pt-20 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] snap-start snap-always flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
       </section>
     );
@@ -28,7 +28,7 @@ export function ShowreelVideo() {
   if (!showreelUrl) return null;
 
   return (
-      <section id="showreel" className="w-full h-screen pt-20 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] flex items-center">
+      <section id="showreel" className="w-full h-screen pt-20 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] snap-start snap-always flex items-center">
       <div className="max-w-5xl mx-auto w-full">
         <div className="flex flex-col mb-6 md:mb-8">
           <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-4 uppercase">
