@@ -63,15 +63,21 @@ export function SectionNav() {
         >
           <span
             className={cn(
-              "text-xs md:text-sm tracking-wider uppercase transition-all duration-300 opacity-60 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0",
-              active === id ? "text-white opacity-100 translate-x-0" : "text-zinc-300"
+              "text-xs md:text-sm tracking-wider uppercase transition-all duration-300",
+              id === "hero"
+                ? active === "hero"
+                  ? "opacity-0 w-0"
+                  : "opacity-60 group-hover:opacity-100 text-zinc-300"
+                : active === id
+                  ? "text-white opacity-100 translate-x-0"
+                  : "opacity-60 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 text-zinc-300"
             )}
           >
-            {label}
+            {id === "hero" && active !== "hero" ? "返回顶部" : label}
           </span>
           <span
             className={cn(
-              "block rounded-full transition-all duration-300",
+              "block rounded-full transition-all duration-300 origin-center",
               active === id
                 ? "w-3 h-3 md:w-3.5 md:h-3.5 bg-white shadow-[0_0_12px_rgba(255,255,255,0.6)]"
                 : "w-2 h-2 md:w-2.5 md:h-2.5 bg-zinc-400 group-hover:bg-white"
