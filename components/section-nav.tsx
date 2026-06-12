@@ -66,7 +66,7 @@ export function SectionNav() {
               "text-xs md:text-sm tracking-wider uppercase",
               id === "hero"
                 ? active === "hero"
-                  ? "hidden"
+                  ? "opacity-0 w-0 overflow-hidden"
                   : "opacity-60 group-hover:opacity-100 text-zinc-300 transition-all duration-300"
                 : active === id
                   ? "text-white opacity-100 translate-x-0 transition-all duration-300"
