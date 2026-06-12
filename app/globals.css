@@ -190,3 +190,9 @@
   80% { transform: scaleX(0.85); }
   100% { transform: scaleX(1); }
 }
+
+@keyframes preloader {
+  0% { transform: scaleX(0); opacity: 0.3; }
+  50% { transform: scaleX(0.15); opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0.3; }
+}

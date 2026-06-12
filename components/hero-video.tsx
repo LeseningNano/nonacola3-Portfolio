@@ -68,8 +68,9 @@ export function HeroVideo() {
             <div
               className="h-full bg-white origin-center"
               style={{
-                transform: `scaleX(${barProgress / 100})`,
-                transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                transform: barProgress > 0 ? `scaleX(${barProgress / 100})` : undefined,
+                animation: barProgress > 0 ? "none" : "preloader 2s ease-in-out infinite",
+                transition: barProgress > 0 ? "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
               }}
             />
           </div>
