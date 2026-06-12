@@ -9,7 +9,7 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const scrollContainer = document.querySelector("main");
+    const scrollContainer = document.querySelector("div.h-screen");
     if (!scrollContainer) return;
 
     const handleScroll = () => {

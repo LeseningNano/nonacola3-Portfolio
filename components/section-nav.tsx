@@ -14,6 +14,9 @@ export function SectionNav() {
   const [active, setActive] = useState("hero");
 
   useEffect(() => {
+    const container = document.querySelector("main") || document.querySelector("div.h-screen");
+    if (!container) return;
+
     const observers: IntersectionObserver[] = [];
 
     sections.forEach(({ id }) => {
@@ -26,7 +29,7 @@ export function SectionNav() {
             setActive(id);
           }
         },
-        { threshold: 0.5 }
+        { root: container, threshold: 0.5 }
       );
       observer.observe(el);
       observers.push(observer);
@@ -36,9 +39,14 @@ export function SectionNav() {
   }, []);
 
   function scrollTo(id: string) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+    const sections_arr = ["hero", "showreel", "works", "contact"];
+    const index = sections_arr.indexOf(id);
+    const container = document.querySelector("div.h-screen");
+    if (container && index >= 0) {
+      container.scrollTo({
+        top: index * container.clientHeight,
+        behavior: "smooth",
+      });
     }
   }
 
