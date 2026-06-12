@@ -53,7 +53,7 @@ export function SectionNav() {
   return (
     <>
       {/* Right-side gradient overlay */}
-      <div className="fixed top-0 right-0 bottom-0 w-32 md:w-48 z-40 pointer-events-none bg-gradient-to-l from-black/40 to-transparent" />
+      <div className="fixed top-0 right-0 bottom-0 w-48 md:w-64 lg:w-80 z-40 pointer-events-none bg-gradient-to-l from-black/30 via-black/10 to-transparent" />
       <nav className="fixed right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-50 flex flex-col items-end gap-6 md:gap-7">
       {sections.map(({ id, label }) => (
         <button

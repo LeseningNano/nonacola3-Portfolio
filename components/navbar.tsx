@@ -18,18 +18,25 @@ export function Navbar() {
     };
 
     handleScroll();
-
     scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
 
-    // Check if hero already loaded (event fired before mount)
-    if ((window as any).__heroLoaded) {
+    // Check if loader is already gone
+    const loader = document.querySelector("[data-hero-loader]");
+    if (!loader) {
       setVisible(true);
     } else {
-      const handleLoaded = () => setVisible(true);
-      window.addEventListener("hero-loaded", handleLoaded);
+      // Watch for loader removal
+      const observer = new MutationObserver(() => {
+        const el = document.querySelector("[data-hero-loader]");
+        if (!el) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
       return () => {
         scrollContainer.removeEventListener("scroll", handleScroll);
-        window.removeEventListener("hero-loaded", handleLoaded);
+        observer.disconnect();
       };
     }
 

@@ -47,8 +47,6 @@ export function HeroVideo() {
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
-          (window as any).__heroLoaded = true;
-          window.dispatchEvent(new CustomEvent("hero-loaded"));
         }, 600);
       }, 500);
       return () => clearTimeout(timer);
@@ -61,6 +59,7 @@ export function HeroVideo() {
       {showLoader && (
         <div
           key="loader"
+          data-hero-loader
           className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#0a0a0a] transition-opacity duration-500 ${
             fadeOut ? "opacity-0" : "opacity-100"
           }`}
