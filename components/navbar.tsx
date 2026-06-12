@@ -38,15 +38,15 @@ export function Navbar() {
           {siteConfig.name}
         </Link>
         <div className="flex items-center gap-6">
-          <a href="#showreel" className="text-sm text-zinc-400 hover:text-white transition-colors">
-            Showreel
-          </a>
-          <a href="#works" className="text-sm text-zinc-400 hover:text-white transition-colors">
-            作品集
-          </a>
-          <a href="#contact" className="text-sm text-zinc-400 hover:text-white transition-colors">
+          <button
+            onClick={() => {
+              const container = document.querySelector("div.h-screen");
+              container?.scrollTo({ top: 3 * container.clientHeight, behavior: "smooth" });
+            }}
+            className="text-sm text-zinc-400 hover:text-white transition-colors"
+          >
             联系
-          </a>
+          </button>
           <Link
             href="/dashboard"
             className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
