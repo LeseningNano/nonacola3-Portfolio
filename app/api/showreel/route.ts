@@ -7,9 +7,12 @@ export async function GET() {
     const showreel = await db.showreel.findUnique({
       where: { showreelId: "showreelId" },
     });
-    return NextResponse.json({ showreelUrl: showreel?.showreelUrl || "" });
+    return NextResponse.json({
+      showreelUrl: showreel?.showreelUrl || "",
+      videoType: showreel?.videoType || "url",
+    });
   } catch (error) {
-    return NextResponse.json({ showreelUrl: "" });
+    return NextResponse.json({ showreelUrl: "", videoType: "url" });
   }
 }
 
@@ -20,15 +23,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { showreelUrl } = await request.json();
+    const { showreelUrl, videoType } = await request.json();
     
     const showreel = await db.showreel.upsert({
       where: { showreelId: "showreelId" },
-      update: { showreelUrl },
-      create: { showreelId: "showreelId", showreelUrl },
+      update: { showreelUrl, videoType: videoType || "url" },
+      create: { showreelId: "showreelId", showreelUrl, videoType: videoType || "url" },
     });
 
-    return NextResponse.json({ success: true, showreelUrl: showreel.showreelUrl });
+    return NextResponse.json({
+      success: true,
+      showreelUrl: showreel.showreelUrl,
+      videoType: showreel.videoType,
+    });
   } catch (error) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
