@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,9 @@ export function VideoForm({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [thumbMode, setThumbMode] = useState<"url" | "upload">("url");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<VideoData>({
     title: initialData?.title ?? "",
     description: initialData?.description ?? "",
@@ -36,6 +39,26 @@ export function VideoForm({
     featured: initialData?.featured ?? false,
     order: initialData?.order ?? 0,
   });
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+        method: "POST",
+        body: file,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setForm((prev) => ({ ...prev, thumbnail: data.url }));
+      }
+    } catch (err) {
+      console.error("Upload failed", err);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,13 +117,66 @@ export function VideoForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="thumbnail">封面图 URL（选填）</Label>
-            <Input
-              id="thumbnail"
-              value={form.thumbnail}
-              onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
-              className="bg-zinc-800 border-zinc-700"
-            />
+            <div className="flex items-center justify-between">
+              <Label htmlFor="thumbnail">封面图</Label>
+              <div className="flex rounded-md overflow-hidden border border-zinc-700">
+                <button
+                  type="button"
+                  onClick={() => setThumbMode("url")}
+                  className={`px-3 py-1 text-xs transition-colors ${thumbMode === "url" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}
+                >
+                  链接
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setThumbMode("upload")}
+                  className={`px-3 py-1 text-xs transition-colors ${thumbMode === "upload" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}
+                >
+                  上传
+                </button>
+              </div>
+            </div>
+            {thumbMode === "url" ? (
+              <Input
+                id="thumbnail"
+                value={form.thumbnail}
+                onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+                placeholder="https://example.com/image.jpg"
+                className="bg-zinc-800 border-zinc-700"
+              />
+            ) : (
+              <div className="flex items-center gap-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {uploading ? "上传中..." : "选择文件"}
+                </Button>
+                {form.thumbnail && (
+                  <span className="text-xs text-zinc-500 truncate max-w-xs">
+                    {form.thumbnail}
+                  </span>
+                )}
+              </div>
+            )}
+            {form.thumbnail && (
+              <div className="mt-2">
+                <img
+                  src={form.thumbnail}
+                  alt="封面预览"
+                  className="w-40 h-24 object-cover rounded border border-zinc-700"
+                />
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">描述（选填）</Label>
