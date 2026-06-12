@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const scrollContainer = document.querySelector("div.h-screen");
@@ -20,26 +19,6 @@ export function Navbar() {
     handleScroll();
     scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
 
-    // Check if loader is already gone
-    const loader = document.querySelector("[data-hero-loader]");
-    if (!loader) {
-      setVisible(true);
-    } else {
-      // Watch for loader removal
-      const observer = new MutationObserver(() => {
-        const el = document.querySelector("[data-hero-loader]");
-        if (!el) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-      return () => {
-        scrollContainer.removeEventListener("scroll", handleScroll);
-        observer.disconnect();
-      };
-    }
-
     return () => {
       scrollContainer.removeEventListener("scroll", handleScroll);
     };
@@ -48,10 +27,7 @@ export function Navbar() {
   return (
     <nav 
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-all duration-700 ease-out",
-        visible
-          ? "opacity-100 translate-x-0"
-          : "opacity-0 -translate-x-8",
+        "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
         isScrolled 
           ? "bg-[#0a0a0a]/80 backdrop-blur-md" 
           : "bg-transparent"
