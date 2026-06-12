@@ -45,7 +45,10 @@ export function HeroVideo() {
     if (barProgress >= 100) {
       const timer = setTimeout(() => {
         setFadeOut(true);
-        setTimeout(() => setShowLoader(false), 600);
+        setTimeout(() => {
+          setShowLoader(false);
+          window.dispatchEvent(new CustomEvent("hero-loaded"));
+        }, 600);
       }, 500);
       return () => clearTimeout(timer);
     }

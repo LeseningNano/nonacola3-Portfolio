@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const scrollContainer = document.querySelector("div.h-screen");
@@ -19,15 +20,25 @@ export function Navbar() {
     handleScroll();
 
     scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+
+    const handleLoaded = () => {
+      requestAnimationFrame(() => setVisible(true));
+    };
+    window.addEventListener("hero-loaded", handleLoaded);
+
     return () => {
       scrollContainer.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("hero-loaded", handleLoaded);
     };
   }, []);
 
   return (
     <nav 
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
+        "fixed top-0 left-0 right-0 z-40 transition-all duration-700 ease-out",
+        visible
+          ? "opacity-100 translate-x-0"
+          : "opacity-0 -translate-x-8",
         isScrolled 
           ? "bg-[#0a0a0a]/80 backdrop-blur-md" 
           : "bg-transparent"

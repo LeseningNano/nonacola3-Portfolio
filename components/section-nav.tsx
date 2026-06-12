@@ -51,7 +51,7 @@ export function SectionNav() {
   }
 
   return (
-    <nav className="fixed right-8 md:right-12 lg:right-16 top-1/2 -translate-y-1/2 z-50 flex flex-col items-end gap-5 md:gap-6">
+    <nav className="fixed right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-50 flex flex-col items-end gap-6 md:gap-7 bg-black/20 backdrop-blur-sm rounded-full px-4 py-5">
       {sections.map(({ id, label }) => (
         <button
           key={id}
@@ -60,8 +60,8 @@ export function SectionNav() {
         >
           <span
             className={cn(
-              "text-xs md:text-sm tracking-wider uppercase transition-all duration-300 opacity-50 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0",
-              active === id ? "text-white opacity-100 translate-x-0" : "text-zinc-400"
+              "text-xs md:text-sm tracking-wider uppercase transition-all duration-300 opacity-60 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0",
+              active === id ? "text-white opacity-100 translate-x-0" : "text-zinc-300"
             )}
           >
             {label}
@@ -70,8 +70,8 @@ export function SectionNav() {
             className={cn(
               "block rounded-full transition-all duration-300",
               active === id
-                ? "w-2.5 h-2.5 md:w-3 md:h-3 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                : "w-1.5 h-1.5 md:w-2 md:h-2 bg-zinc-500 group-hover:bg-zinc-300"
+                ? "w-3 h-3 md:w-3.5 md:h-3.5 bg-white shadow-[0_0_12px_rgba(255,255,255,0.6)]"
+                : "w-2 h-2 md:w-2.5 md:h-2.5 bg-zinc-400 group-hover:bg-white"
             )}
           />
         </button>
