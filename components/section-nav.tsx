@@ -7,7 +7,7 @@ const sections = [
   { id: "hero", label: "Hero" },
   { id: "showreel", label: "Showreel" },
   { id: "works", label: "作品集" },
-  { id: "contact", label: "联系" },
+  { id: "contact", label: "关于我" },
 ];
 
 export function SectionNav() {
