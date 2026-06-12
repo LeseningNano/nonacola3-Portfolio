@@ -21,14 +21,20 @@ export function Navbar() {
 
     scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
 
-    const handleLoaded = () => {
-      requestAnimationFrame(() => setVisible(true));
-    };
-    window.addEventListener("hero-loaded", handleLoaded);
+    // Check if hero already loaded (event fired before mount)
+    if ((window as any).__heroLoaded) {
+      setVisible(true);
+    } else {
+      const handleLoaded = () => setVisible(true);
+      window.addEventListener("hero-loaded", handleLoaded);
+      return () => {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+        window.removeEventListener("hero-loaded", handleLoaded);
+      };
+    }
 
     return () => {
       scrollContainer.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("hero-loaded", handleLoaded);
     };
   }, []);
 

@@ -47,6 +47,7 @@ export function HeroVideo() {
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
+          (window as any).__heroLoaded = true;
           window.dispatchEvent(new CustomEvent("hero-loaded"));
         }, 600);
       }, 500);
