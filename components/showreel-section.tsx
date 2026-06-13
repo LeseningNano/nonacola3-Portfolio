@@ -21,7 +21,7 @@ export function ShowreelVideo() {
 
   if (loading) {
     return (
-      <section id="showreel" className="w-full h-screen pt-20 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] flex items-center justify-center">
+      <section id="showreel" className="w-full h-screen bg-[#0a0a0a] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
       </section>
     );
@@ -30,18 +30,18 @@ export function ShowreelVideo() {
   if (!showreelUrl) return null;
 
   return (
-    <section id="showreel" className="w-full h-screen pt-20 px-6 md:px-12 lg:px-24 bg-[#0a0a0a] flex items-center">
-      <div className="max-w-5xl mx-auto w-full">
-        <div className="flex flex-col mb-6 md:mb-8">
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tighter text-white mb-4 uppercase">
+    <section id="showreel" className="w-full h-screen bg-[#0a0a0a] flex items-center">
+      <div className="w-full px-6 md:px-12 lg:px-16">
+        <div className="flex flex-col mb-8 md:mb-10">
+          <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white uppercase">
             Showreel
           </h2>
-          <p className="text-lg md:text-xl text-zinc-400 font-light">
+          <p className="text-lg md:text-xl text-zinc-400 font-light mt-3">
             近期视频制作与视觉创作总结
           </p>
         </div>
         
-        <div className="group relative aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-2xl border border-zinc-800 cursor-pointer">
+        <div className="group relative aspect-video w-full rounded-xl overflow-hidden bg-black shadow-2xl border border-zinc-800 cursor-pointer">
           {videoType === "upload" ? (
             <video
               src={showreelUrl}
