@@ -47,7 +47,7 @@ export function VideoGrid() {
   return (
     <section id="works" className="h-screen w-full overflow-y-auto bg-[#0a0a0a]">
       <div className="pt-24 pb-20 px-4 max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold mb-8">作品展示</h2>
+        <h2 className="text-2xl md:text-3xl font-bold mb-8 font-[family-name:var(--font-pixel)]">作品展示</h2>
         <CategoryFilter
           categories={categories}
           selected={selectedCategory}
