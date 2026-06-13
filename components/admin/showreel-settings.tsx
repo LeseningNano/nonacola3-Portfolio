@@ -5,6 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Save } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+interface BlobFile {
+  url: string;
+  pathname: string;
+  size: number;
+  sizeMB: string;
+}
 
 export function ShowreelSettings() {
   const [url, setUrl] = useState("");
@@ -16,6 +29,9 @@ export function ShowreelSettings() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showBlobPicker, setShowBlobPicker] = useState(false);
+  const [blobFiles, setBlobFiles] = useState<BlobFile[]>([]);
+  const [blobLoading, setBlobLoading] = useState(false);
 
   useEffect(() => {
     fetch("/api/showreel")
@@ -29,6 +45,21 @@ export function ShowreelSettings() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  function openBlobPicker() {
+    setBlobLoading(true);
+    setShowBlobPicker(true);
+    fetch("/api/blob-usage")
+      .then((res) => res.json())
+      .then((data) => setBlobFiles(data.files || []))
+      .catch(() => setError("加载 Blob 文件失败"))
+      .finally(() => setBlobLoading(false));
+  }
+
+  function selectBlobFile(file: BlobFile) {
+    setUrl(file.url);
+    setShowBlobPicker(false);
+  }
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -165,6 +196,13 @@ export function ShowreelSettings() {
               >
                 {uploading ? "上传中..." : "选择视频文件"}
               </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={openBlobPicker}
+              >
+                从 Blob 选择
+              </Button>
               {url && url !== savedUrl && (
                 <span className="text-xs text-zinc-500 truncate max-w-xs">
                   {url}
@@ -214,6 +252,54 @@ export function ShowreelSettings() {
         )}
         保存设置
       </Button>
+
+      <Dialog open={showBlobPicker} onOpenChange={setShowBlobPicker}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 max-w-2xl max-h-[70vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>选择已上传的文件</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+            {blobLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+              </div>
+            ) : blobFiles.length === 0 ? (
+              <p className="text-zinc-500 text-sm text-center py-8">暂无已上传的文件</p>
+            ) : (
+              blobFiles.map((file) => (
+                <button
+                  key={file.url}
+                  type="button"
+                  onClick={() => selectBlobFile(file)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/50 transition-colors text-left"
+                >
+                  {file.pathname.match(/\.(mp4|webm|mov|avi)$/i) ? (
+                    <video
+                      src={file.url}
+                      className="w-24 h-16 object-cover rounded flex-shrink-0"
+                      muted
+                    />
+                  ) : file.pathname.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                    <img
+                      src={file.url}
+                      alt={file.pathname}
+                      className="w-24 h-16 object-cover rounded flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-24 h-16 bg-zinc-800 rounded flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs text-zinc-500">文件</span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-zinc-200 truncate">{file.pathname}</p>
+                    <p className="text-xs text-zinc-500">{file.sizeMB} MB</p>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

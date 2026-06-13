@@ -64,7 +64,7 @@ export function ShowreelVideo() {
                 </div>
               </div>
               <a 
-                href={showreelUrl.includes('bilibili') ? `https://www.bilibili.com/video/${showreelUrl.match(/bvid=([^&]+)/)?.[1]}` : showreelUrl.includes('youtube') ? `https://www.youtube.com/watch?v=${showreelUrl.match(/embed\/([^?]+)/)?.[1]}` : '#'}
+                href={showreelUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="absolute inset-0 z-10"
