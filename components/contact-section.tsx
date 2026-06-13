@@ -9,9 +9,7 @@ export function ContactSection() {
           <p className="text-base md:text-lg text-zinc-400 font-light mt-3">了解更多 & 合作洽谈</p>
         </div>
         <p className="text-lg md:text-xl text-zinc-300 mb-14 max-w-2xl leading-relaxed">
-          nonacola3，努力精进中<br />
-          期待通过每一个作品不断打磨技术，也希望能与更多志同道合的朋友交流合作。<br />
-          希望有一天可以用视觉语言讲述故事。
+          我是nonacola3，是一名业余PV师，正在努力进步中。热爱影像创作（也爱打游戏），喜欢用视觉语言讲述故事。期待通过每一个作品不断打磨技术，也希望能与更多志同道合的朋友交流合作。
         </p>
         <div className="flex flex-col md:flex-row gap-16">
           <div>
