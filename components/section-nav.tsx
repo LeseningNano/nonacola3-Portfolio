@@ -19,15 +19,18 @@ export function SectionNav() {
     if (!loader) {
       setVisible(true);
     } else {
+      // Show nav when loader starts fading (opacity transition begins)
       const observer = new MutationObserver(() => {
-        const el = document.querySelector("[data-hero-loader]");
-        if (!el) {
+        const el = document.querySelector("[data-hero-loader]") as HTMLElement | null;
+        if (!el || el.style.opacity === "0" || el.classList.contains("opacity-0")) {
           setVisible(true);
           observer.disconnect();
         }
       });
-      observer.observe(document.body, { childList: true, subtree: true });
-      return () => observer.disconnect();
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
+      // Fallback: show after 3s regardless
+      const fallback = setTimeout(() => { setVisible(true); observer.disconnect(); }, 3000);
+      return () => { observer.disconnect(); clearTimeout(fallback); };
     }
   }, []);
 
@@ -59,39 +62,24 @@ export function SectionNav() {
   function scrollTo(id: string) {
     const sections_arr = ["hero", "showreel", "works", "contact"];
     const index = sections_arr.indexOf(id);
-    const container = document.querySelector("div.h-screen") as HTMLElement | null;
-    if (!container || index < 0) return;
-
-    const start = container.scrollTop;
-    const target = index * container.clientHeight;
-    const distance = target - start;
-    if (distance === 0) return;
-    const duration = 700;
-    const startTime = performance.now();
-
-    function easeOutCubic(t: number) {
-      return 1 - Math.pow(1 - t, 3);
+    const container = document.querySelector("div.h-screen");
+    if (container && index >= 0) {
+      container.scrollTo({
+        top: index * container.clientHeight,
+        behavior: "smooth",
+      });
     }
-
-    function animate(now: number) {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      container!.scrollTop = start + distance * easeOutCubic(progress);
-      if (progress < 1) requestAnimationFrame(animate);
-    }
-
-    requestAnimationFrame(animate);
   }
 
   return (
     <>
       {/* Right-side gradient overlay */}
       <div className={cn(
-        "fixed top-0 right-0 bottom-0 w-48 md:w-64 lg:w-80 z-40 pointer-events-none bg-gradient-to-l from-black/30 via-black/10 to-transparent transition-all duration-700 ease-out",
+        "fixed top-0 right-0 bottom-0 w-48 md:w-64 lg:w-80 z-40 pointer-events-none bg-gradient-to-l from-black/30 via-black/10 to-transparent transition-all duration-400 ease-out",
         visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
       )} />
       <nav className={cn(
-        "fixed right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-50 transition-all duration-700 ease-out",
+        "fixed right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-50 transition-all duration-400 ease-out",
         visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
       )}>
         {/* Single line from first to last dot */}

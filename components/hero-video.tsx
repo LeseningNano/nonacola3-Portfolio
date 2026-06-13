@@ -40,15 +40,15 @@ export function HeroVideo() {
     return () => timers.forEach(clearTimeout);
   }, [isVideoReady]);
 
-  // After bar reaches 100%, wait 0.5s then fade out
+  // After bar reaches 100%, wait briefly then fade out
   useEffect(() => {
     if (barProgress >= 100) {
       const timer = setTimeout(() => {
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
-        }, 600);
-      }, 500);
+        }, 400);
+      }, 200);
       return () => clearTimeout(timer);
     }
   }, [barProgress]);
