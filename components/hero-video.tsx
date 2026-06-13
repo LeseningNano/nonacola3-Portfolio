@@ -101,7 +101,7 @@ export function HeroVideo() {
 
         {/* Content Layer */}
         <div className="relative z-10 flex flex-col items-start justify-center h-full text-left w-full px-6 md:px-16 lg:px-32 xl:px-48">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 font-[family-name:var(--font-pixel)]">
+          <h1 className="text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 font-[family-name:var(--font-montserrat)]">
             {siteConfig.name}
           </h1>
           <p className="text-2xl md:text-3xl lg:text-4xl text-zinc-400 font-light">
