@@ -27,10 +27,10 @@ export function Navbar() {
   return (
     <nav 
       className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
+        "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
         isScrolled 
-          ? "bg-[#0a0a0a]/80 backdrop-blur-md" 
-          : "bg-transparent"
+          ? "bg-[#0a0a0a]/80 backdrop-blur-md border-b border-zinc-800/50" 
+          : "bg-transparent border-b border-transparent"
       )}
     >
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -55,16 +55,6 @@ export function Navbar() {
           </Link>
         </div>
       </div>
-
-      {/* Animated Bottom Border */}
-      <div 
-        className={cn(
-          "absolute bottom-0 left-0 right-0 h-[1px]",
-          !isScrolled 
-            ? "bg-transparent transition-colors duration-300" 
-            : "animate-border-flash"
-        )}
-      />
     </nav>
   );
 }
