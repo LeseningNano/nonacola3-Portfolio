@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [flashBorder, setFlashBorder] = useState(false);
+  const [flashKey, setFlashKey] = useState(0);
   const prevSection = useRef(0);
 
   useEffect(() => {
@@ -18,15 +18,10 @@ export function Navbar() {
       const scrolled = scrollContainer.scrollTop > 50;
       setIsScrolled(scrolled);
 
-      // Detect section change and trigger border flash
       const sectionIndex = Math.round(scrollContainer.scrollTop / scrollContainer.clientHeight);
       if (sectionIndex !== prevSection.current) {
         prevSection.current = sectionIndex;
-        setFlashBorder(false);
-        // Force reflow to restart animation
-        requestAnimationFrame(() => {
-          setFlashBorder(true);
-        });
+        setFlashKey((k) => k + 1);
       }
     };
 
@@ -70,11 +65,12 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Animated Bottom Border */}
+      {/* Animated Bottom Border — key forces re-mount to restart CSS animation */}
       <div
+        key={flashKey}
         className={cn(
           "absolute bottom-0 left-0 right-0 h-[1px]",
-          !flashBorder
+          flashKey === 0
             ? "bg-transparent"
             : "animate-border-flash"
         )}
