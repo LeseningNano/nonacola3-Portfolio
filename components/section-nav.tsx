@@ -80,7 +80,7 @@ export function SectionNav() {
         visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
       )}>
         {/* Single line from first to last dot */}
-        <div className="absolute right-[8px] top-[5px] bottom-[5px] w-px bg-zinc-600/50" />
+        <div className="absolute right-[7.5px] top-[5px] bottom-[5px] w-px bg-zinc-600/50" />
         <div className="flex flex-col items-end gap-6 md:gap-7">
         {sections.map(({ id, label }) => (
           <button
