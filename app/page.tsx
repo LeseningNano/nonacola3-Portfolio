@@ -54,7 +54,7 @@ export default function Home() {
   return (
     <>
       <SectionNav />
-      <div ref={containerRef} className="h-screen overflow-y-scroll">
+      <div ref={containerRef} className="h-screen overflow-y-scroll scrollbar-hide">
         <HeroVideo />
         <ShowreelVideo />
         <VideoGrid />
