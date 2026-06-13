@@ -1,19 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [flashBorder, setFlashBorder] = useState(false);
+  const prevSection = useRef(0);
 
   useEffect(() => {
     const scrollContainer = document.querySelector("div.h-screen");
     if (!scrollContainer) return;
 
     const handleScroll = () => {
-      setIsScrolled(scrollContainer.scrollTop > 50);
+      const scrolled = scrollContainer.scrollTop > 50;
+      setIsScrolled(scrolled);
+
+      // Detect section change and trigger border flash
+      const sectionIndex = Math.round(scrollContainer.scrollTop / scrollContainer.clientHeight);
+      if (sectionIndex !== prevSection.current) {
+        prevSection.current = sectionIndex;
+        setFlashBorder(false);
+        // Force reflow to restart animation
+        requestAnimationFrame(() => {
+          setFlashBorder(true);
+        });
+      }
     };
 
     handleScroll();
@@ -25,11 +39,11 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav 
+    <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
-        isScrolled 
-          ? "bg-[#0a0a0a]/80 backdrop-blur-md" 
+        isScrolled
+          ? "bg-[#0a0a0a]/80 backdrop-blur-md"
           : "bg-transparent"
       )}
     >
@@ -57,11 +71,11 @@ export function Navbar() {
       </div>
 
       {/* Animated Bottom Border */}
-      <div 
+      <div
         className={cn(
           "absolute bottom-0 left-0 right-0 h-[1px]",
-          !isScrolled 
-            ? "bg-transparent transition-colors duration-300" 
+          !flashBorder
+            ? "bg-transparent"
             : "animate-border-flash"
         )}
       />
