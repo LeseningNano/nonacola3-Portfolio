@@ -25,14 +25,31 @@ export default function Home() {
 
     function scrollToSection(index: number) {
       const clamped = Math.max(0, Math.min(index, sectionIds.length - 1));
+      if (clamped === getCurrentSection()) return;
       isScrolling.current = true;
-      container!.scrollTo({
-        top: clamped * container!.clientHeight,
-        behavior: "smooth",
-      });
-      setTimeout(() => {
-        isScrolling.current = false;
-      }, 600);
+
+      const start = container!.scrollTop;
+      const target = clamped * container!.clientHeight;
+      const distance = target - start;
+      const duration = 700;
+      const startTime = performance.now();
+
+      function easeOutCubic(t: number) {
+        return 1 - Math.pow(1 - t, 3);
+      }
+
+      function animate(now: number) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        container!.scrollTop = start + distance * easeOutCubic(progress);
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isScrolling.current = false;
+        }
+      }
+
+      requestAnimationFrame(animate);
     }
 
     function handleWheel(e: WheelEvent) {

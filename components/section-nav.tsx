@@ -59,13 +59,28 @@ export function SectionNav() {
   function scrollTo(id: string) {
     const sections_arr = ["hero", "showreel", "works", "contact"];
     const index = sections_arr.indexOf(id);
-    const container = document.querySelector("div.h-screen");
-    if (container && index >= 0) {
-      container.scrollTo({
-        top: index * container.clientHeight,
-        behavior: "smooth",
-      });
+    const container = document.querySelector("div.h-screen") as HTMLElement | null;
+    if (!container || index < 0) return;
+
+    const start = container.scrollTop;
+    const target = index * container.clientHeight;
+    const distance = target - start;
+    if (distance === 0) return;
+    const duration = 700;
+    const startTime = performance.now();
+
+    function easeOutCubic(t: number) {
+      return 1 - Math.pow(1 - t, 3);
     }
+
+    function animate(now: number) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      container!.scrollTop = start + distance * easeOutCubic(progress);
+      if (progress < 1) requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
   }
 
   return (
