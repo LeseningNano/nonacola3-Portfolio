@@ -31,8 +31,8 @@ export function ShowreelVideo() {
 
   return (
     <section id="showreel" className="w-full h-screen bg-[#0a0a0a] flex items-center">
-      <div className="w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-16">
-        <div className="flex flex-col mb-6 md:mb-8">
+      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
+        <div className="flex flex-col mb-5 md:mb-6">
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white uppercase">
             Showreel
           </h2>
