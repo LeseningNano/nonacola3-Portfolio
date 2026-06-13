@@ -31,12 +31,12 @@ export function ShowreelVideo() {
 
   return (
     <section id="showreel" className="w-full h-screen bg-[#0a0a0a] flex items-center">
-      <div className="w-full px-6 md:px-12 lg:px-16">
-        <div className="flex flex-col mb-8 md:mb-10">
-          <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter text-white uppercase">
+      <div className="w-full max-w-6xl mx-auto px-6 md:px-12 lg:px-16">
+        <div className="flex flex-col mb-6 md:mb-8">
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white uppercase">
             Showreel
           </h2>
-          <p className="text-lg md:text-xl text-zinc-400 font-light mt-3">
+          <p className="text-base md:text-lg text-zinc-400 font-light mt-2">
             近期视频制作与视觉创作总结
           </p>
         </div>
