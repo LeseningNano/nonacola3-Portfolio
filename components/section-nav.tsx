@@ -90,9 +90,9 @@ export function SectionNav() {
           >
             <span
               className={cn(
-                "text-xs md:text-sm tracking-wider uppercase transition-all duration-300",
+                "text-xs md:text-sm tracking-wider uppercase transition-all duration-300 w-16 text-right",
                 id === "hero" && active === "hero"
-                  ? "opacity-0 w-0 overflow-hidden"
+                  ? "opacity-0"
                   : active === id
                     ? "text-white opacity-100 translate-x-0"
                     : "opacity-60 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 text-zinc-300"
