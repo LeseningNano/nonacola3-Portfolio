@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { AlertCircle } from "lucide-react";
 import { VideoCard } from "./video-card";
 import { VideoModal } from "./video-modal";
 import { CategoryFilter } from "./category-filter";
@@ -18,13 +19,20 @@ interface Video {
 
 export function VideoGrid() {
   const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("全部");
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   useEffect(() => {
     fetch("/api/videos")
-      .then((res) => res.json())
-      .then((data) => setVideos(data));
+      .then((res) => {
+        if (!res.ok) throw new Error("加载作品失败");
+        return res.json();
+      })
+      .then((data) => setVideos(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   const categories = [
@@ -46,13 +54,24 @@ export function VideoGrid() {
           onSelect={setSelectedCategory}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {filteredVideos.map((video) => (
-            <VideoCard
-              key={video.id}
-              video={video}
-              onClick={() => setSelectedVideo(video)}
-            />
-          ))}
+          {loading ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-video bg-zinc-900 rounded-lg animate-pulse" />
+            ))
+          ) : error ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-zinc-500">
+              <AlertCircle className="w-8 h-8 mb-3" />
+              <p>{error}</p>
+            </div>
+          ) : (
+            filteredVideos.map((video) => (
+              <VideoCard
+                key={video.id}
+                video={video}
+                onClick={() => setSelectedVideo(video)}
+              />
+            ))
+          )}
         </div>
         {selectedVideo && (
           <VideoModal
