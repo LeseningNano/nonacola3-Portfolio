@@ -90,17 +90,13 @@ export function SectionNav() {
           >
             <span
               className={cn(
-                "text-xs md:text-sm tracking-wider uppercase overflow-hidden",
-                id === "hero"
-                  ? active === "hero"
-                    ? "opacity-0 max-w-0 transition-all duration-300"
-                    : "opacity-60 group-hover:opacity-100 text-zinc-300 transition-all duration-300 max-w-[100px]"
-                  : active === id
-                    ? "text-white opacity-100 translate-x-0 transition-all duration-300"
-                    : "opacity-60 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 text-zinc-300 transition-all duration-300"
+                "text-xs md:text-sm tracking-wider uppercase",
+                active === id
+                  ? "text-white opacity-100 translate-x-0 transition-all duration-300"
+                  : "opacity-60 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 text-zinc-300 transition-all duration-300"
               )}
             >
-              {id === "hero" && active !== "hero" ? "返回顶部" : label}
+              {label}
             </span>
             <span className="relative flex items-center justify-center w-4">
               <span
