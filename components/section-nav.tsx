@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 const sections = [
   { id: "hero", label: "返回主屏" },
   { id: "showreel", label: "Showreel" },
-  { id: "works", label: "作品集" },
-  { id: "contact", label: "关于我" },
+  { id: "works", label: "作品" },
+  { id: "contact", label: "关于" },
 ];
 
 export function SectionNav() {
@@ -93,7 +93,7 @@ export function SectionNav() {
           >
             <span
               className={cn(
-                "text-xs md:text-sm tracking-wider uppercase transition-all duration-300 w-20 text-right",
+                "text-xs md:text-sm tracking-wider uppercase transition-all duration-300 w-24 text-right",
                 id === "hero" && active === "hero"
                   ? "opacity-0"
                   : active === id

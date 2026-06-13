@@ -1,28 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [flashKey, setFlashKey] = useState(0);
-  const prevSection = useRef(0);
 
   useEffect(() => {
     const scrollContainer = document.querySelector("div.h-screen");
     if (!scrollContainer) return;
 
     const handleScroll = () => {
-      const scrolled = scrollContainer.scrollTop > 50;
-      setIsScrolled(scrolled);
-
-      const sectionIndex = Math.round(scrollContainer.scrollTop / scrollContainer.clientHeight);
-      if (sectionIndex !== prevSection.current) {
-        prevSection.current = sectionIndex;
-        setFlashKey((k) => k + 1);
-      }
+      setIsScrolled(scrollContainer.scrollTop > 50);
     };
 
     handleScroll();
@@ -34,11 +25,11 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav
+    <nav 
       className={cn(
         "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
-        isScrolled
-          ? "bg-[#0a0a0a]/80 backdrop-blur-md"
+        isScrolled 
+          ? "bg-[#0a0a0a]/80 backdrop-blur-md" 
           : "bg-transparent"
       )}
     >
@@ -65,13 +56,12 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Animated Bottom Border — key forces re-mount to restart CSS animation */}
-      <div
-        key={flashKey}
+      {/* Animated Bottom Border */}
+      <div 
         className={cn(
-          "absolute bottom-0 left-0 right-0 h-[2px]",
-          flashKey === 0
-            ? "bg-transparent"
+          "absolute bottom-0 left-0 right-0 h-[1px]",
+          !isScrolled 
+            ? "bg-transparent transition-colors duration-300" 
             : "animate-border-flash"
         )}
       />
