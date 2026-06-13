@@ -69,7 +69,7 @@ export function Navbar() {
       <div
         key={flashKey}
         className={cn(
-          "absolute bottom-0 left-0 right-0 h-[1px]",
+          "absolute bottom-0 left-0 right-0 h-[2px]",
           flashKey === 0
             ? "bg-transparent"
             : "animate-border-flash"
