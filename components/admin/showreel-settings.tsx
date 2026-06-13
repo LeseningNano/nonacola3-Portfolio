@@ -8,10 +8,12 @@ import { Loader2, Save } from "lucide-react";
 
 export function ShowreelSettings() {
   const [url, setUrl] = useState("");
+  const [savedUrl, setSavedUrl] = useState("");
   const [videoType, setVideoType] = useState<"url" | "upload">("url");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -19,7 +21,10 @@ export function ShowreelSettings() {
     fetch("/api/showreel")
       .then((res) => res.json())
       .then((data) => {
-        if (data?.showreelUrl) setUrl(data.showreelUrl);
+        if (data?.showreelUrl) {
+          setUrl(data.showreelUrl);
+          setSavedUrl(data.showreelUrl);
+        }
         if (data?.videoType) setVideoType(data.videoType);
       })
       .finally(() => setLoading(false));
@@ -29,23 +34,37 @@ export function ShowreelSettings() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setProgress(0);
     setError("");
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        setUrl(data.url);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload");
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        setProgress(Math.round((event.loaded / event.total) * 100));
       }
-    } catch (err) {
-      setError("上传失败，请重试");
-    } finally {
+    };
+
+    xhr.onload = () => {
       setUploading(false);
-    }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
+        if (data.url) setUrl(data.url);
+      } else {
+        setError("上传失败，请重试");
+      }
+    };
+
+    xhr.onerror = () => {
+      setUploading(false);
+      setError("上传失败，请检查网络");
+    };
+
+    xhr.send(formData);
   }
 
   async function handleSave() {
@@ -117,6 +136,19 @@ export function ShowreelSettings() {
         ) : (
           <>
             <Label>上传视频文件</Label>
+            {savedUrl && (
+              <div className="space-y-2 mb-3">
+                <p className="text-xs text-zinc-400">当前已保存的视频：</p>
+                <video
+                  src={savedUrl}
+                  className="w-full max-h-48 object-contain rounded border border-zinc-700"
+                  controls
+                  muted
+                  playsInline
+                />
+                <p className="text-xs text-zinc-500 truncate">{savedUrl}</p>
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <input
                 ref={fileInputRef}
@@ -133,27 +165,43 @@ export function ShowreelSettings() {
               >
                 {uploading ? "上传中..." : "选择视频文件"}
               </Button>
-              {url && (
+              {url && url !== savedUrl && (
                 <span className="text-xs text-zinc-500 truncate max-w-xs">
                   {url}
                 </span>
               )}
             </div>
+            {uploading && (
+              <div className="space-y-1">
+                <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-white h-full rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-zinc-400 text-right">{progress}%</p>
+              </div>
+            )}
           </>
         )}
       </div>
 
-      {url && (
+      {url && videoType === "url" && (
         <div className="rounded overflow-hidden border border-zinc-700">
-          {videoType === "upload" ? (
+          <iframe
+            src={url}
+            className="w-full aspect-video"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          />
+        </div>
+      )}
+
+      {url && videoType === "upload" && url !== savedUrl && (
+        <div className="space-y-1">
+          <p className="text-xs text-zinc-400">新上传的视频预览：</p>
+          <div className="rounded overflow-hidden border border-zinc-700">
             <video src={url} controls className="w-full max-h-48 object-contain" />
-          ) : (
-            <iframe
-              src={url}
-              className="w-full aspect-video"
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          )}
+          </div>
         </div>
       )}
 

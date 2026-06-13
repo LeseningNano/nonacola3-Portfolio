@@ -4,6 +4,7 @@ import Link from "next/link";
 import { VideoTable } from "@/components/admin/video-table";
 import { HeroUpload } from "@/components/admin/hero-upload";
 import { ShowreelSettings } from "@/components/admin/showreel-settings";
+import { BlobUsage } from "@/components/admin/blob-usage";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,10 @@ export default async function DashboardPage() {
     <div className="min-h-screen pt-24 pb-8 px-8 max-w-6xl mx-auto space-y-12">
       {/* 页面设置 */}
       <section>
-        <h2 className="text-lg font-semibold text-zinc-300 mb-4">页面设置</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-zinc-300">页面设置</h2>
+          <BlobUsage />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <HeroUpload />
           <ShowreelSettings />

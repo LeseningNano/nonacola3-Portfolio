@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 export function HeroUpload() {
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 加载当前已有的视频
   useEffect(() => {
     fetch("/api/hero")
       .then((res) => res.json())
@@ -23,49 +22,57 @@ export function HeroUpload() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 限制只能上传视频，大小可以自己控制
     if (file.type !== "video/mp4") {
       setError("仅支持上传 MP4 格式视频");
       return;
     }
 
     setUploading(true);
+    setProgress(0);
     setError(null);
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload");
 
-      if (!res.ok) {
-        throw new Error("上传文件服务错误");
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        setProgress(Math.round((event.loaded / event.total) * 100));
       }
+    };
 
-      const data = await res.json();
-      if (!data.url) {
-        throw new Error("未能获取上传后的链接");
-      }
-
-      const saveRes = await fetch("/api/hero", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blobUrl: data.url }),
-      });
-
-      if (!saveRes.ok) {
-        throw new Error("保存到数据库失败");
-      }
-
-      setCurrentUrl(data.url);
-    } catch (err: any) {
-      setError(err?.message || "上传失败，请检查配置文件或重试");
-    } finally {
+    xhr.onload = async () => {
       setUploading(false);
-    }
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
+        if (!data.url) {
+          setError("未能获取上传后的链接");
+          return;
+        }
+        try {
+          const saveRes = await fetch("/api/hero", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ blobUrl: data.url }),
+          });
+          if (!saveRes.ok) throw new Error("保存到数据库失败");
+          setCurrentUrl(data.url);
+        } catch (err: any) {
+          setError(err?.message || "保存失败");
+        }
+      } else {
+        setError("上传文件服务错误");
+      }
+    };
+
+    xhr.onerror = () => {
+      setUploading(false);
+      setError("上传失败，请检查网络");
+    };
+
+    xhr.send(formData);
   }
 
   return (
@@ -100,7 +107,15 @@ export function HeroUpload() {
         />
         
         {uploading && (
-          <p className="text-sm text-yellow-500 animate-pulse">视频上传中，请勿关闭页面...</p>
+          <div className="space-y-1">
+            <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-white h-full rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-xs text-zinc-400 text-right">{progress}%</p>
+          </div>
         )}
         
         {error && (
