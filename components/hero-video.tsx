@@ -37,7 +37,11 @@ export function HeroVideo() {
       setTimeout(() => setBarProgress(75), 1500),
       setTimeout(() => setBarProgress(90), 2500),
     ];
-    return () => timers.forEach(clearTimeout);
+    // Fallback: if video doesn't load within 5s, finish anyway
+    const fallback = setTimeout(() => {
+      setBarProgress(100);
+    }, 5000);
+    return () => { timers.forEach(clearTimeout); clearTimeout(fallback); };
   }, [isVideoReady]);
 
   // After bar reaches 100%, wait briefly then fade out
