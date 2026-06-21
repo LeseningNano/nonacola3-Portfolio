@@ -132,6 +132,15 @@ export function HeroVideo() {
         {/* Gradient Mask Layer */}
         <div className="absolute inset-0 z-[2] bg-black/50 pointer-events-none" />
 
+        {/* Halftone Texture Layer */}
+        <div
+          className="absolute inset-0 z-[3] pointer-events-none opacity-[0.15]"
+          style={{
+            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)",
+            backgroundSize: "4px 4px",
+          }}
+        />
+
         {/* Content Layer */}
         <div className="relative z-10 flex flex-col items-start justify-center h-full text-left w-full px-6 md:px-16 lg:px-32 xl:px-48">
           <h1 className="text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight mb-6 font-[family-name:var(--font-montserrat)]">
