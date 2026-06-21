@@ -30,6 +30,7 @@ export function VideoForm({
   const [loading, setLoading] = useState(false);
   const [thumbMode, setThumbMode] = useState<"url" | "upload">("url");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<VideoData>({
     title: initialData?.title ?? "",
@@ -42,26 +43,42 @@ export function VideoForm({
     date: initialData?.date ?? "",
   });
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        setForm((prev) => ({ ...prev, thumbnail: data.url }));
+    setUploadProgress(0);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload");
+
+    xhr.upload.onprogress = (ev) => {
+      if (ev.lengthComputable) {
+        setUploadProgress(Math.round((ev.loaded / ev.total) * 100));
       }
-    } catch (err) {
-      console.error("Upload failed", err);
-    } finally {
+    };
+
+    xhr.onload = () => {
+      try {
+        const data = JSON.parse(xhr.responseText);
+        if (data.url) {
+          setForm((prev) => ({ ...prev, thumbnail: data.url }));
+        }
+      } catch { /* ignore */ }
       setUploading(false);
-    }
+      setUploadProgress(0);
+    };
+
+    xhr.onerror = () => {
+      console.error("Upload failed");
+      setUploading(false);
+      setUploadProgress(0);
+    };
+
+    xhr.send(formData);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -149,7 +166,7 @@ export function VideoForm({
                 className="bg-zinc-800 border-zinc-700"
               />
             ) : (
-              <div className="flex items-center gap-3">
+              <div className="space-y-2">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -157,18 +174,34 @@ export function VideoForm({
                   onChange={handleFileUpload}
                   className="hidden"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={uploading}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {uploading ? "上传中..." : "选择文件"}
-                </Button>
-                {form.thumbnail && (
-                  <span className="text-xs text-zinc-500 truncate max-w-xs">
-                    {form.thumbnail}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={uploading}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {uploading ? "上传中..." : "选择文件"}
+                  </Button>
+                  {form.thumbnail && !uploading && (
+                    <span className="text-xs text-zinc-500 truncate max-w-xs">
+                      {form.thumbnail}
+                    </span>
+                  )}
+                </div>
+                {uploading && (
+                  <div className="w-full">
+                    <div className="flex justify-between text-xs text-zinc-400 mb-1">
+                      <span>上传中</span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-white transition-all duration-200 rounded-full"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
             )}
