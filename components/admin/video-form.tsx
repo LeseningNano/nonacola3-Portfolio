@@ -54,26 +54,52 @@ export function VideoForm({
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "/api/upload");
+    xhr.timeout = 120000;
+
+    let progressTimer: ReturnType<typeof setInterval> | null = null;
 
     xhr.upload.onprogress = (ev) => {
       if (ev.lengthComputable) {
-        setUploadProgress(Math.round((ev.loaded / ev.total) * 100));
+        const pct = Math.round((ev.loaded / ev.total) * 100);
+        setUploadProgress(pct);
+        if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
       }
     };
 
+    // Fallback: if no progress events fire, simulate progress
+    progressTimer = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 90) { if (progressTimer) clearInterval(progressTimer); return prev; }
+        return prev + 10;
+      });
+    }, 500);
+
     xhr.onload = () => {
-      try {
-        const data = JSON.parse(xhr.responseText);
-        if (data.url) {
-          setForm((prev) => ({ ...prev, thumbnail: data.url }));
-        }
-      } catch { /* ignore */ }
+      if (progressTimer) clearInterval(progressTimer);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (data.url) {
+            setForm((prev) => ({ ...prev, thumbnail: data.url }));
+          }
+        } catch { /* ignore */ }
+        setUploadProgress(100);
+      } else {
+        console.error("Upload failed:", xhr.status, xhr.responseText);
+      }
+      setTimeout(() => { setUploading(false); setUploadProgress(0); }, 300);
+    };
+
+    xhr.onerror = () => {
+      if (progressTimer) clearInterval(progressTimer);
+      console.error("Upload failed");
       setUploading(false);
       setUploadProgress(0);
     };
 
-    xhr.onerror = () => {
-      console.error("Upload failed");
+    xhr.ontimeout = () => {
+      if (progressTimer) clearInterval(progressTimer);
+      console.error("Upload timed out");
       setUploading(false);
       setUploadProgress(0);
     };
