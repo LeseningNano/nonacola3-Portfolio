@@ -59,7 +59,7 @@ export function VideoGrid() {
             onSelect={setSelectedCategory}
           />
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 mt-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 mt-8">
           {loading ? (
             Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="aspect-video bg-zinc-900 animate-pulse" />
