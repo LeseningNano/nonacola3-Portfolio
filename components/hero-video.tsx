@@ -136,8 +136,8 @@ export function HeroVideo() {
         <div
           className="absolute inset-0 z-[3] pointer-events-none opacity-[0.5]"
           style={{
-            backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.9) 0.8px, transparent 0.8px)",
-            backgroundSize: "3px 3px",
+            backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.9) 0.5px, transparent 0.5px)",
+            backgroundSize: "2px 2px",
             transform: "rotate(45deg) scale(1.5)",
           }}
         />
