@@ -11,6 +11,7 @@ export function HeroVideo() {
   const [showLoader, setShowLoader] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [barProgress, setBarProgress] = useState(0);
+  const [parallaxY, setParallaxY] = useState(0);
 
   useEffect(() => {
     fetch("/api/hero")
@@ -23,6 +24,24 @@ export function HeroVideo() {
       .finally(() => {
         setIsFetched(true);
       });
+  }, []);
+
+  // Parallax effect: video moves slower than scroll
+  useEffect(() => {
+    const container = document.querySelector("div.h-screen");
+    if (!container) return;
+
+    function handleScroll() {
+      const scrollTop = container!.scrollTop;
+      const heroHeight = container!.clientHeight;
+      // Only apply within hero section range
+      if (scrollTop <= heroHeight) {
+        setParallaxY(scrollTop * 0.4);
+      }
+    }
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Simulate loading progress
@@ -82,7 +101,17 @@ export function HeroVideo() {
 
       <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]">
         {/* Background / Video Layer */}
-        <div className="absolute inset-0 z-0">
+        <div
+          className="absolute z-0"
+          style={{
+            top: "-10%",
+            left: "-5%",
+            right: "-5%",
+            bottom: "-10%",
+            transform: `translateY(${parallaxY}px)`,
+            willChange: "transform",
+          }}
+        >
           {videoUrl ? (
             <video
               autoPlay
