@@ -10,12 +10,15 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  console.log("[videos] POST received");
   const session = await auth();
   if (!session) {
+    console.log("[videos] Unauthorized");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();
+  console.log("[videos] Creating video:", body.title);
   const video = await db.video.create({
     data: {
       title: body.title,
@@ -29,5 +32,6 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  console.log("[videos] Created:", video.id);
   return NextResponse.json(video, { status: 201 });
 }

@@ -115,13 +115,26 @@ export function VideoForm({
       mode === "edit" ? `/api/videos/${initialData?.id}` : "/api/videos";
     const method = mode === "edit" ? "PUT" : "POST";
 
-    await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    router.push("/dashboard");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "保存失败" }));
+        alert(err.error || `保存失败 (${res.status})`);
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("保存失败，请检查网络连接");
+      setLoading(false);
+    }
   }
 
   return (
