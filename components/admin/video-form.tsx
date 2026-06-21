@@ -16,6 +16,7 @@ interface VideoData {
   thumbnail: string;
   featured: boolean;
   order: number;
+  date: string;
 }
 
 export function VideoForm({
@@ -38,6 +39,7 @@ export function VideoForm({
     thumbnail: initialData?.thumbnail ?? "",
     featured: initialData?.featured ?? false,
     order: initialData?.order ?? 0,
+    date: initialData?.date ?? "",
   });
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -190,6 +192,16 @@ export function VideoForm({
                 setForm({ ...form, description: e.target.value })
               }
               className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="date">发布日期（选填）</Label>
+            <Input
+              id="date"
+              type="date"
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+              className="bg-zinc-800 border-zinc-700"
             />
           </div>
           <div className="flex items-center space-x-4">

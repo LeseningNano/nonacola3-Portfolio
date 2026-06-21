@@ -7,16 +7,17 @@ datasource db {
 }
 
 model Video {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
   category    String
   embedUrl    String
   thumbnail   String?
-  featured    Boolean  @default(false)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  featured    Boolean   @default(false)
+  order       Int       @default(0)
+  date        DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model HeroVideo {

@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       thumbnail: body.thumbnail,
       featured: body.featured ?? false,
       order: body.order ?? 0,
+      date: body.date ? new Date(body.date) : null,
     },
   });
 

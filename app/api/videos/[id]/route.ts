@@ -35,6 +35,7 @@ export async function PUT(
       thumbnail: body.thumbnail,
       featured: body.featured,
       order: body.order,
+      date: body.date ? new Date(body.date) : null,
     },
   });
 

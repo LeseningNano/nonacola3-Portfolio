@@ -9,6 +9,7 @@ interface Video {
   category: string;
   embedUrl: string;
   thumbnail: string | null;
+  date: string | null;
 }
 
 export function VideoCard({
@@ -20,7 +21,7 @@ export function VideoCard({
 }) {
   return (
     <div
-      className="group relative aspect-video bg-zinc-900 rounded-lg overflow-hidden cursor-pointer"
+      className="group relative aspect-video bg-zinc-900 overflow-hidden cursor-pointer"
       onClick={onClick}
     >
       {video.thumbnail ? (
@@ -35,6 +36,13 @@ export function VideoCard({
         </div>
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {video.date && (
+          <span className="text-[10px] text-zinc-300 bg-black/60 backdrop-blur-sm px-2 py-1 rounded">
+            {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "short" })}
+          </span>
+        )}
+      </div>
       <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
         <span className="text-xs text-zinc-400 mb-1 block">{video.category}</span>
         <h3 className="font-semibold text-lg">{video.title}</h3>

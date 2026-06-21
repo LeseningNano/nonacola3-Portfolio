@@ -27,6 +27,7 @@ export default async function EditVideoPage({
           thumbnail: video.thumbnail ?? "",
           featured: video.featured,
           order: video.order,
+          date: video.date ? new Date(video.date).toISOString().split("T")[0] : "",
         }}
       />
     </div>

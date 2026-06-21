@@ -15,6 +15,7 @@ interface Video {
   thumbnail: string | null;
   featured: boolean;
   order: number;
+  date: string | null;
 }
 
 export function VideoGrid() {
@@ -46,20 +47,22 @@ export function VideoGrid() {
 
   return (
     <section id="works" className="h-screen w-full overflow-y-auto scrollbar-hide bg-[#0a0a0a]">
-      <div className="pt-24 pb-20 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto">
-        <div className="mb-10">
+      <div className="pt-24 pb-20">
+        <div className="mb-10 px-6 md:px-12 lg:px-16">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">作品展示</h2>
           <p className="text-base md:text-lg text-zinc-400 font-light mt-3">精选视频作品与创作项目</p>
         </div>
-        <CategoryFilter
-          categories={categories}
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="px-6 md:px-12 lg:px-16">
+          <CategoryFilter
+            categories={categories}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 mt-8">
           {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="aspect-video bg-zinc-900 rounded-lg animate-pulse" />
+            Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="aspect-video bg-zinc-900 animate-pulse" />
             ))
           ) : error ? (
             <div className="col-span-full flex flex-col items-center justify-center py-16 text-zinc-500">
