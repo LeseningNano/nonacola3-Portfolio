@@ -7,7 +7,7 @@ import { VideoGrid } from "@/components/video-grid";
 import { ContactSection } from "@/components/contact-section";
 import { SectionNav } from "@/components/section-nav";
 
-const sectionIds = ["hero", "showreel", "works", "contact"];
+const sectionIds = ["hero", "works", "showreel", "contact"];
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -56,8 +56,8 @@ export default function Home() {
       <SectionNav />
       <div ref={containerRef} className="h-screen overflow-y-scroll scrollbar-hide">
         <HeroVideo />
-        <ShowreelVideo />
         <VideoGrid />
+        <ShowreelVideo />
         <ContactSection />
       </div>
     </>

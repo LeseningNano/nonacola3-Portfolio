@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 const sections = [
   { id: "hero", label: "返回主屏" },
-  { id: "showreel", label: "Showreel" },
   { id: "works", label: "作品" },
+  { id: "showreel", label: "REEL" },
   { id: "contact", label: "关于" },
 ];
 
@@ -60,7 +60,7 @@ export function SectionNav() {
   }, []);
 
   function scrollTo(id: string) {
-    const sections_arr = ["hero", "showreel", "works", "contact"];
+    const sections_arr = ["hero", "works", "showreel", "contact"];
     const index = sections_arr.indexOf(id);
     const container = document.querySelector("div.h-screen");
     if (container && index >= 0) {

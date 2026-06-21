@@ -34,7 +34,7 @@ export function ShowreelVideo() {
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
         <div className="flex flex-col mb-5 md:mb-6">
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white uppercase">
-            Showreel
+            REEL
           </h2>
           <p className="text-base md:text-lg text-zinc-400 font-light mt-2">
             近期视频制作与视觉创作总结
