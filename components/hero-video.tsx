@@ -134,10 +134,11 @@ export function HeroVideo() {
 
         {/* Halftone Texture Layer */}
         <div
-          className="absolute inset-0 z-[3] pointer-events-none opacity-[0.15]"
+          className="absolute inset-0 z-[3] pointer-events-none opacity-[0.2]"
           style={{
-            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)",
-            backgroundSize: "4px 4px",
+            backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.7) 0.5px, transparent 0.5px)",
+            backgroundSize: "3px 3px",
+            transform: "rotate(45deg) scale(1.5)",
           }}
         />
 
