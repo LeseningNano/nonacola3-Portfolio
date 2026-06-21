@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
 
 export async function POST(req: NextRequest) {
   console.log("[upload] Request received");
@@ -17,28 +19,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No file" }, { status: 400 });
   }
 
-  console.log(`[upload] Uploading: ${file.name}, size: ${file.size}, type: ${file.type}`);
-  console.log(`[upload] File constructor: ${file.constructor.name}`);
-
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
-  const blobName = `upload-${Date.now()}-${safeName}`;
-  console.log(`[upload] Blob name: ${blobName}`);
+  const fileName = `upload-${Date.now()}-${safeName}`;
+  console.log(`[upload] Uploading: ${file.name}, size: ${file.size}, type: ${file.type}`);
 
-  try {
-    const blob = await Promise.race([
-      put(blobName, file, {
+  // Vercel environment: use Blob storage
+  if (process.env.VERCEL) {
+    try {
+      const blob = await put(fileName, file, {
         access: "public",
         contentType: file.type,
-      }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Blob upload timed out after 30s")), 30000)
-      ),
-    ]);
+      });
+      console.log(`[upload] Blob success: ${blob.url}`);
+      return NextResponse.json({ url: blob.url });
+    } catch (err) {
+      console.error("[upload] Blob error:", err);
+      return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    }
+  }
 
-    console.log(`[upload] Success: ${blob.url}`);
-    return NextResponse.json({ url: blob.url });
+  // Local development: save to public/uploads/
+  try {
+    const uploadDir = join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const filePath = join(uploadDir, fileName);
+    await writeFile(filePath, buffer);
+    const url = `/uploads/${fileName}`;
+    console.log(`[upload] Local success: ${url}`);
+    return NextResponse.json({ url });
   } catch (err) {
-    console.error("[upload] Blob error:", err);
+    console.error("[upload] Local error:", err);
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
