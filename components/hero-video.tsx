@@ -66,15 +66,16 @@ export function HeroVideo() {
     return () => { timers.forEach(clearTimeout); clearTimeout(fallback); };
   }, [isVideoReady]);
 
-  // After bar reaches 100%, wait briefly then fade out, then trigger glimm once
+  // After bar reaches 100%, trigger glimm then fade out
   useEffect(() => {
     if (barProgress >= 100 && !glimmTriggered.current) {
       glimmTriggered.current = true;
       const timer = setTimeout(() => {
+        // Trigger glimm sweep as fade-out begins
+        router.push("/");
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
-          router.push("/");
         }, 400);
       }, 200);
       return () => clearTimeout(timer);
