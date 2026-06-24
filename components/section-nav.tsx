@@ -60,14 +60,9 @@ export function SectionNav() {
   }, []);
 
   function scrollTo(id: string) {
-    const sections_arr = ["hero", "works", "showreel", "contact"];
-    const index = sections_arr.indexOf(id);
-    const container = document.querySelector("div.h-screen");
-    if (container && index >= 0) {
-      container.scrollTo({
-        top: index * container.clientHeight,
-        behavior: "smooth",
-      });
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
     }
   }
 
