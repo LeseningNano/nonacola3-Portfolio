@@ -5,61 +5,68 @@ import { usePathname } from "next/navigation";
 
 export function ProgressBar() {
   const pathname = usePathname();
-  const [visible, setVisible] = useState(false);
+  const [show, setShow] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
   const [progress, setProgress] = useState(0);
-  const animRef = useRef<number>(0);
   const prevPathname = useRef(pathname);
+  const timers = useRef<NodeJS.Timeout[]>([]);
 
   useEffect(() => {
     if (pathname === prevPathname.current) return;
     prevPathname.current = pathname;
 
-    // Route changed — show bar and animate
-    setVisible(true);
+    // Clear any pending timers
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+
+    // Show loader
+    setShow(true);
+    setFadeOut(false);
     setProgress(0);
 
-    let current = 0;
-    const steps = [
-      { target: 30, delay: 100 },
-      { target: 60, delay: 300 },
-      { target: 80, delay: 600 },
-      { target: 95, delay: 1000 },
-    ];
+    // Animate progress
+    timers.current.push(setTimeout(() => setProgress(30), 100));
+    timers.current.push(setTimeout(() => setProgress(55), 300));
+    timers.current.push(setTimeout(() => setProgress(75), 600));
+    timers.current.push(setTimeout(() => setProgress(90), 900));
+    timers.current.push(setTimeout(() => setProgress(100), 1100));
 
-    const timers: NodeJS.Timeout[] = [];
-    steps.forEach(({ target, delay }) => {
-      timers.push(
-        setTimeout(() => {
-          setProgress(target);
-        }, delay)
-      );
-    });
-
-    // Complete after a short delay
-    timers.push(
+    // Fade out then hide
+    timers.current.push(
       setTimeout(() => {
-        setProgress(100);
-        setTimeout(() => {
-          setVisible(false);
-          setProgress(0);
-        }, 300);
-      }, 1200)
+        setFadeOut(true);
+        timers.current.push(
+          setTimeout(() => {
+            setShow(false);
+            setProgress(0);
+          }, 500)
+        );
+      }, 1300)
     );
 
     return () => {
-      timers.forEach(clearTimeout);
-      cancelAnimationFrame(animRef.current);
+      timers.current.forEach(clearTimeout);
+      timers.current = [];
     };
   }, [pathname]);
 
-  if (!visible) return null;
+  if (!show) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[100] h-[2px]">
-      <div
-        className="h-full bg-white transition-all duration-300 ease-out"
-        style={{ width: `${progress}%` }}
-      />
+    <div
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#0a0a0a] transition-opacity duration-500 ${
+        fadeOut ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      <div className="w-screen h-[2px] bg-zinc-800 overflow-hidden">
+        <div
+          className="h-full bg-white origin-center"
+          style={{
+            transform: `scaleX(${progress / 100})`,
+            transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        />
+      </div>
     </div>
   );
 }
