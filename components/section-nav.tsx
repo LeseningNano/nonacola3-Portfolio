@@ -61,9 +61,31 @@ export function SectionNav() {
 
   function scrollTo(id: string) {
     const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+    const container = document.querySelector("div.h-screen");
+    if (!el || !container) return;
+
+    const start = container.scrollTop;
+    const target = el.offsetTop;
+    const distance = target - start;
+    const duration = 1200;
+    let startTime: number | null = null;
+
+    function easeInOutCubic(t: number) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
+
+    function step(timestamp: number) {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeInOutCubic(progress);
+      container!.scrollTop = start + distance * eased;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    }
+
+    requestAnimationFrame(step);
   }
 
   return (
