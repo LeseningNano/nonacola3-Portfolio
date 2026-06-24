@@ -1,19 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [flashKey, setFlashKey] = useState(0);
+  const wasScrolled = useRef(false);
 
   useEffect(() => {
     const scrollContainer = document.querySelector("div.h-screen");
     if (!scrollContainer) return;
 
     const handleScroll = () => {
-      setIsScrolled(scrollContainer.scrollTop > 50);
+      const scrolled = scrollContainer.scrollTop > 50;
+      setIsScrolled(scrolled);
+      // Trigger flash only when transitioning from top to scrolled
+      if (scrolled && !wasScrolled.current) {
+        setFlashKey((k) => k + 1);
+      }
+      wasScrolled.current = scrolled;
     };
 
     handleScroll();
@@ -61,11 +69,12 @@ export function Navbar() {
 
       {/* Animated Bottom Border */}
       <div
+        key={flashKey}
         className={cn(
           "absolute bottom-0 left-0 right-0 h-[1px]",
-          !isScrolled
-            ? "bg-transparent transition-colors duration-300"
-            : "animate-border-flash"
+          isScrolled && flashKey > 0
+            ? "animate-border-flash"
+            : "bg-transparent"
         )}
       />
     </nav>
