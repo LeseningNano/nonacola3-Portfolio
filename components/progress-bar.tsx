@@ -1,46 +1,58 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 export function PageTransition() {
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
   const [opacity, setOpacity] = useState(0);
   const [visible, setVisible] = useState(false);
+  const pendingUrl = useRef<string | null>(null);
+  const isTransitioning = useRef(false);
+  const prevPathname = useRef(pathname);
 
+  // Detect route change complete → fade out
   useEffect(() => {
-    // New page: fade out from black
-    if (sessionStorage.getItem("page-transition") === "out") {
-      sessionStorage.removeItem("page-transition");
-      setVisible(true);
-      setOpacity(1);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
+    if (pathname !== prevPathname.current) {
+      prevPathname.current = pathname;
+      if (isTransitioning.current) {
+        // Fade out after small delay to ensure new page rendered
+        setTimeout(() => {
           setOpacity(0);
-        });
-      });
-      const timer = setTimeout(() => setVisible(false), 600);
-      return () => clearTimeout(timer);
+          setTimeout(() => {
+            setVisible(false);
+            isTransitioning.current = false;
+          }, 500);
+        }, 50);
+      }
     }
-  }, []);
+  }, [pathname]);
 
   const startTransition = useCallback((url: string) => {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+    pendingUrl.current = url;
+
+    // Fade to black
     setVisible(true);
-    setOpacity(0);
-    // Fade in to black
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setOpacity(1);
-      });
+      requestAnimationFrame(() => setOpacity(1));
     });
-    // Navigate after fade-in
+
+    // After fade-in, navigate via Next.js router (no full reload)
     setTimeout(() => {
-      sessionStorage.setItem("page-transition", "out");
-      window.location.href = url;
+      router.push(url);
     }, 500);
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
+      if (isTransitioning.current) {
+        e.preventDefault();
+        return;
+      }
+
       const anchor = (e.target as HTMLElement).closest("a");
       if (!anchor) return;
 
@@ -49,15 +61,18 @@ export function PageTransition() {
 
       if (href.startsWith("/") && !href.startsWith("//")) {
         if (href.startsWith("/dashboard") || href.startsWith("/login")) return;
+        // Don't intercept if already on this page
+        if (href === pathname) return;
 
         e.preventDefault();
+        e.stopPropagation();
         startTransition(href);
       }
     }
 
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, [startTransition]);
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick, true);
+  }, [startTransition, pathname]);
 
   if (!visible) return null;
 

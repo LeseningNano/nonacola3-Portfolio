@@ -3,7 +3,7 @@ import { Inter, Montserrat } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { MobileWarning } from "@/components/mobile-warning";
 import { PageTransition } from "@/components/progress-bar";
-import { GlimmProvider, InterceptLinks } from "glimm/next";
+import { GlimmProvider } from "glimm/next";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,7 +26,6 @@ export default function RootLayout({
         <MobileWarning />
         <Navbar />
         <GlimmProvider palette="prism">
-          <InterceptLinks />
           {children}
         </GlimmProvider>
       </body>
