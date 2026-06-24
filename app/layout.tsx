@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { MobileWarning } from "@/components/mobile-warning";
-import { ProgressBar } from "@/components/progress-bar";
+import { PageTransition } from "@/components/progress-bar";
 import { GlimmProvider, InterceptLinks } from "glimm/next";
 import "./globals.css";
 
@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="dark">
       <body className={`${inter.className} ${montserrat.variable} bg-[#0a0a0a] text-white antialiased`}>
-        <ProgressBar />
+        <PageTransition />
         <MobileWarning />
         <Navbar />
         <GlimmProvider palette="prism">
