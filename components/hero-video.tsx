@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { useTransitionRouter } from "glimm/next";
@@ -14,6 +14,7 @@ export function HeroVideo() {
   const [fadeOut, setFadeOut] = useState(false);
   const [barProgress, setBarProgress] = useState(0);
   const [parallaxY, setParallaxY] = useState(0);
+  const glimmTriggered = useRef(false);
 
   useEffect(() => {
     fetch("/api/hero")
@@ -65,14 +66,14 @@ export function HeroVideo() {
     return () => { timers.forEach(clearTimeout); clearTimeout(fallback); };
   }, [isVideoReady]);
 
-  // After bar reaches 100%, wait briefly then fade out, then trigger glimm
+  // After bar reaches 100%, wait briefly then fade out, then trigger glimm once
   useEffect(() => {
-    if (barProgress >= 100) {
+    if (barProgress >= 100 && !glimmTriggered.current) {
+      glimmTriggered.current = true;
       const timer = setTimeout(() => {
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
-          // Trigger glimm sweep as the hero reveals
           router.push("/");
         }, 400);
       }, 200);
