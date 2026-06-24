@@ -35,23 +35,21 @@ export function VideoCard({
           <Play className="w-12 h-12 text-zinc-600" />
         </div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        {video.date && (
-          <span className="text-[10px] text-zinc-300 bg-black/60 backdrop-blur-sm px-2 py-1 rounded">
-            {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "short" })}
-          </span>
-        )}
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      {/* Always visible: category + title */}
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <span className="text-[10px] text-zinc-400 mb-1 block">{video.category}</span>
+        <h3 className="font-semibold text-sm md:text-base leading-tight">{video.title}</h3>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-        <span className="text-xs text-zinc-400 mb-1 block">{video.category}</span>
-        <h3 className="font-semibold text-lg">{video.title}</h3>
-        {video.description && (
-          <p className="text-zinc-400 text-sm line-clamp-2">
+      {/* Hover: description */}
+      {video.description && (
+        <div className="absolute inset-0 flex items-end p-4 pt-12 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <p className="text-zinc-300 text-xs md:text-sm line-clamp-3">
             {video.description}
           </p>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
