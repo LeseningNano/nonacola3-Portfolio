@@ -56,13 +56,11 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Animated Bottom Border */}
+      {/* Bottom Border */}
       <div 
         className={cn(
-          "absolute bottom-0 left-0 right-0 h-[1px]",
-          !isScrolled 
-            ? "bg-transparent transition-colors duration-300" 
-            : "animate-border-flash"
+          "absolute bottom-0 left-0 right-0 h-[1px] transition-colors duration-300",
+          isScrolled ? "bg-zinc-800" : "bg-transparent"
         )}
       />
     </nav>
