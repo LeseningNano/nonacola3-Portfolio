@@ -30,7 +30,7 @@ export default function Home() {
         animating.current = false;
         return;
       }
-      container!.scrollTop = cur + diff * 0.12;
+      container!.scrollTop = cur + diff * 0.06;
       requestAnimationFrame(animate);
     }
 
@@ -40,7 +40,7 @@ export default function Home() {
       const maxScroll = container!.scrollHeight - container!.clientHeight;
       targetScroll.current = Math.max(
         0,
-        Math.min(maxScroll, targetScroll.current + e.deltaY)
+        Math.min(maxScroll, targetScroll.current + e.deltaY * 2.5)
       );
 
       if (!animating.current) {
