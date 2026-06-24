@@ -11,6 +11,10 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const targetScroll = useRef(0);
   const animating = useRef(false);
+  const startTime = useRef(0);
+  const startScroll = useRef(0);
+  const distance = useRef(0);
+  const duration = 900;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -18,20 +22,21 @@ export default function Home() {
 
     targetScroll.current = container.scrollTop;
 
-    function easeOutExpo(t: number) {
-      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    function easeOutCubic(t: number) {
+      return 1 - Math.pow(1 - t, 3);
     }
 
-    function animate() {
-      const cur = container!.scrollTop;
-      const diff = targetScroll.current - cur;
-      if (Math.abs(diff) < 0.5) {
-        container!.scrollTop = targetScroll.current;
+    function animate(timestamp: number) {
+      if (!startTime.current) startTime.current = timestamp;
+      const elapsed = timestamp - startTime.current;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutCubic(progress);
+      container!.scrollTop = startScroll.current + distance.current * eased;
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
         animating.current = false;
-        return;
       }
-      container!.scrollTop = cur + diff * 0.06;
-      requestAnimationFrame(animate);
     }
 
     function handleWheel(e: WheelEvent) {
@@ -45,7 +50,12 @@ export default function Home() {
 
       if (!animating.current) {
         animating.current = true;
+        startTime.current = 0;
+        startScroll.current = container!.scrollTop;
+        distance.current = targetScroll.current - startScroll.current;
         requestAnimationFrame(animate);
+      } else {
+        distance.current = targetScroll.current - container!.scrollTop;
       }
     }
 
