@@ -1,37 +1,70 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
 
 export function PageTransition() {
-  const pathname = usePathname();
-  const [phase, setPhase] = useState<"idle" | "in" | "out">("idle");
-  const prevPathname = useRef(pathname);
+  const [mounted, setMounted] = useState(false);
+  const [opacity, setOpacity] = useState(0);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (pathname === prevPathname.current) return;
-    prevPathname.current = pathname;
+    // New page: fade out from black
+    if (sessionStorage.getItem("page-transition") === "out") {
+      sessionStorage.removeItem("page-transition");
+      setVisible(true);
+      setOpacity(1);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setOpacity(0);
+        });
+      });
+      const timer = setTimeout(() => setVisible(false), 600);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
-    // Fade to black
-    setPhase("in");
-    // After fade-in completes, fade out
-    const timer = setTimeout(() => {
-      setPhase("out");
-      // After fade-out completes, idle
-      const hide = setTimeout(() => setPhase("idle"), 500);
-      return () => clearTimeout(hide);
+  const startTransition = useCallback((url: string) => {
+    setVisible(true);
+    setOpacity(0);
+    // Fade in to black
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setOpacity(1);
+      });
+    });
+    // Navigate after fade-in
+    setTimeout(() => {
+      sessionStorage.setItem("page-transition", "out");
+      window.location.href = url;
     }, 500);
+  }, []);
 
-    return () => clearTimeout(timer);
-  }, [pathname]);
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      const anchor = (e.target as HTMLElement).closest("a");
+      if (!anchor) return;
 
-  if (phase === "idle") return null;
+      const href = anchor.getAttribute("href");
+      if (!href) return;
+
+      if (href.startsWith("/") && !href.startsWith("//")) {
+        if (href.startsWith("/dashboard") || href.startsWith("/login")) return;
+
+        e.preventDefault();
+        startTransition(href);
+      }
+    }
+
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, [startTransition]);
+
+  if (!visible) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] bg-[#0a0a0a] pointer-events-none transition-opacity duration-500 ${
-        phase === "in" ? "opacity-100" : "opacity-0"
-      }`}
+      className="fixed inset-0 z-[9999] bg-[#0a0a0a] pointer-events-none"
+      style={{ opacity, transition: "opacity 500ms ease-in-out" }}
     />
   );
 }
