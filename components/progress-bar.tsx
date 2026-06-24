@@ -23,7 +23,7 @@ export function PageTransition() {
           setTimeout(() => {
             setVisible(false);
             isTransitioning.current = false;
-          }, 500);
+          }, 100);
         }, 50);
       }
     }
@@ -43,7 +43,7 @@ export function PageTransition() {
     // After fade-in, navigate via Next.js router (no full reload)
     setTimeout(() => {
       router.push(url);
-    }, 500);
+    }, 100);
   }, [router]);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export function PageTransition() {
   return (
     <div
       className="fixed inset-0 z-[9999] bg-[#0a0a0a] pointer-events-none"
-      style={{ opacity, transition: "opacity 500ms ease-in-out" }}
+      style={{ opacity, transition: "opacity 100ms ease-in-out" }}
     />
   );
 }
