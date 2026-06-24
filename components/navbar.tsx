@@ -25,11 +25,11 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav 
+    <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
-        isScrolled 
-          ? "bg-[#0a0a0a]/80 backdrop-blur-md" 
+        isScrolled
+          ? "bg-[#0a0a0a]/80 backdrop-blur-md"
           : "bg-transparent"
       )}
     >
@@ -38,15 +38,18 @@ export function Navbar() {
           {siteConfig.name}
         </Link>
         <div className="flex items-center gap-6">
-          <button
-            onClick={() => {
-              const container = document.querySelector("div.h-screen");
-              container?.scrollTo({ top: 3 * container.clientHeight, behavior: "smooth" });
-            }}
+          <Link
+            href="/reel"
             className="text-sm text-zinc-400 hover:text-white transition-colors"
           >
-            联系
-          </button>
+            REEL
+          </Link>
+          <Link
+            href="/about"
+            className="text-sm text-zinc-400 hover:text-white transition-colors"
+          >
+            关于
+          </Link>
           <Link
             href="/dashboard"
             className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
@@ -57,11 +60,11 @@ export function Navbar() {
       </div>
 
       {/* Animated Bottom Border */}
-      <div 
+      <div
         className={cn(
           "absolute bottom-0 left-0 right-0 h-[1px]",
-          !isScrolled 
-            ? "bg-transparent transition-colors duration-300" 
+          !isScrolled
+            ? "bg-transparent transition-colors duration-300"
             : "animate-border-flash"
         )}
       />

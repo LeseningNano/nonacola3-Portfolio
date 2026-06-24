@@ -2,10 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { HeroVideo } from "@/components/hero-video";
-import { ShowreelVideo } from "@/components/showreel-section";
 import { VideoGrid } from "@/components/video-grid";
-import { ContactSection } from "@/components/contact-section";
-import { SectionNav } from "@/components/section-nav";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -63,12 +60,9 @@ export default function Home() {
 
   return (
     <>
-      <SectionNav />
       <div ref={containerRef} className="h-screen overflow-y-hidden scrollbar-hide">
         <HeroVideo />
         <VideoGrid />
-        <ShowreelVideo />
-        <ContactSection />
       </div>
     </>
   );
