@@ -27,7 +27,7 @@ export function VideoGrid() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState("全部");
+  const [selectedYear, setSelectedYear] = useState("全部");
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
   useEffect(() => {
@@ -41,15 +41,18 @@ export function VideoGrid() {
       .finally(() => setLoading(false));
   }, []);
 
-  const categories = useMemo(
-    () => [...new Set(videos.map((v) => v.category))],
-    [videos]
-  );
+  const years = useMemo(() => {
+    const set = new Set<string>();
+    for (const v of videos) {
+      if (v.date) set.add(new Date(v.date).getFullYear().toString());
+    }
+    return [...set].sort((a, b) => b.localeCompare(a));
+  }, [videos]);
 
   const filteredVideos =
-    selectedCategory === "全部"
+    selectedYear === "全部"
       ? videos
-      : videos.filter((v) => v.category === selectedCategory);
+      : videos.filter((v) => v.date && new Date(v.date).getFullYear().toString() === selectedYear);
 
   const yearGroups = useMemo(() => {
     const groups: Record<string, Video[]> = {};
@@ -74,9 +77,9 @@ export function VideoGrid() {
         </div>
         <div className="px-6 md:px-12 lg:px-16 mb-6">
           <CategoryFilter
-            categories={categories}
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
+            categories={years}
+            selected={selectedYear}
+            onSelect={setSelectedYear}
           />
         </div>
 

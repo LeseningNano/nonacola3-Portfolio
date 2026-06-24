@@ -35,21 +35,19 @@ export function VideoCard({
           <Play className="w-12 h-12 text-zinc-600" />
         </div>
       )}
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-      {/* Always visible: category + title */}
-      <div className="absolute bottom-0 left-0 right-0 p-4">
+      {/* Gradient overlay — stronger on hover for description readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent transition-all duration-300" />
+      {/* Always visible: category + title at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
         <span className="text-[10px] text-zinc-400 mb-1 block">{video.category}</span>
         <h3 className="font-semibold text-sm md:text-base leading-tight">{video.title}</h3>
-      </div>
-      {/* Hover: description */}
-      {video.description && (
-        <div className="absolute inset-0 flex items-end p-4 pt-12 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="text-zinc-300 text-xs md:text-sm line-clamp-3">
+        {/* Description — revealed on hover, pushed below title */}
+        {video.description && (
+          <p className="text-zinc-300 text-xs md:text-sm line-clamp-2 mt-1 max-h-0 overflow-hidden opacity-0 group-hover:max-h-20 group-hover:opacity-100 transition-all duration-300">
             {video.description}
           </p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
