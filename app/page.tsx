@@ -60,7 +60,7 @@ export default function Home() {
 
   return (
     <>
-      <div ref={containerRef} className="h-screen overflow-y-hidden scrollbar-hide">
+      <div ref={containerRef} className="h-screen overflow-y-auto scrollbar-hide">
         <HeroVideo />
         <VideoGrid />
       </div>
