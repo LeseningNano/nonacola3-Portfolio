@@ -21,6 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" className="dark">
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@400&display=swap" rel="stylesheet" />
+      </head>
       <body className={`${inter.className} ${montserrat.variable} bg-[#0a0a0a] text-white antialiased`}>
         <PageTransition />
         <MobileWarning />

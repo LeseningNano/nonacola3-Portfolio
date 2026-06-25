@@ -7,7 +7,7 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-40">
       <div className="px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="font-normal text-lg font-[family-name:var(--font-bitcount-grid)]">
+        <Link href="/" className="font-normal text-lg" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
           {siteConfig.name}
         </Link>
         <div className="flex items-center gap-6">
