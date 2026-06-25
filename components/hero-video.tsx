@@ -159,6 +159,23 @@ export function HeroVideo() {
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce pointer-events-none">
           <ChevronDown className="w-8 h-8 text-zinc-400" />
         </div>
+
+        <button
+          onClick={() => {
+            const container = document.querySelector("div.h-screen");
+            const works = document.getElementById("works");
+            if (container && works) {
+              const worksTop = works.offsetTop;
+              const target = worksTop * 0.78;
+              container.dispatchEvent(
+                new CustomEvent("smooth-scroll-to", { detail: { target } })
+              );
+            }
+          }}
+          className="absolute bottom-10 right-6 md:right-12 lg:right-16 z-10 text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer border border-zinc-600 hover:border-zinc-400 px-4 py-2 rounded-full"
+        >
+          跳转至 works.
+        </button>
       </section>
     </>
   );

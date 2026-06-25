@@ -61,11 +61,25 @@ export default function Home() {
       targetScroll.current = container!.scrollTop;
     }
 
+    function handleSmoothScroll(e: Event) {
+      const detail = (e as CustomEvent<{ target: number }>).detail;
+      if (typeof detail?.target !== "number") return;
+      const maxScroll = container!.scrollHeight - container!.clientHeight;
+      targetScroll.current = Math.max(0, Math.min(maxScroll, detail.target));
+      if (!rafId.current) {
+        currentScroll.current = container!.scrollTop;
+        lastTime.current = performance.now();
+        rafId.current = requestAnimationFrame(animate);
+      }
+    }
+
     container.addEventListener("wheel", handleWheel, { passive: false });
     container.addEventListener("scroll", handleScroll, { passive: true });
+    container.addEventListener("smooth-scroll-to", handleSmoothScroll);
     return () => {
       container.removeEventListener("wheel", handleWheel);
       container.removeEventListener("scroll", handleScroll);
+      container.removeEventListener("smooth-scroll-to", handleSmoothScroll);
       cancelAnimationFrame(rafId.current);
     };
   }, []);
