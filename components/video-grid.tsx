@@ -72,7 +72,7 @@ export function VideoGrid() {
     <section id="works" className="h-screen w-full overflow-y-auto scrollbar-hide bg-[#0a0a0a]">
       <div className="pt-24 pb-20">
         <div className="mb-6 px-6 md:px-12 lg:px-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight font-[family-name:var(--font-bitcount-grid)]">作品展示</h2>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight font-[family-name:var(--font-bitcount-grid)]">works.</h2>
           <p className="text-base md:text-lg text-zinc-400 font-light mt-3">精选视频作品与创作项目</p>
         </div>
         <div className="px-6 md:px-12 lg:px-16 mb-6">
