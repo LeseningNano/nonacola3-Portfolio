@@ -172,7 +172,8 @@ export function HeroVideo() {
               );
             }
           }}
-          className="absolute bottom-10 right-6 md:right-12 lg:right-16 z-10 text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer border border-zinc-600 hover:border-zinc-400 px-4 py-2 rounded-full"
+          className="absolute bottom-10 right-6 md:right-12 lg:right-16 z-10 text-sm text-white hover:text-zinc-300 transition-colors cursor-pointer border border-white hover:border-zinc-300 px-4 py-2"
+          style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}
         >
           跳转至 works.
         </button>
