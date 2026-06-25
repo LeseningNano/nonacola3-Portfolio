@@ -128,15 +128,13 @@ export function HeroVideo() {
               className={`w-full h-full object-cover transition-opacity duration-1000 ${
                 isVideoReady ? "opacity-100" : "opacity-0"
               }`}
+              style={{ filter: "brightness(0.5)" }}
               src={videoUrl}
             />
           ) : isFetched ? (
             <div className="w-full h-full bg-gradient-to-b from-zinc-900 to-[#0a0a0a]" />
           ) : null}
         </div>
-
-        {/* Gradient Mask Layer */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2, backgroundColor: "rgba(0, 0, 0, 0.5)" }} />
 
         {/* Halftone Texture Layer */}
         <div
