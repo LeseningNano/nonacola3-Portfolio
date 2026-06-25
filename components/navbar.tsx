@@ -34,12 +34,7 @@ export function Navbar() {
 
   return (
     <nav
-      className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
-        isScrolled
-          ? "bg-[#0a0a0a]/80 backdrop-blur-md"
-          : "bg-transparent"
-      )}
+      className="fixed top-0 left-0 right-0 z-40"
     >
       <div className="px-6 h-16 flex items-center justify-between">
         <Link href="/" className="font-bold text-lg">
