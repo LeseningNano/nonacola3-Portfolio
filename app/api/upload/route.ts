@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest) {
   console.log("[upload] Request received");
   const session = await auth();
@@ -32,9 +34,9 @@ export async function POST(req: NextRequest) {
       });
       console.log(`[upload] Blob success: ${blob.url}`);
       return NextResponse.json({ url: blob.url });
-    } catch (err) {
-      console.error("[upload] Blob error:", err);
-      return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    } catch (err: any) {
+      console.error("[upload] Blob error:", err?.message || err);
+      return NextResponse.json({ error: `Blob upload failed: ${err?.message || "unknown"}` }, { status: 500 });
     }
   }
 

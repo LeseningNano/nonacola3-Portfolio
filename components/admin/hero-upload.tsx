@@ -106,7 +106,8 @@ export function HeroUpload() {
           setError(err?.message || "保存失败");
         }
       } else {
-        setError("上传文件服务错误");
+        const data = JSON.parse(xhr.responseText);
+        setError(data.error || "上传文件服务错误");
       }
     };
 
