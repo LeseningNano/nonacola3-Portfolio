@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { siteConfig } from "@/lib/config";
-import { useTransitionRouter } from "glimm/next";
-
 export function HeroVideo() {
-  const router = useTransitionRouter();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isFetched, setIsFetched] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -66,13 +63,11 @@ export function HeroVideo() {
     return () => { timers.forEach(clearTimeout); clearTimeout(fallback); };
   }, [isVideoReady]);
 
-  // After bar reaches 100%, trigger glimm then fade out
+  // After bar reaches 100%, fade out loader
   useEffect(() => {
     if (barProgress >= 100 && !glimmTriggered.current) {
       glimmTriggered.current = true;
       const timer = setTimeout(() => {
-        // Trigger glimm sweep as fade-out begins
-        router.push("/");
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
@@ -80,7 +75,7 @@ export function HeroVideo() {
       }, 200);
       return () => clearTimeout(timer);
     }
-  }, [barProgress, router]);
+  }, [barProgress]);
 
   return (
     <>
