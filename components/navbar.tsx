@@ -42,7 +42,7 @@ export function Navbar() {
       )}
     >
       <div className="px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="font-bold text-lg">
+          <Link href="/" className="font-normal text-lg font-[family-name:var(--font-bitcount-grid)]">
           {siteConfig.name}
         </Link>
         <div className="flex items-center gap-6">
