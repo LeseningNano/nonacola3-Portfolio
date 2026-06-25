@@ -166,7 +166,7 @@ export function HeroVideo() {
             const works = document.getElementById("works");
             if (container && works) {
               const worksTop = works.offsetTop;
-              const target = worksTop * 0.78;
+              const target = worksTop * 0.90;
               container.dispatchEvent(
                 new CustomEvent("smooth-scroll-to", { detail: { target } })
               );
