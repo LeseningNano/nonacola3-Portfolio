@@ -39,6 +39,10 @@ export default function Home() {
     function handleWheel(e: WheelEvent) {
       e.preventDefault();
 
+      // Sync with actual scroll position (handles middle-click drag, touch, etc.)
+      currentScroll.current = container!.scrollTop;
+      targetScroll.current = container!.scrollTop;
+
       const maxScroll = container!.scrollHeight - container!.clientHeight;
       targetScroll.current = Math.max(
         0,
