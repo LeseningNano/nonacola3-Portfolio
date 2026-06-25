@@ -10,6 +10,7 @@ export default function Home() {
   const currentScroll = useRef(0);
   const rafId = useRef(0);
   const lastTime = useRef(0);
+  const isAnimating = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -26,22 +27,20 @@ export default function Home() {
       if (Math.abs(diff) < 0.5) {
         currentScroll.current = targetScroll.current;
         container!.scrollTop = targetScroll.current;
+        isAnimating.current = false;
         rafId.current = 0;
         return;
       }
 
       const factor = 1 - Math.exp(-10 * dt);
       currentScroll.current += diff * factor;
+      isAnimating.current = true;
       container!.scrollTop = currentScroll.current;
       rafId.current = requestAnimationFrame(animate);
     }
 
     function handleWheel(e: WheelEvent) {
       e.preventDefault();
-
-      // Sync with actual scroll position (handles middle-click drag, touch, etc.)
-      currentScroll.current = container!.scrollTop;
-      targetScroll.current = container!.scrollTop;
 
       const maxScroll = container!.scrollHeight - container!.clientHeight;
       targetScroll.current = Math.max(
@@ -50,14 +49,23 @@ export default function Home() {
       );
 
       if (!rafId.current) {
+        currentScroll.current = container!.scrollTop;
         lastTime.current = performance.now();
         rafId.current = requestAnimationFrame(animate);
       }
     }
 
+    function handleScroll() {
+      if (isAnimating.current) return;
+      currentScroll.current = container!.scrollTop;
+      targetScroll.current = container!.scrollTop;
+    }
+
     container.addEventListener("wheel", handleWheel, { passive: false });
+    container.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       container.removeEventListener("wheel", handleWheel);
+      container.removeEventListener("scroll", handleScroll);
       cancelAnimationFrame(rafId.current);
     };
   }, []);
