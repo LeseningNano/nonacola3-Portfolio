@@ -1,38 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/lib/config";
-import { cn } from "@/lib/utils";
 
 export function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const scrollContainer = document.querySelector("div.h-screen");
-    if (!scrollContainer) return;
-
-    const handleScroll = () => {
-      setIsScrolled(scrollContainer.scrollTop > 50);
-    };
-
-    handleScroll();
-    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      scrollContainer.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <nav
-      className={cn(
-        "fixed top-0 left-0 right-0 z-40 transition-colors duration-300",
-        isScrolled
-          ? "bg-[#0a0a0a]/80"
-          : "bg-transparent"
-      )}
-    >
+    <nav className="fixed top-0 left-0 right-0 z-40">
       <div className="px-6 h-16 flex items-center justify-between">
         <Link href="/" className="font-normal text-lg font-[family-name:var(--font-bitcount-grid)]">
           {siteConfig.name}
