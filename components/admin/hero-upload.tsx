@@ -106,14 +106,18 @@ export function HeroUpload() {
           setError(err?.message || "保存失败");
         }
       } else {
-        const data = JSON.parse(xhr.responseText);
-        setError(data.error || "上传文件服务错误");
+        try {
+          const data = JSON.parse(xhr.responseText);
+          setError(data.error || `服务器错误 (${xhr.status})`);
+        } catch {
+          setError(`服务器返回错误 (${xhr.status}): ${xhr.responseText.slice(0, 200)}`);
+        }
       }
     };
 
     xhr.onerror = () => {
       setUploading(false);
-      setError("上传失败，请检查网络");
+      setError("上传失败，请检查网络连接");
     };
 
     xhr.send(formData);
