@@ -172,7 +172,7 @@ export function HeroVideo() {
               );
             }
           }}
-          className="group absolute bottom-20 right-[20%] z-10 text-[13px] text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white pt-3.5 pb-2.5 pl-4 pr-3 hover:pr-5 flex items-center gap-2"
+          className="group absolute bottom-20 right-16 z-10 text-[13px] text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white pt-3.5 pb-2.5 pl-4 pr-3 hover:pr-5 flex items-center gap-2"
           style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}
         >
           跳转至 works.
