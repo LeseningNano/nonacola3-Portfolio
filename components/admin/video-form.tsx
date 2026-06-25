@@ -43,68 +43,30 @@ export function VideoForm({
     date: initialData?.date ?? "",
   });
 
-  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     setUploadProgress(0);
 
-    const formData = new FormData();
-    formData.append("file", file);
+    try {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
+      const pathname = `uploads/thumb-${Date.now()}-${safeName}`;
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/upload");
-    xhr.timeout = 120000;
-
-    let progressTimer: ReturnType<typeof setInterval> | null = null;
-
-    xhr.upload.onprogress = (ev) => {
-      if (ev.lengthComputable) {
-        const pct = Math.round((ev.loaded / ev.total) * 100);
-        setUploadProgress(pct);
-        if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
-      }
-    };
-
-    // Fallback: if no progress events fire, simulate progress
-    progressTimer = setInterval(() => {
-      setUploadProgress((prev) => {
-        if (prev >= 90) { if (progressTimer) clearInterval(progressTimer); return prev; }
-        return prev + 10;
+      const { upload } = await import("@vercel/blob/client");
+      const blob = await upload(pathname, file, {
+        access: "public",
+        handleUploadUrl: "/api/blob-token",
+        onUploadProgress: (p) => setUploadProgress(p.percentage),
       });
-    }, 500);
 
-    xhr.onload = () => {
-      if (progressTimer) clearInterval(progressTimer);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const data = JSON.parse(xhr.responseText);
-          if (data.url) {
-            setForm((prev) => ({ ...prev, thumbnail: data.url }));
-          }
-        } catch { /* ignore */ }
-        setUploadProgress(100);
-      } else {
-        console.error("Upload failed:", xhr.status, xhr.responseText);
-      }
+      setForm((prev) => ({ ...prev, thumbnail: blob.url }));
+      setUploadProgress(100);
+    } catch (err: any) {
+      console.error("Upload failed:", err);
+    } finally {
       setTimeout(() => { setUploading(false); setUploadProgress(0); }, 300);
-    };
-
-    xhr.onerror = () => {
-      if (progressTimer) clearInterval(progressTimer);
-      console.error("Upload failed");
-      setUploading(false);
-      setUploadProgress(0);
-    };
-
-    xhr.ontimeout = () => {
-      if (progressTimer) clearInterval(progressTimer);
-      console.error("Upload timed out");
-      setUploading(false);
-      setUploadProgress(0);
-    };
-
-    xhr.send(formData);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {

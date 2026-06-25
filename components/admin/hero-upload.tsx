@@ -74,53 +74,32 @@ export function HeroUpload() {
     setProgress(0);
     setError(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
+    try {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
+      const pathname = `uploads/hero-${Date.now()}-${safeName}`;
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/upload");
+      const { upload } = await import("@vercel/blob/client");
+      const blob = await upload(pathname, file, {
+        access: "public",
+        handleUploadUrl: "/api/blob-token",
+        onUploadProgress: (p) => {
+          setProgress(p.percentage);
+        },
+      });
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        setProgress(Math.round((event.loaded / event.total) * 100));
-      }
-    };
-
-    xhr.onload = async () => {
+      // Save URL to database
+      const saveRes = await fetch("/api/hero", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blobUrl: blob.url }),
+      });
+      if (!saveRes.ok) throw new Error("保存到数据库失败");
+      setCurrentUrl(blob.url);
+    } catch (err: any) {
+      setError(err?.message || "上传失败");
+    } finally {
       setUploading(false);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const data = JSON.parse(xhr.responseText);
-        if (!data.url) {
-          setError("未能获取上传后的链接");
-          return;
-        }
-        try {
-          const saveRes = await fetch("/api/hero", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ blobUrl: data.url }),
-          });
-          if (!saveRes.ok) throw new Error("保存到数据库失败");
-          setCurrentUrl(data.url);
-        } catch (err: any) {
-          setError(err?.message || "保存失败");
-        }
-      } else {
-        try {
-          const data = JSON.parse(xhr.responseText);
-          setError(data.error || `服务器错误 (${xhr.status})`);
-        } catch {
-          setError(`服务器返回错误 (${xhr.status}): ${xhr.responseText.slice(0, 200)}`);
-        }
-      }
-    };
-
-    xhr.onerror = () => {
-      setUploading(false);
-      setError("上传失败，请检查网络连接");
-    };
-
-    xhr.send(formData);
+    }
   }
 
   return (

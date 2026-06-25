@@ -68,34 +68,23 @@ export function ShowreelSettings() {
     setProgress(0);
     setError("");
 
-    const formData = new FormData();
-    formData.append("file", file);
+    try {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
+      const pathname = `uploads/reel-${Date.now()}-${safeName}`;
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/upload");
+      const { upload } = await import("@vercel/blob/client");
+      const blob = await upload(pathname, file, {
+        access: "public",
+        handleUploadUrl: "/api/blob-token",
+        onUploadProgress: (p) => setProgress(p.percentage),
+      });
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        setProgress(Math.round((event.loaded / event.total) * 100));
-      }
-    };
-
-    xhr.onload = () => {
+      setUrl(blob.url);
+    } catch (err: any) {
+      setError(err?.message || "上传失败");
+    } finally {
       setUploading(false);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const data = JSON.parse(xhr.responseText);
-        if (data.url) setUrl(data.url);
-      } else {
-        setError("上传失败，请重试");
-      }
-    };
-
-    xhr.onerror = () => {
-      setUploading(false);
-      setError("上传失败，请检查网络");
-    };
-
-    xhr.send(formData);
+    }
   }
 
   async function handleSave() {
