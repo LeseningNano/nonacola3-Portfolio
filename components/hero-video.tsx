@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { useTransitionRouter } from "glimm/next";
 
@@ -172,10 +172,11 @@ export function HeroVideo() {
               );
             }
           }}
-          className="absolute bottom-10 right-6 md:right-12 lg:right-16 z-10 text-[13px] text-white hover:text-zinc-300 transition-colors cursor-pointer border border-white hover:border-zinc-300 pt-3.5 pb-2.5 px-4"
+          className="group absolute bottom-10 right-1/2 translate-x-1/2 z-10 text-[13px] text-zinc-500 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-600 hover:border-zinc-300 pt-3.5 pb-2.5 pl-4 pr-3 hover:pr-5 flex items-center gap-2"
           style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}
         >
           跳转至 works.
+          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
         </button>
       </section>
     </>
