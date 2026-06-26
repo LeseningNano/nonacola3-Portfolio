@@ -11,6 +11,7 @@ export default function Home() {
   const rafId = useRef(0);
   const lastTime = useRef(0);
   const isAnimating = useRef(false);
+  const scrollEasing = useRef(10);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -32,7 +33,7 @@ export default function Home() {
         return;
       }
 
-      const factor = 1 - Math.exp(-10 * dt);
+      const factor = 1 - Math.exp(-scrollEasing.current * dt);
       currentScroll.current += diff * factor;
       isAnimating.current = true;
       container!.scrollTop = currentScroll.current;
@@ -41,6 +42,7 @@ export default function Home() {
 
     function handleWheel(e: WheelEvent) {
       e.preventDefault();
+      scrollEasing.current = 10;
 
       const maxScroll = container!.scrollHeight - container!.clientHeight;
       targetScroll.current = Math.max(
@@ -66,6 +68,7 @@ export default function Home() {
       if (typeof detail?.target !== "number") return;
       const maxScroll = container!.scrollHeight - container!.clientHeight;
       targetScroll.current = Math.max(0, Math.min(maxScroll, detail.target));
+      scrollEasing.current = 4;
       if (!rafId.current) {
         currentScroll.current = container!.scrollTop;
         lastTime.current = performance.now();
