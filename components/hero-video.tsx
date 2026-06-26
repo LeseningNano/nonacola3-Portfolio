@@ -32,18 +32,21 @@ export function HeroVideo() {
 
   // Parallax effect: video moves slower than scroll
   useEffect(() => {
-    const container = document.querySelector("div.h-screen");
-    if (!container) return;
+    function getScrollContainer() {
+      return document.querySelector("div.h-screen") || document.documentElement;
+    }
 
     function handleScroll() {
-      const scrollTop = container!.scrollTop;
-      const heroHeight = container!.clientHeight;
+      const container = getScrollContainer();
+      const scrollTop = container === document.documentElement ? window.scrollY : (container as HTMLElement).scrollTop;
+      const heroHeight = window.innerHeight;
       if (scrollTop <= heroHeight) {
         setParallaxY(scrollTop * 0.4);
         setScrollProgress(scrollTop / heroHeight);
       }
     }
 
+    const container = getScrollContainer();
     container.addEventListener("scroll", handleScroll, { passive: true });
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
@@ -168,12 +171,17 @@ export function HeroVideo() {
           onClick={() => {
             const container = document.querySelector("div.h-screen");
             const works = document.getElementById("works");
-            if (container && works) {
-              const worksTop = works.offsetTop;
-              const target = worksTop * 0.90;
-              container.dispatchEvent(
-                new CustomEvent("smooth-scroll-to", { detail: { target } })
-              );
+            if (works) {
+              if (container) {
+                const worksTop = works.offsetTop;
+                const target = worksTop * 0.90;
+                container.dispatchEvent(
+                  new CustomEvent("smooth-scroll-to", { detail: { target } })
+                );
+              } else {
+                const worksTop = works.offsetTop;
+                window.scrollTo({ top: worksTop * 0.90, behavior: "smooth" });
+              }
             }
           }}
           className="group absolute bottom-16 md:bottom-20 right-1/2 translate-x-1/2 md:right-20 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white flex items-center gap-2"

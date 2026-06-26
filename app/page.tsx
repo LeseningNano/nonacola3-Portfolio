@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HeroVideo } from "@/components/hero-video";
 import { VideoGrid } from "@/components/video-grid";
 
@@ -12,8 +12,22 @@ export default function Home() {
   const lastTime = useRef(0);
   const isAnimating = useRef(false);
   const scrollEasing = useRef(10);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    setIsMobile(mq.matches);
+
+    function onResize(e: MediaQueryListEvent) {
+      setIsMobile(e.matches);
+    }
+    mq.addEventListener("change", onResize);
+    return () => mq.removeEventListener("change", onResize);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -85,7 +99,16 @@ export default function Home() {
       container.removeEventListener("smooth-scroll-to", handleSmoothScroll);
       cancelAnimationFrame(rafId.current);
     };
-  }, []);
+  }, [isMobile]);
+
+  if (isMobile) {
+    return (
+      <>
+        <HeroVideo />
+        <VideoGrid />
+      </>
+    );
+  }
 
   return (
     <>
