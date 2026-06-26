@@ -149,10 +149,10 @@ export function HeroVideo() {
 
         {/* Content Layer */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center w-full px-6 md:px-16 lg:px-32 xl:px-48">
-          <h1 className="text-7xl md:text-8xl lg:text-9xl font-normal tracking-tight mb-6" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-6" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
             {siteConfig.name}
           </h1>
-          <p className="text-2xl md:text-3xl lg:text-4xl text-zinc-400 font-light" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-zinc-400 font-light" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
             {siteConfig.title}
           </p>
         </div>
