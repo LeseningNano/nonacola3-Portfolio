@@ -14,6 +14,7 @@ export function HeroVideo() {
   const [fadeOut, setFadeOut] = useState(false);
   const [barProgress, setBarProgress] = useState(0);
   const [parallaxY, setParallaxY] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const glimmTriggered = useRef(false);
 
   useEffect(() => {
@@ -37,9 +38,9 @@ export function HeroVideo() {
     function handleScroll() {
       const scrollTop = container!.scrollTop;
       const heroHeight = container!.clientHeight;
-      // Only apply within hero section range
       if (scrollTop <= heroHeight) {
         setParallaxY(scrollTop * 0.4);
+        setScrollProgress(scrollTop / heroHeight);
       }
     }
 
@@ -128,7 +129,7 @@ export function HeroVideo() {
               className={`w-full h-full object-cover transition-opacity duration-1000 ${
                 isVideoReady ? "opacity-100" : "opacity-0"
               }`}
-              style={{ filter: "brightness(0.5)" }}
+              style={{ filter: `brightness(${0.5 - scrollProgress * 0.5})` }}
               src={videoUrl}
             />
           ) : isFetched ? (
@@ -156,7 +157,10 @@ export function HeroVideo() {
           </p>
         </div>
         
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce pointer-events-none">
+        <div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce pointer-events-none transition-opacity duration-300"
+          style={{ opacity: Math.max(0, 1 - scrollProgress * 2.5) }}
+        >
           <ChevronDown className="w-8 h-8 text-zinc-400" />
         </div>
 
@@ -173,7 +177,7 @@ export function HeroVideo() {
             }
           }}
           className="group absolute bottom-20 right-20 z-10 text-[13px] text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white pt-3.5 pb-2.5 pl-4 pr-3 hover:pr-5 flex items-center gap-2"
-          style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}
+          style={{ fontFamily: "'Bitcount Grid Single', sans-serif", opacity: Math.max(0, 1 - scrollProgress * 2.5), pointerEvents: scrollProgress > 0.45 ? "none" as const : "auto" as const }}
         >
           跳转至 works.
           <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
