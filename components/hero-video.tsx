@@ -158,7 +158,7 @@ export function HeroVideo() {
         </div>
         
         <div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce pointer-events-none transition-opacity duration-300"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce pointer-events-none transition-opacity duration-300 max-md:hidden"
           style={{ opacity: Math.max(0, 1 - scrollProgress * 2.5) }}
         >
           <ChevronDown className="w-8 h-8 text-zinc-400" />
@@ -176,11 +176,11 @@ export function HeroVideo() {
               );
             }
           }}
-          className="group absolute bottom-20 right-20 z-10 text-[13px] text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white pt-3.5 pb-2.5 pl-4 pr-3 hover:pr-5 flex items-center gap-2"
+          className="group absolute bottom-16 md:bottom-20 right-1/2 translate-x-1/2 md:right-20 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white flex items-center gap-2"
           style={{ fontFamily: "'Bitcount Grid Single', sans-serif", opacity: Math.max(0, 1 - scrollProgress * 2.5), pointerEvents: scrollProgress > 0.45 ? "none" as const : "auto" as const }}
         >
           跳转至 works.
-          <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+          <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </button>
       </section>
     </>
