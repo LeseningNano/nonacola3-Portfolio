@@ -129,7 +129,7 @@ export function HeroVideo() {
               className={`w-full h-full object-cover transition-opacity duration-1000 ${
                 isVideoReady ? "opacity-100" : "opacity-0"
               }`}
-              style={{ filter: `brightness(${0.5 - scrollProgress * 0.5})` }}
+              style={{ filter: `brightness(${0.5 - scrollProgress * 0.3})` }}
               src={videoUrl}
             />
           ) : isFetched ? (
