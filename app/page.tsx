@@ -68,7 +68,7 @@ export default function Home() {
       if (typeof detail?.target !== "number") return;
       const maxScroll = container!.scrollHeight - container!.clientHeight;
       targetScroll.current = Math.max(0, Math.min(maxScroll, detail.target));
-      scrollEasing.current = 4;
+      scrollEasing.current = 8;
       if (!rafId.current) {
         currentScroll.current = container!.scrollTop;
         lastTime.current = performance.now();
