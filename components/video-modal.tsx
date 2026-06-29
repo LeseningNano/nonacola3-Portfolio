@@ -10,6 +10,7 @@ interface Video {
   description: string | null;
   category: string;
   embedUrl: string;
+  date: string | null;
 }
 
 export function VideoModal({
@@ -68,17 +69,27 @@ export function VideoModal({
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               />
             </div>
+            {/* Title + tags below video */}
+            <div className="mt-4">
+              <h3 className="text-2xl font-bold text-white">{video.title}</h3>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="text-sm font-medium text-zinc-400 bg-zinc-800/50 px-2.5 py-0.5 rounded-full">
+                  {video.category}
+                </span>
+                {video.date && (
+                  <span className="text-sm text-zinc-500">
+                    {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
-          {/* Info panel */}
-          <div className="lg:w-[320px] xl:w-[380px] flex-shrink-0 flex flex-col">
-            <h3 className="text-2xl font-bold text-white">{video.title}</h3>
-            <span className="inline-block mt-2 text-sm font-medium text-zinc-400 bg-zinc-800/50 px-2.5 py-0.5 rounded-full self-start">
-              {video.category}
-            </span>
-            {video.description && (
-              <p className="text-zinc-300 mt-4 leading-relaxed whitespace-pre-line">{video.description}</p>
-            )}
-          </div>
+          {/* Description panel */}
+          {video.description && (
+            <div className="lg:w-[320px] xl:w-[380px] flex-shrink-0">
+              <p className="text-zinc-300 leading-relaxed whitespace-pre-line">{video.description}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
