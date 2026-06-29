@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     data: {
       title: body.title,
       description: body.description,
+      summary: body.summary,
       category: body.category,
       embedUrl: body.embedUrl,
       thumbnail: body.thumbnail,

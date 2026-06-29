@@ -11,6 +11,7 @@ interface VideoData {
   id?: string;
   title: string;
   description: string;
+  summary: string;
   category: string;
   embedUrl: string;
   thumbnail: string;
@@ -35,6 +36,7 @@ export function VideoForm({
   const [form, setForm] = useState<VideoData>({
     title: initialData?.title ?? "",
     description: initialData?.description ?? "",
+    summary: initialData?.summary ?? "",
     category: initialData?.category ?? "",
     embedUrl: initialData?.embedUrl ?? "",
     thumbnail: initialData?.thumbnail ?? "",
@@ -217,14 +219,28 @@ export function VideoForm({
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">描述（选填）</Label>
+            <Label htmlFor="summary">概要（选填，显示在卡片上）</Label>
+            <textarea
+              id="summary"
+              rows={2}
+              value={form.summary}
+              onChange={(e) =>
+                setForm({ ...form, summary: e.target.value })
+              }
+              placeholder="简短的概要文字，显示在视频卡片上"
+              className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">简介（选填，显示在详情页）</Label>
             <textarea
               id="description"
-              rows={3}
+              rows={5}
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
+              placeholder="详细的视频简介，支持换行"
               className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm"
             />
           </div>

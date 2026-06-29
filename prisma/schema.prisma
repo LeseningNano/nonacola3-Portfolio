@@ -10,6 +10,7 @@ model Video {
   id          String    @id @default(cuid())
   title       String
   description String?
+  summary     String?
   category    String
   embedUrl    String
   thumbnail   String?

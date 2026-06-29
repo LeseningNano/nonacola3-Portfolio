@@ -10,6 +10,7 @@ interface Video {
   id: string;
   title: string;
   description: string | null;
+  summary: string | null;
   category: string;
   embedUrl: string;
   thumbnail: string | null;

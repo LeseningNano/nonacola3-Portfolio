@@ -57,22 +57,28 @@ export function VideoModal({
         >
           <X className="w-8 h-8" />
         </button>
-        <div className="aspect-video w-full rounded-lg overflow-hidden bg-black shadow-2xl border border-zinc-800">
-          <iframe
-            src={getEmbedUrl(video.embedUrl)}
-            className="w-full h-full"
-            allowFullScreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          />
-        </div>
-        <div className="mt-6 px-2">
-          <h3 className="text-2xl font-bold text-white">{video.title}</h3>
-          <span className="inline-block mt-2 text-sm font-medium text-zinc-400 bg-zinc-800/50 px-2.5 py-0.5 rounded-full">
-            {video.category}
-          </span>
-          {video.description && (
-            <p className="text-zinc-300 mt-4 leading-relaxed max-w-4xl">{video.description}</p>
-          )}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Video */}
+          <div className="flex-1 min-w-0">
+            <div className="aspect-video w-full rounded-lg overflow-hidden bg-black shadow-2xl border border-zinc-800">
+              <iframe
+                src={getEmbedUrl(video.embedUrl)}
+                className="w-full h-full"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            </div>
+          </div>
+          {/* Info panel */}
+          <div className="lg:w-[320px] xl:w-[380px] flex-shrink-0 flex flex-col">
+            <h3 className="text-2xl font-bold text-white">{video.title}</h3>
+            <span className="inline-block mt-2 text-sm font-medium text-zinc-400 bg-zinc-800/50 px-2.5 py-0.5 rounded-full self-start">
+              {video.category}
+            </span>
+            {video.description && (
+              <p className="text-zinc-300 mt-4 leading-relaxed whitespace-pre-line">{video.description}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

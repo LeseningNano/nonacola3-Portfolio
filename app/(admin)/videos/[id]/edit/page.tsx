@@ -22,6 +22,7 @@ export default async function EditVideoPage({
           id: video.id,
           title: video.title,
           description: video.description ?? "",
+          summary: video.summary ?? "",
           category: video.category,
           embedUrl: video.embedUrl,
           thumbnail: video.thumbnail ?? "",
