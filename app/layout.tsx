@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
-import { GlimmProvider } from "glimm/next";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,9 +25,7 @@ export default function RootLayout({
       <body className={`${inter.className} ${montserrat.variable} bg-[#0a0a0a] text-white antialiased`}>
         <PageTransition />
         <Navbar />
-        <GlimmProvider palette="prism">
-          {children}
-        </GlimmProvider>
+        {children}
       </body>
     </html>
   );
