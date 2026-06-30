@@ -118,10 +118,10 @@ export function HeroVideo() {
               muted
               playsInline
               onCanPlay={() => setIsVideoReady(true)}
-              className={`w-full h-full object-cover transition-opacity duration-1000 ${
+              className={`w-full h-full object-cover scale-110 transition-opacity duration-1000 ${
                 isVideoReady ? "opacity-100" : "opacity-0"
               }`}
-              style={{ filter: `brightness(${0.5 - scrollProgress * 0.3})` }}
+              style={{ filter: `blur(8px) brightness(${0.5 - scrollProgress * 0.3})` }}
               src={videoUrl}
             />
           ) : isFetched ? (
