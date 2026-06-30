@@ -151,7 +151,7 @@ export function HeroVideo() {
         />
 
         {/* Content Layer */}
-        <div className="absolute bottom-20 md:bottom-24 left-6 md:left-16 lg:left-32 xl:left-48 z-10 text-left">
+        <div className="absolute bottom-16 md:bottom-24 left-8 md:left-24 z-10 text-left">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
             {siteConfig.name}
           </h1>
