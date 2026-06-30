@@ -173,14 +173,14 @@ export function HeroVideo() {
         {/* Scroll hint text */}
         {showScrollHint && scrollHintFade !== "done" && (
           <div
-            className={`absolute bottom-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none transition-all duration-600 max-md:hidden ${
+            className={`absolute bottom-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none transition-all duration-500 max-md:hidden ${
               scrollHintFade === "in"
                 ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-3"
+                : "opacity-0 translate-y-2"
             }`}
             style={{
-              animation: scrollHintFade === "in" ? "scrollHintBounce 2s ease-in-out" : undefined,
-              opacity: Math.max(0, 1 - scrollProgress * 2.5),
+              transitionTimingFunction: "cubic-bezier(0.33, 1, 0.68, 1)",
+              opacity: scrollHintFade === "out" ? 0 : undefined,
             }}
           >
             <span className="text-xs text-zinc-500 tracking-widest uppercase" style={{ fontFamily: "var(--font-montserrat)" }}>
