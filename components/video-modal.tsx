@@ -27,7 +27,7 @@ export function VideoModal({
     setIsClosing(true);
     setTimeout(() => {
       onClose();
-    }, 250); // Matches the CSS animation duration slightly offset
+    }, 250);
   };
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function VideoModal({
       }}
     >
       <div
-        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] ${
+        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-zinc-700 ${
           isClosing ? "animate-modal-content-out" : "animate-modal-content"
         }`}
       >
@@ -58,42 +58,42 @@ export function VideoModal({
         >
           <X className="w-8 h-8" />
         </button>
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Video */}
-          <div className="flex-1 min-w-0">
-            <div className="aspect-video w-full rounded-lg overflow-hidden bg-black shadow-2xl border border-zinc-800">
-              <iframe
-                src={getEmbedUrl(video.embedUrl)}
-                className="w-full h-full"
-                allowFullScreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              />
-            </div>
-            {/* Title + tags below video */}
-            <div className="mt-4">
-              <h3 className="text-2xl font-bold text-white">{video.title}</h3>
-              <div className="flex items-center gap-3 mt-2">
-                <span className="text-sm font-medium text-zinc-400 bg-zinc-800/50 px-2.5 py-0.5 rounded-full">
-                  {video.category}
-                </span>
-                {video.date && (
-                  <span className="text-sm text-zinc-500">
-                    {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-          {/* Description panel */}
-          {video.description && (
-            <div className="lg:w-[320px] xl:w-[380px] flex-shrink-0 flex flex-col">
-              <h4 className="text-sm font-medium text-zinc-400 mb-3">关于</h4>
-              <p className="text-zinc-300 leading-relaxed whitespace-pre-line">{video.description}</p>
-            </div>
-          )}
+
+        {/* Video */}
+        <div className="aspect-video w-full overflow-hidden bg-black">
+          <iframe
+            src={getEmbedUrl(video.embedUrl)}
+            className="w-full h-full"
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          />
         </div>
-        {/* Bottom row: close button right */}
-        <div className="flex justify-end mt-4">
+
+        {/* Title area */}
+        <div className="px-6 py-5 border-t border-zinc-700">
+          <h3 className="text-2xl font-bold text-white">{video.title}</h3>
+          <div className="flex items-center gap-3 mt-2">
+            <span className="text-sm font-medium text-zinc-400 border border-zinc-700 px-2.5 py-0.5">
+              {video.category}
+            </span>
+            {video.date && (
+              <span className="text-sm text-zinc-500">
+                {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* About area */}
+        {video.description && (
+          <div className="px-6 py-5 border-t border-zinc-700">
+            <h4 className="text-sm font-medium text-zinc-400 mb-3">关于</h4>
+            <p className="text-zinc-300 leading-relaxed whitespace-pre-line">{video.description}</p>
+          </div>
+        )}
+
+        {/* Jump to video area */}
+        <div className="px-6 py-4 border-t border-zinc-700 flex justify-end">
           <a
             href={video.embedUrl}
             target="_blank"
