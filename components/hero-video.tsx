@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { useTransitionRouter } from "glimm/next";
 
@@ -15,6 +15,8 @@ export function HeroVideo() {
   const [barProgress, setBarProgress] = useState(0);
   const [parallaxY, setParallaxY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const [scrollHintFade, setScrollHintFade] = useState<"in" | "out" | "done">("done");
   const glimmTriggered = useRef(false);
 
   useEffect(() => {
@@ -80,6 +82,14 @@ export function HeroVideo() {
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
+          // Show scroll hint after loader fades
+          setShowScrollHint(true);
+          setScrollHintFade("in");
+          // Fade out after 2s
+          setTimeout(() => {
+            setScrollHintFade("out");
+            setTimeout(() => setScrollHintFade("done"), 600);
+          }, 2000);
         }, 400);
       }, 200);
       return () => clearTimeout(timer);
@@ -160,12 +170,24 @@ export function HeroVideo() {
           </p>
         </div>
         
-        <div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce pointer-events-none transition-opacity duration-300 max-md:hidden"
-          style={{ opacity: Math.max(0, 1 - scrollProgress * 2.5) }}
-        >
-          <ChevronDown className="w-8 h-8 text-zinc-400" />
-        </div>
+        {/* Scroll hint text */}
+        {showScrollHint && scrollHintFade !== "done" && (
+          <div
+            className={`absolute bottom-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none transition-all duration-600 max-md:hidden ${
+              scrollHintFade === "in"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-3"
+            }`}
+            style={{
+              animation: scrollHintFade === "in" ? "scrollHintBounce 2s ease-in-out" : undefined,
+              opacity: Math.max(0, 1 - scrollProgress * 2.5),
+            }}
+          >
+            <span className="text-xs text-zinc-500 tracking-widest uppercase" style={{ fontFamily: "var(--font-montserrat)" }}>
+              下滑
+            </span>
+          </div>
+        )}
 
         <button
           onClick={() => {

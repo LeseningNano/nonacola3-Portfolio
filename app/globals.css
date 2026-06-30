@@ -183,3 +183,8 @@
   80% { transform: scaleX(0.85); }
   100% { transform: scaleX(1); }
 }
+
+@keyframes scrollHintBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
