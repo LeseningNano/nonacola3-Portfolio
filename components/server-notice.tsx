@@ -8,10 +8,13 @@ export function ServerNotice() {
 
   useEffect(() => {
     const dismissed = sessionStorage.getItem("server-notice-dismissed");
-    if (!dismissed) {
-      const timer = setTimeout(() => setShow(true), 1500);
-      return () => clearTimeout(timer);
-    }
+    if (dismissed) return;
+
+    const timer = setTimeout(() => {
+      setShow(true);
+    }, 3500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const dismiss = () => {
@@ -24,9 +27,10 @@ export function ServerNotice() {
   return (
     <div className="fixed top-20 right-6 z-50 max-w-sm animate-slide-in-right">
       <div className="bg-zinc-900/95 border border-zinc-700 backdrop-blur-md px-4 py-3 shadow-xl flex items-start gap-3">
-        <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-        <p className="text-sm text-zinc-300 leading-relaxed">
-          服务器位于海外，加载可能较慢。如遇访问困难，请尝试开启科学上网环境。
+        <AlertTriangle className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
+        <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">
+          服务器位于海外，缩略图与视频资源加载可能较慢。
+          后期将迁移至阿里云对象存储提升加载速度，如有任何不便还请谅解。
         </p>
         <button
           onClick={dismiss}
