@@ -64,9 +64,9 @@ export function VideoModal({
           {/* Video */}
           <div className="flex-1 min-w-0">
             <div className="aspect-video w-full overflow-hidden bg-black">
-              <iframe
-                src={getEmbedUrl(video.embedUrl)}
-                className="w-full h-full"
+            <iframe
+              src={`${getEmbedUrl(video.embedUrl)}${getEmbedUrl(video.embedUrl).includes("?") ? "&" : "?"}mute=1&muted=1`}
+              className="w-full h-full"
                 allowFullScreen
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               />
