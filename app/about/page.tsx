@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { siteConfig, socialLinks } from "@/lib/config";
 
 export default function AboutPage() {
@@ -30,13 +32,22 @@ export default function AboutPage() {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-3 bg-zinc-800/80 border border-zinc-700/50 rounded-lg hover:bg-zinc-700 hover:border-zinc-600 transition-all text-base"
+                  className="px-5 py-3 border border-zinc-400 hover:border-white text-zinc-300 hover:text-white transition-all duration-300 text-base"
                 >
                   {link.name}
                 </a>
               ))}
             </div>
           </div>
+        </div>
+        <div className="mt-16">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-white border border-zinc-400 hover:border-white px-4 py-2 transition-all duration-300"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            返回主页
+          </Link>
         </div>
       </div>
     </div>
