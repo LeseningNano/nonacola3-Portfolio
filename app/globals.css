@@ -154,12 +154,6 @@
     transform-origin: center;
     will-change: transform;
   }
-  .animate-scrollHintIn {
-    animation: scrollHintIn 0.5s cubic-bezier(0.33, 1, 0.68, 1) forwards;
-  }
-  .animate-scrollHintOut {
-    animation: scrollHintOut 0.5s ease forwards;
-  }
 }
 
 @keyframes fade-in {
@@ -188,14 +182,4 @@
   50% { transform: scaleX(0.6); }
   80% { transform: scaleX(0.85); }
   100% { transform: scaleX(1); }
-}
-
-@keyframes scrollHintIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
-
-@keyframes scrollHintOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
 }

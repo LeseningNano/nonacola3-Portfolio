@@ -15,8 +15,6 @@ export function HeroVideo() {
   const [barProgress, setBarProgress] = useState(0);
   const [parallaxY, setParallaxY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [showScrollHint, setShowScrollHint] = useState(false);
-  const [scrollHintFade, setScrollHintFade] = useState<"in" | "out" | "done">("done");
   const glimmTriggered = useRef(false);
 
   useEffect(() => {
@@ -77,19 +75,10 @@ export function HeroVideo() {
     if (barProgress >= 100 && !glimmTriggered.current) {
       glimmTriggered.current = true;
       const timer = setTimeout(() => {
-        // Trigger glimm sweep as fade-out begins
         router.push("/");
         setFadeOut(true);
         setTimeout(() => {
           setShowLoader(false);
-          // Show scroll hint after loader fades
-          setShowScrollHint(true);
-          setScrollHintFade("in");
-          // Fade out after 2s
-          setTimeout(() => {
-            setScrollHintFade("out");
-            setTimeout(() => setScrollHintFade("done"), 600);
-          }, 2000);
         }, 400);
       }, 200);
       return () => clearTimeout(timer);
@@ -170,21 +159,6 @@ export function HeroVideo() {
           </p>
         </div>
         
-        {/* Scroll hint text */}
-        {showScrollHint && scrollHintFade !== "done" && (
-          <div
-            className={`absolute bottom-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none max-md:hidden ${
-              scrollHintFade === "in"
-                ? "animate-scrollHintIn"
-                : "animate-scrollHintOut"
-            }`}
-          >
-            <span className="text-xs text-white tracking-widest uppercase" style={{ fontFamily: "var(--font-montserrat)" }}>
-              下滑
-            </span>
-          </div>
-        )}
-
         <button
           onClick={() => {
             const container = document.querySelector("div.h-screen");
