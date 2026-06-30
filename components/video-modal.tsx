@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 import { getEmbedUrl } from "@/lib/utils";
 
 interface Video {
@@ -86,10 +86,23 @@ export function VideoModal({
           </div>
           {/* Description panel */}
           {video.description && (
-            <div className="lg:w-[320px] xl:w-[380px] flex-shrink-0">
+            <div className="lg:w-[320px] xl:w-[380px] flex-shrink-0 flex flex-col">
+              <h4 className="text-sm font-medium text-zinc-400 mb-3">关于</h4>
               <p className="text-zinc-300 leading-relaxed whitespace-pre-line">{video.description}</p>
             </div>
           )}
+        </div>
+        {/* Bottom row: close button right */}
+        <div className="flex justify-end mt-4">
+          <a
+            href={video.embedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-4 py-2 rounded-full transition-colors"
+          >
+            跳转至视频
+            <ExternalLink className="w-4 h-4" />
+          </a>
         </div>
       </div>
     </div>
