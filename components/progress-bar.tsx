@@ -6,27 +6,11 @@ import { useRouter, usePathname } from "next/navigation";
 export function PageTransition() {
   const router = useRouter();
   const pathname = usePathname();
-  const [opacity, setOpacity] = useState(1);
-  const [visible, setVisible] = useState(true);
+  const [opacity, setOpacity] = useState(0);
+  const [visible, setVisible] = useState(false);
   const pendingUrl = useRef<string | null>(null);
   const isTransitioning = useRef(false);
   const prevPathname = useRef(pathname);
-  const isInitialLoad = useRef(true);
-
-  // Initial load: fade out black screen when page is ready
-  useEffect(() => {
-    if (isInitialLoad.current) {
-      isInitialLoad.current = false;
-      // Wait for page to be fully loaded, then fade out
-      const timer = setTimeout(() => {
-        setOpacity(0);
-        setTimeout(() => {
-          setVisible(false);
-        }, 300);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   // Detect route change complete → fade out
   useEffect(() => {
@@ -95,7 +79,7 @@ export function PageTransition() {
   return (
     <div
       className="fixed inset-0 z-[9999] bg-[#0a0a0a] pointer-events-none"
-      style={{ opacity, transition: "opacity 300ms ease-in-out" }}
+      style={{ opacity, transition: "opacity 200ms ease-in-out" }}
     />
   );
 }
