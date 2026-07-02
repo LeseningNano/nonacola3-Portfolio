@@ -48,7 +48,7 @@ export function VideoModal({
       }}
     >
       <div
-        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-zinc-700 bg-black ${
+        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-zinc-700 bg-zinc-950/90 ${
           isClosing ? "animate-modal-content-out" : "animate-modal-content"
         }`}
       >
