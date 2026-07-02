@@ -74,20 +74,21 @@ export function VideoGrid() {
   return (
     <section id="works" className="h-screen w-full overflow-y-auto scrollbar-hide bg-[#0a0a0a]">
       <div className="pt-24 pb-20">
-        <div className="mb-6 px-6 md:px-12 lg:px-16">
+        <div className="mb-6 px-6 md:px-12 lg:px-16 group/reel">
           <div className="flex items-end gap-6">
             <div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
-              <p className="text-base md:text-lg text-zinc-400 font-light mt-1">精选视频作品与创作项目</p>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-white group-hover/reel:text-zinc-600 transition-colors duration-300" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
+              <p className="text-base md:text-lg text-zinc-400 font-light mt-1 opacity-100 group-hover/reel:opacity-0 transition-opacity duration-300">精选视频作品与创作项目</p>
             </div>
             <button
               onClick={() => setShowShowreel(true)}
-              className="group/reel cursor-pointer"
+              className="cursor-pointer flex flex-col"
             >
-              <span className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-zinc-600 group-hover/reel:text-white transition-colors duration-300" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
-                REEL
+              <span className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-zinc-600 group-hover/reel:text-white transition-all duration-300 flex items-center gap-2">
+                <span className="text-zinc-600 group-hover/reel:text-white text-xs md:text-sm transition-all duration-300 opacity-0 group-hover/reel:opacity-100 -translate-x-2 group-hover/reel:translate-x-0">▶</span>
+                <span className="group-hover/reel:translate-x-1 transition-transform duration-300">REEL</span>
               </span>
-              <p className="text-base md:text-lg text-zinc-400 font-light mt-1 opacity-0 group-hover/reel:opacity-100 transition-opacity duration-300">视觉创作总结</p>
+              <p className="text-base md:text-lg text-zinc-400 font-light mt-1 opacity-0 group-hover/reel:opacity-100 transition-opacity duration-300 text-left">视觉创作总结</p>
             </button>
           </div>
         </div>
