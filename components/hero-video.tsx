@@ -140,7 +140,7 @@ export function HeroVideo() {
         />
 
         {/* Content Layer */}
-        <div className="absolute bottom-20 md:bottom-28 left-12 md:left-28 z-10 text-left">
+        <div className="absolute bottom-20 md:bottom-28 left-4 md:left-20 z-10 text-left">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.name}
           </h1>
