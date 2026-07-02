@@ -32,7 +32,6 @@ export function VideoGrid() {
   const [selectedYear, setSelectedYear] = useState("全部");
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [showShowreel, setShowShowreel] = useState(false);
-  const [reelHover, setReelHover] = useState(false);
 
   useEffect(() => {
     fetch("/api/videos")
@@ -76,24 +75,8 @@ export function VideoGrid() {
     <section id="works" className="h-screen w-full overflow-y-auto scrollbar-hide bg-[#0a0a0a]">
       <div className="pt-24 pb-20">
         <div className="mb-6 px-6 md:px-12 lg:px-16">
-          <div className="flex items-end gap-6">
-            <div>
-              <h2 className={`text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight transition-colors duration-300 ${reelHover ? "text-zinc-600" : "text-white"}`} style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
-              <p className={`text-base md:text-lg text-zinc-400 font-light mt-1 transition-opacity duration-300 ${reelHover ? "opacity-0" : "opacity-100"}`}>精选视频作品与创作项目</p>
-            </div>
-            <button
-              onClick={() => setShowShowreel(true)}
-              onMouseEnter={() => setReelHover(true)}
-              onMouseLeave={() => setReelHover(false)}
-              className="cursor-pointer flex flex-col"
-            >
-              <span className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-zinc-600 transition-all duration-300 flex items-center gap-2" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
-                <span className={`text-zinc-600 text-xs md:text-sm transition-all duration-300 ${reelHover ? "opacity-100 translate-x-0 text-white" : "opacity-0 -translate-x-2"}`}>▶</span>
-                <span className={`transition-transform duration-300 ${reelHover ? "translate-x-1 text-white" : ""}`}>REEL</span>
-              </span>
-              <p className={`text-base md:text-lg text-zinc-400 font-light mt-1 transition-opacity duration-300 text-left ${reelHover ? "opacity-100" : "opacity-0"}`}>视觉创作总结</p>
-            </button>
-          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
+          <p className="text-base md:text-lg text-zinc-400 font-light mt-1">精选视频作品与创作项目</p>
         </div>
         <div className="px-6 md:px-12 lg:px-16 mb-6">
           <CategoryFilter
@@ -101,6 +84,20 @@ export function VideoGrid() {
             selected={selectedYear}
             onSelect={setSelectedYear}
           />
+        </div>
+
+        {/* Showreel strip */}
+        <div className="px-6 md:px-12 lg:px-16 mb-6">
+          <button
+            onClick={() => setShowShowreel(true)}
+            className="w-full flex items-center justify-between px-4 py-3 border border-zinc-800 hover:border-zinc-600 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all duration-300 cursor-pointer group"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-zinc-500 tracking-wider">REEL</span>
+              <span className="text-sm text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
+            </div>
+            <span className="text-xs text-zinc-600 group-hover:text-zinc-400 transition-colors duration-300">▶</span>
+          </button>
         </div>
 
         {loading ? (
