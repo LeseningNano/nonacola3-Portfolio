@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { AlertCircle } from "lucide-react";
 import { VideoCard } from "./video-card";
 import { VideoModal } from "./video-modal";
+import { ShowreelModal } from "./showreel-modal";
 import { CategoryFilter } from "./category-filter";
 
 interface Video {
@@ -30,6 +31,7 @@ export function VideoGrid() {
   const [error, setError] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState("全部");
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [showShowreel, setShowShowreel] = useState(false);
 
   useEffect(() => {
     fetch("/api/videos")
@@ -73,7 +75,15 @@ export function VideoGrid() {
     <section id="works" className="h-screen w-full overflow-y-auto scrollbar-hide bg-[#0a0a0a]">
       <div className="pt-24 pb-20">
         <div className="mb-6 px-6 md:px-12 lg:px-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
+            <button
+              onClick={() => setShowShowreel(true)}
+              className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-400 px-3 py-1 transition-all duration-300"
+            >
+              REEL
+            </button>
+          </div>
           <p className="text-base md:text-lg text-zinc-400 font-light mt-1">精选视频作品与创作项目</p>
         </div>
         <div className="px-6 md:px-12 lg:px-16 mb-6">
@@ -121,6 +131,10 @@ export function VideoGrid() {
             video={selectedVideo}
             onClose={() => setSelectedVideo(null)}
           />
+        )}
+
+        {showShowreel && (
+          <ShowreelModal onClose={() => setShowShowreel(false)} />
         )}
       </div>
     </section>
