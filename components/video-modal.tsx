@@ -40,7 +40,7 @@ export function VideoModal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 ${
         isClosing ? "animate-modal-backdrop-out" : "animate-modal-backdrop"
       }`}
       onClick={(e) => {
@@ -48,7 +48,7 @@ export function VideoModal({
       }}
     >
       <div
-        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-zinc-700 ${
+        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-zinc-700 bg-black ${
           isClosing ? "animate-modal-content-out" : "animate-modal-content"
         }`}
       >
