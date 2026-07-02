@@ -75,16 +75,21 @@ export function VideoGrid() {
     <section id="works" className="h-screen w-full overflow-y-auto scrollbar-hide bg-[#0a0a0a]">
       <div className="pt-24 pb-20">
         <div className="mb-6 px-6 md:px-12 lg:px-16">
-          <div className="flex items-center gap-4">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
+          <div className="flex items-end gap-6">
+            <div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
+              <p className="text-base md:text-lg text-zinc-400 font-light mt-1">精选视频作品与创作项目</p>
+            </div>
             <button
               onClick={() => setShowShowreel(true)}
-              className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-400 px-3 py-1 transition-all duration-300"
+              className="group/reel cursor-pointer"
             >
-              REEL
+              <span className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-zinc-600 group-hover/reel:text-white transition-colors duration-300" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
+                REEL
+              </span>
+              <p className="text-base md:text-lg text-zinc-400 font-light mt-1 opacity-0 group-hover/reel:opacity-100 transition-opacity duration-300">视觉创作总结</p>
             </button>
           </div>
-          <p className="text-base md:text-lg text-zinc-400 font-light mt-1">精选视频作品与创作项目</p>
         </div>
         <div className="px-6 md:px-12 lg:px-16 mb-6">
           <CategoryFilter
