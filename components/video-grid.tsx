@@ -94,7 +94,7 @@ export function VideoGrid() {
             className="w-full h-10 bg-zinc-900/80 hover:bg-zinc-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
           >
             <div className="flex items-center gap-3">
-              <span className="text-zinc-500 text-xs md:text-sm tracking-wider" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>REEL</span>
+              <span className="text-zinc-500 text-xs md:text-sm tracking-wider translate-y-px" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>REEL</span>
               <span className="text-sm text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
             </div>
             <span className="text-zinc-600 group-hover:text-zinc-400 text-xs transition-colors duration-300">▶</span>
