@@ -84,7 +84,7 @@ export function VideoGrid() {
               onClick={() => setShowShowreel(true)}
               className="cursor-pointer flex flex-col"
             >
-              <span className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-zinc-600 group-hover/reel:text-white transition-all duration-300 flex items-center gap-2">
+              <span className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight text-zinc-600 group-hover/reel:text-white transition-all duration-300 flex items-center gap-2" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>
                 <span className="text-zinc-600 group-hover/reel:text-white text-xs md:text-sm transition-all duration-300 opacity-0 group-hover/reel:opacity-100 -translate-x-2 group-hover/reel:translate-x-0">▶</span>
                 <span className="group-hover/reel:translate-x-1 transition-transform duration-300">REEL</span>
               </span>
