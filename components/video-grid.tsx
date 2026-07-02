@@ -90,13 +90,16 @@ export function VideoGrid() {
         <div className="px-6 md:px-12 lg:px-16 mb-6">
           <button
             onClick={() => setShowShowreel(true)}
-            className="w-full flex items-center justify-between px-4 py-3 border border-zinc-800 hover:border-zinc-600 bg-zinc-900/50 hover:bg-zinc-800/50 transition-all duration-300 cursor-pointer group"
+            className="w-full aspect-[3/1] md:aspect-[4/1] bg-zinc-900 overflow-hidden cursor-pointer group relative"
           >
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-zinc-500 tracking-wider">REEL</span>
-              <span className="text-sm text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-800/50 to-transparent" />
+            <div className="absolute inset-0 p-4 md:p-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-zinc-500 text-xs md:text-sm tracking-wider">REEL</span>
+                <span className="text-sm md:text-base text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
+              </div>
+              <span className="text-zinc-600 group-hover:text-zinc-400 text-xs md:text-sm transition-colors duration-300">▶</span>
             </div>
-            <span className="text-xs text-zinc-600 group-hover:text-zinc-400 transition-colors duration-300">▶</span>
           </button>
         </div>
 
