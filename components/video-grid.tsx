@@ -88,12 +88,17 @@ export function VideoGrid() {
         </div>
 
         {/* Showreel strip */}
-        <div className="mb-6 relative group/reel h-6 flex items-center cursor-pointer" onClick={() => setShowShowreel(true)}>
-          <div className="absolute inset-x-0 top-1/2 h-px bg-zinc-800 group-hover/reel:bg-zinc-600 transition-colors duration-300" />
-          <div className="absolute left-6 md:left-12 lg:left-16 flex items-center gap-3 opacity-0 group-hover/reel:opacity-100 transition-opacity duration-300 -translate-y-1/2">
-            <span className="text-zinc-500 text-xs md:text-sm tracking-wider" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>REEL</span>
-            <span className="text-sm text-zinc-400">视觉创作总结</span>
-          </div>
+        <div className="mb-6">
+          <button
+            onClick={() => setShowShowreel(true)}
+            className="w-full h-10 bg-zinc-900/80 hover:bg-zinc-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-zinc-500 text-xs md:text-sm tracking-wider" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>REEL</span>
+              <span className="text-sm text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
+            </div>
+            <span className="text-zinc-600 group-hover:text-zinc-400 text-xs transition-colors duration-300">▶</span>
+          </button>
         </div>
 
         {loading ? (
