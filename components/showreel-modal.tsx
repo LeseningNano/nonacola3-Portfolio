@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink, X } from "lucide-react";
+import { X } from "lucide-react";
 import { getEmbedUrl } from "@/lib/utils";
 
 interface ShowreelModalProps {
@@ -82,24 +82,6 @@ export function ShowreelModal({ onClose }: ShowreelModalProps) {
             />
           )}
         </div>
-
-        {/* Title */}
-        <div className="px-6 py-4 border-t border-zinc-700 flex items-center justify-between">
-          <h3 className="text-xl font-bold text-white">REEL</h3>
-        </div>
-
-        {/* Jump to video */}
-        {showreelUrl && (
-          <a
-            href={showreelUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between px-6 py-4 text-zinc-300 hover:text-white hover:bg-zinc-800/50 transition-all duration-300 group border-t border-zinc-700"
-          >
-            <span className="text-sm">跳转至视频</span>
-            <ExternalLink className="w-4 h-4 text-zinc-500 group-hover:text-white transition-colors" />
-          </a>
-        )}
       </div>
     </div>
   );

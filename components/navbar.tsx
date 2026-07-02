@@ -12,12 +12,6 @@ export function Navbar() {
         </Link>
         <div className="flex items-center gap-6">
           <Link
-            href="/reel"
-            className="text-sm text-zinc-400 hover:text-white transition-colors"
-          >
-            REEL
-          </Link>
-          <Link
             href="/about"
             className="text-sm text-zinc-400 hover:text-white transition-colors"
           >
