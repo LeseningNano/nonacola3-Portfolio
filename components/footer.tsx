@@ -9,7 +9,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <p className="text-sm text-zinc-500">
-              &copy; {new Date().getFullYear()} {siteConfig.author}. All rights reserved.
+              &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
             </p>
             <p className="text-xs text-zinc-600 mt-1">
               Built with Next.js &middot; Deployed on Vercel
