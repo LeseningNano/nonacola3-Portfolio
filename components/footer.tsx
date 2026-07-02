@@ -5,7 +5,7 @@ import { siteConfig, socialLinks } from "@/lib/config";
 export function Footer() {
   return (
     <footer className="w-full bg-[#0a0a0a] border-t border-zinc-800/50 mt-24">
-      <div className="px-6 md:px-12 lg:px-16 py-10">
+      <div className="px-6 md:px-12 lg:px-16 py-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <p className="text-sm text-zinc-500">
