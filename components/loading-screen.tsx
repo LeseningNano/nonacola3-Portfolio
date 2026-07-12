@@ -43,7 +43,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
       }`}
     >
       <div className="w-full h-full flex items-center justify-center p-6">
-        <div className="w-full max-w-lg space-y-3" style={{ fontFamily: "'Courier New', monospace" }}>
+        <div className="w-full max-w-lg space-y-3" style={{ fontFamily: "var(--font-montserrat), sans-serif" }}>
           {/* Header */}
           <div className="flex items-center justify-between" style={flicker("0s")}>
             <span className="text-[#D2D7D5] text-lg tracking-wider font-bold">{siteConfig.name.toUpperCase()}</span>
