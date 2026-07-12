@@ -32,7 +32,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
   }, [progress, onReady]);
 
   const flicker = (delay: string) => ({
-    animation: `flicker-in 0.6s ${delay} both`,
+    animation: `flicker-in 0.1s ${delay} both`,
   });
 
   return (
@@ -51,7 +51,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           </div>
 
           {/* Info grid */}
-          <div className="grid grid-cols-2 gap-3" style={flicker("0.1s")}>
+          <div className="grid grid-cols-2 gap-3" style={flicker("0.05s")}>
             <div className="bg-white px-3 py-3">
               <div className="text-[10px] leading-relaxed">
                 <span className="text-black">CODING:</span><br />
@@ -69,7 +69,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           </div>
 
           {/* Description */}
-          <div className="border border-zinc-700 px-3 py-3" style={flicker("0.2s")}>
+          <div className="border border-zinc-700 px-3 py-3" style={flicker("0.1s")}>
             <div className="flex items-center justify-between">
               <span className="text-[#D2D7D5] text-[10px] tracking-widest">INFO</span>
               <span className="text-[#D2D7D5] text-[11px]">VIDEO PORTFOLIO / {siteConfig.description.toUpperCase()}</span>
@@ -77,7 +77,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           </div>
 
           {/* Progress bar */}
-          <div className="border border-zinc-700 px-3 py-3" style={flicker("0.3s")}>
+          <div className="border border-zinc-700 px-3 py-3" style={flicker("0.15s")}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[#D2D7D5] text-[10px] tracking-widest">PROGRESS</span>
               <span className="text-[#D2D7D5] text-xs">{Math.min(100, Math.floor(progress))}%</span>
@@ -91,7 +91,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between" style={flicker("0.4s")}>
+          <div className="flex items-center justify-between" style={flicker("0.2s")}>
             <span className="text-[#D2D7D5] text-xs animate-pulse">© {new Date().getFullYear()}</span>
             <span className="text-[#D2D7D5] text-xs">MADE WITH LOVE</span>
           </div>
