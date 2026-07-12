@@ -42,7 +42,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
-      <div className="w-full h-full flex items-start justify-center pt-[35vh] p-6">
+      <div className="w-full h-full flex items-center justify-center p-6">
         <div className="w-full max-w-lg space-y-3" style={{ fontFamily: "var(--font-montserrat), sans-serif" }}>
           {/* Header */}
           <div className="flex items-center justify-between" style={flicker("0s")}>
@@ -80,7 +80,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           <div className="border border-zinc-700 px-3 py-3" style={flicker("0.15s")}>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[#D2D7D5] text-[10px] tracking-widest">PROGRESS</span>
-              <span className="text-[#D2D7D5] text-xs">{Math.min(100, Math.floor(progress))}%</span>
+              <span className="text-[#D2D7D5] text-[10px]">{Math.min(100, Math.floor(progress))}%</span>
             </div>
             <div className="w-full h-px bg-zinc-800 relative">
               <div
