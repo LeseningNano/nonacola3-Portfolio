@@ -42,11 +42,12 @@ export function VideoCard({
       <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
         <span className="text-[10px] md:text-xs lg:text-sm text-zinc-400 mb-1 block">{video.category}</span>
         <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
-        {/* Summary — revealed on hover, pushed below title */}
         {video.summary && (
-          <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm lg:text-base line-clamp-2 mt-1 max-h-0 overflow-hidden opacity-0 group-hover:max-h-20 group-hover:opacity-100 transition-all duration-300">
-            {video.summary}
-          </p>
+          <div className="grid transition-[grid-template-rows] duration-300 ease-in-out group-hover:grid-rows-[1fr] grid-rows-[0fr]">
+            <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm lg:text-base line-clamp-2 overflow-hidden">
+              <span className="block mt-1">{video.summary}</span>
+            </p>
+          </div>
         )}
       </div>
     </div>
