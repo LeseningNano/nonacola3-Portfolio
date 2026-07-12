@@ -32,7 +32,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
   }, [progress, onReady]);
 
   const flicker = (delay: string) => ({
-    animation: `flicker-in 0.1s ${delay} both`,
+    animation: `flicker-in 0.08s ${delay} both`,
   });
 
   return (

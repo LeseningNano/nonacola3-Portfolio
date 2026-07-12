@@ -202,8 +202,10 @@ body::after {
 }
 
 @keyframes flicker-in {
-  0% { opacity: 1; }
+  0% { opacity: 0; }
+  30% { opacity: 1; }
   50% { opacity: 0; }
+  80% { opacity: 1; }
   100% { opacity: 1; }
 }
 
