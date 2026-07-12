@@ -39,17 +39,15 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
       }`}
     >
       <div className="w-full h-full flex items-center justify-center p-6">
-        <div className="w-full max-w-lg border border-zinc-700" style={{ fontFamily: "'Courier New', monospace" }}>
+        <div className="w-full max-w-lg space-y-3" style={{ fontFamily: "'Courier New', monospace" }}>
           {/* Header */}
-          <div className="border-b border-zinc-700 px-5 py-4">
-            <div className="flex items-center justify-between">
-              <span className="text-white text-lg tracking-wider font-bold">{siteConfig.name.toUpperCase()}</span>
-              <span className="text-zinc-500 text-xs">LOADING</span>
-            </div>
+          <div className="flex items-center justify-between px-1">
+            <span className="text-white text-lg tracking-wider font-bold">{siteConfig.name.toUpperCase()}</span>
+            <span className="text-zinc-500 text-xs">LOADING</span>
           </div>
 
           {/* Info grid */}
-          <div className="grid grid-cols-2 border-b border-zinc-700">
+          <div className="grid grid-cols-2 border border-zinc-700">
             <div className="border-r border-zinc-700 px-5 py-4">
               <div className="text-zinc-500 text-[10px] tracking-widest mb-2">STATUS</div>
               <div className="text-white text-xs">INITIALIZING</div>
@@ -61,7 +59,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           </div>
 
           {/* Description */}
-          <div className="border-b border-zinc-700 px-5 py-4">
+          <div className="border border-zinc-700 px-5 py-4">
             <div className="text-zinc-500 text-[10px] tracking-widest mb-2">INFO</div>
             <div className="text-zinc-400 text-[11px] leading-relaxed">
               VIDEO PORTFOLIO / {siteConfig.description.toUpperCase()}
@@ -69,7 +67,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           </div>
 
           {/* Progress bar */}
-          <div className="px-5 py-4">
+          <div className="border border-zinc-700 px-5 py-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-zinc-500 text-[10px] tracking-widest">PROGRESS</span>
               <span className="text-white text-xs">{Math.min(100, Math.floor(progress))}%</span>
@@ -83,7 +81,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-zinc-700 px-5 py-3 flex items-center justify-between">
+          <div className="flex items-center justify-between px-1">
             <span className="text-zinc-600 text-[10px]">© {new Date().getFullYear()}</span>
             <span className="text-zinc-600 text-[10px]">MADE WITH LOVE</span>
           </div>
