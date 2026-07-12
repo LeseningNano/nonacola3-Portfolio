@@ -42,7 +42,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
-      <div className="w-full h-full flex items-center justify-center p-6">
+      <div className="w-full h-full flex items-start justify-center pt-[35vh] p-6">
         <div className="w-full max-w-lg space-y-3" style={{ fontFamily: "var(--font-montserrat), sans-serif" }}>
           {/* Header */}
           <div className="flex items-center justify-between" style={flicker("0s")}>
