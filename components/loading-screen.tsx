@@ -43,31 +43,31 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           {/* Header */}
           <div className="flex items-center justify-between px-1">
             <span className="text-[#D2D7D5] text-lg tracking-wider font-bold">{siteConfig.name.toUpperCase()}</span>
-            <span className="text-zinc-500 text-xs">LOADING</span>
+            <span className="text-[#D2D7D5] text-xs">LOADING</span>
           </div>
 
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white px-5 py-4">
               <div className="text-[10px] leading-relaxed">
-                <span className="text-zinc-500">CODING:</span><br />
+                <span className="text-black">CODING:</span><br />
                 <span className="text-black">OPENCODE / XIAOMI MIMO / Google Gemini 3.0 Pro</span><br />
-                <span className="text-zinc-500">DESIGN:</span><br />
+                <span className="text-black">DESIGN:</span><br />
                 <span className="text-black">NONACOLA3</span><br />
-                <span className="text-zinc-500">HOST:</span><br />
+                <span className="text-black">HOST:</span><br />
                 <span className="text-black">VERCEL</span>
               </div>
             </div>
             <div className="border border-zinc-700 px-5 py-4">
-              <div className="text-zinc-500 text-[10px] tracking-widest mb-2">VER</div>
+              <div className="text-[#D2D7D5] text-[10px] tracking-widest mb-2">VER</div>
               <div className="text-[#D2D7D5] text-xs">03</div>
             </div>
           </div>
 
           {/* Description */}
           <div className="border border-zinc-700 px-5 py-4">
-            <div className="text-zinc-500 text-[10px] tracking-widest mb-2">INFO</div>
-            <div className="text-zinc-400 text-[11px] leading-relaxed">
+            <div className="text-[#D2D7D5] text-[10px] tracking-widest mb-2">INFO</div>
+            <div className="text-[#D2D7D5] text-[11px] leading-relaxed">
               VIDEO PORTFOLIO / {siteConfig.description.toUpperCase()}
             </div>
           </div>
@@ -75,7 +75,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           {/* Progress bar */}
           <div className="border border-zinc-700 px-5 py-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-zinc-500 text-[10px] tracking-widest">PROGRESS</span>
+              <span className="text-[#D2D7D5] text-[10px] tracking-widest">PROGRESS</span>
               <span className="text-[#D2D7D5] text-xs">{Math.min(100, Math.floor(progress))}%</span>
             </div>
             <div className="w-full h-px bg-zinc-800 relative">
@@ -88,8 +88,8 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
 
           {/* Footer */}
           <div className="flex items-center justify-between px-1">
-            <span className="text-zinc-600 text-[10px]">© {new Date().getFullYear()}</span>
-            <span className="text-zinc-600 text-[10px]">MADE WITH LOVE</span>
+            <span className="text-[#D2D7D5] text-[10px]">© {new Date().getFullYear()}</span>
+            <span className="text-[#D2D7D5] text-[10px]">MADE WITH LOVE</span>
           </div>
         </div>
       </div>
