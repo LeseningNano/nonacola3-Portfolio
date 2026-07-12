@@ -3,11 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
-import { useTransitionRouter } from "glimm/next";
 import { LoadingScreen } from "./loading-screen";
 
 export function HeroVideo() {
-  const router = useTransitionRouter();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isFetched, setIsFetched] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -15,7 +13,7 @@ export function HeroVideo() {
   const [fadeOut, setFadeOut] = useState(false);
   const [parallaxY, setParallaxY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const glimmTriggered = useRef(false);
+  const loadTriggered = useRef(false);
 
   useEffect(() => {
     fetch("/api/hero")
@@ -51,11 +49,10 @@ export function HeroVideo() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // After loading screen finishes, trigger glimm then fade out
+  // After loading screen finishes, fade out
   const handleLoadReady = () => {
-    if (!glimmTriggered.current) {
-      glimmTriggered.current = true;
-      router.push("/");
+    if (!loadTriggered.current) {
+      loadTriggered.current = true;
       setFadeOut(true);
       setTimeout(() => setShowLoader(false), 500);
     }

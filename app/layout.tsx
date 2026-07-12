@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
-import { GlimmProvider } from "glimm/next";
+
 import { ServerNotice } from "@/components/server-notice";
 import "./globals.css";
 
@@ -28,9 +28,7 @@ export default function RootLayout({
         <PageTransition />
         <ServerNotice />
         <Navbar />
-        <GlimmProvider palette="prism">
-          {children}
-        </GlimmProvider>
+        {children}
       </body>
     </html>
   );
