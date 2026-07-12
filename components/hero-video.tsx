@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { useTransitionRouter } from "glimm/next";
+import { LoadingScreen } from "./loading-screen";
 
 export function HeroVideo() {
   const router = useTransitionRouter();
@@ -12,7 +13,6 @@ export function HeroVideo() {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
-  const [barProgress, setBarProgress] = useState(0);
   const [parallaxY, setParallaxY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const glimmTriggered = useRef(false);
@@ -51,51 +51,21 @@ export function HeroVideo() {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Simulate loading progress
-  useEffect(() => {
-    if (isVideoReady) {
-      setBarProgress(100);
-      return;
-    }
-    const timers = [
-      setTimeout(() => setBarProgress(30), 300),
-      setTimeout(() => setBarProgress(55), 800),
-      setTimeout(() => setBarProgress(75), 1500),
-      setTimeout(() => setBarProgress(90), 2500),
-    ];
-    // Fallback: if video doesn't load within 5s, finish anyway
-    const fallback = setTimeout(() => {
-      setBarProgress(100);
-    }, 5000);
-    return () => { timers.forEach(clearTimeout); clearTimeout(fallback); };
-  }, [isVideoReady]);
-
-  // After bar reaches 100%, trigger glimm then fade out
-  useEffect(() => {
-    if (barProgress >= 100 && !glimmTriggered.current) {
+  // After loading screen finishes, trigger glimm then fade out
+  const handleLoadReady = () => {
+    if (!glimmTriggered.current) {
       glimmTriggered.current = true;
-      const timer = setTimeout(() => {
-        router.push("/");
-        setFadeOut(true);
-        setTimeout(() => {
-          setShowLoader(false);
-        }, 400);
-      }, 200);
-      return () => clearTimeout(timer);
+      router.push("/");
+      setFadeOut(true);
+      setTimeout(() => setShowLoader(false), 500);
     }
-  }, [barProgress, router]);
+  };
 
   return (
     <>
       {/* Full-screen loading overlay */}
       {showLoader && (
-        <div
-          key="loader"
-          data-hero-loader
-          className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#0a0a0a] transition-opacity duration-500 ${
-            fadeOut ? "opacity-0" : "opacity-100"
-          }`}
-        />
+        <LoadingScreen onReady={handleLoadReady} />
       )}
 
       <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]">
