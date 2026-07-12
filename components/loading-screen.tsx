@@ -53,7 +53,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3" style={flicker("0.05s")}>
             <div className="bg-white px-3 py-3">
-              <div className="text-[9px] leading-relaxed">
+              <div className="text-[8px] leading-relaxed">
                 <span className="text-black">CODING:</span><br />
                 <span className="text-black">OPENCODE / XIAOMI MIMO / Google Gemini 3.0 Pro</span><br />
                 <span className="text-black">DESIGN:</span><br />
@@ -63,8 +63,8 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
               </div>
             </div>
             <div className="px-3 py-3">
-              <div className="text-[#D2D7D5] text-[10px] tracking-widest mb-2">VER</div>
-              <div className="text-[#D2D7D5] text-[10px]">03</div>
+              <div className="text-[#D2D7D5] text-[8px] tracking-widest mb-2">VER</div>
+              <div className="text-[#D2D7D5] text-[8px]">03</div>
             </div>
           </div>
 
