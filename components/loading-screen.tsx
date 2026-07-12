@@ -49,8 +49,14 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
           {/* Info grid */}
           <div className="grid grid-cols-2 border border-zinc-700">
             <div className="border-r border-zinc-700 px-5 py-4">
-              <div className="text-zinc-500 text-[10px] tracking-widest mb-2">STATUS</div>
-              <div className="text-white text-xs">INITIALIZING</div>
+              <div className="text-zinc-400 text-[10px] leading-relaxed">
+                <span className="text-zinc-500">CODING:</span><br />
+                OPENCODE / XIAOMI MIMO / Google Gemini 3.0 Pro<br />
+                <span className="text-zinc-500">DESIGN:</span><br />
+                NONACOLA3<br />
+                <span className="text-zinc-500">HOST:</span><br />
+                VERCEL
+              </div>
             </div>
             <div className="px-5 py-4">
               <div className="text-zinc-500 text-[10px] tracking-widest mb-2">VER</div>
