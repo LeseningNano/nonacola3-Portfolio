@@ -54,7 +54,6 @@ export function ShowreelModal({ onClose }: ShowreelModalProps) {
       >
         <button
           onClick={handleClose}
-          data-cuelume-press data-cuelume-release
           className="absolute -top-12 right-0 text-zinc-400 hover:text-white transition-colors"
         >
           <X className="w-8 h-8" />

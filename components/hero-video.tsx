@@ -134,7 +134,6 @@ export function HeroVideo() {
             }
           }}
           className="group absolute bottom-20 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white flex items-center gap-2"
-          data-cuelume-press data-cuelume-release
           style={{ fontFamily: "'Bitcount Grid Single', sans-serif", opacity: Math.max(0, 1 - scrollProgress * 2.5), pointerEvents: scrollProgress > 0.45 ? "none" as const : "auto" as const }}
         >
           跳转至 works.

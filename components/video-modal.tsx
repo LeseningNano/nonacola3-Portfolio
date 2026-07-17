@@ -54,7 +54,6 @@ export function VideoModal({
       >
         <button
           onClick={handleClose}
-          data-cuelume-press data-cuelume-release
           className="absolute -top-12 right-0 text-zinc-400 hover:text-white transition-colors"
         >
           <X className="w-8 h-8" />
@@ -105,7 +104,6 @@ export function VideoModal({
           href={video.embedUrl}
           target="_blank"
           rel="noopener noreferrer"
-          data-cuelume-hover="chime" data-cuelume-press
           className="flex items-center justify-between px-6 py-4 text-zinc-300 hover:text-white hover:bg-zinc-800/50 transition-all duration-300 group"
         >
           <span className="text-sm">跳转至视频</span>

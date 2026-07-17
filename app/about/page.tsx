@@ -18,7 +18,6 @@ export default function AboutPage() {
             <p className="text-sm text-zinc-500 uppercase tracking-wider mb-4">期待与你合作</p>
             <a
               href={`mailto:${siteConfig.email}`}
-              data-cuelume-hover="chime" data-cuelume-press
               className="text-2xl md:text-3xl hover:text-zinc-300 transition-colors"
             >
               {siteConfig.email}
@@ -33,7 +32,6 @@ export default function AboutPage() {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-cuelume-hover="tick" data-cuelume-press
                   className="px-5 py-3 border border-zinc-400 hover:border-white text-zinc-300 hover:text-white transition-all duration-300 text-base"
                 >
                   {link.name}
@@ -45,7 +43,6 @@ export default function AboutPage() {
         <div className="mt-16">
           <Link
             href="/"
-            data-cuelume-hover="tick" data-cuelume-press
             className="inline-flex items-center gap-2 text-sm text-zinc-300 hover:text-white border border-zinc-400 hover:border-white px-4 py-2 transition-all duration-300"
           >
             <ArrowLeft className="w-4 h-4" />
