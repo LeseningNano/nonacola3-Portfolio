@@ -70,8 +70,8 @@ export function LoadingScreen({
         <div className="w-full max-w-lg space-y-3" style={{ fontFamily: "var(--font-montserrat), sans-serif" }}>
           {/* Header */}
           <div className="flex items-center justify-between" style={flicker("0s")}>
-            <span className="text-[#D2D7D5] text-lg tracking-wider font-bold">{siteConfig.name.toUpperCase()}</span>
-            <span className="text-[#D2D7D5] text-xs animate-pulse">LOADING</span>
+            <span className="text-[#e4e4e7] text-lg tracking-wider font-bold">{siteConfig.name.toUpperCase()}</span>
+            <span className="text-[#e4e4e7] text-xs animate-pulse">LOADING</span>
           </div>
 
           {/* Info grid */}
@@ -87,28 +87,28 @@ export function LoadingScreen({
               </div>
             </div>
             <div className="px-3 py-3">
-              <div className="text-[#D2D7D5] text-[8px] tracking-widest mb-2">VER</div>
-              <div className="text-[#D2D7D5] text-[8px]">03</div>
+              <div className="text-[#e4e4e7] text-[8px] tracking-widest mb-2">VER</div>
+              <div className="text-[#e4e4e7] text-[8px]">03</div>
             </div>
           </div>
 
           {/* Description */}
           <div className="border border-zinc-700 px-3 py-3" style={flicker("0.1s")}>
             <div className="flex items-center justify-between">
-              <span className="text-[#D2D7D5] text-[10px] tracking-widest">INFO</span>
-              <span className="text-[#D2D7D5] text-[11px]">VIDEO PORTFOLIO / {siteConfig.description.toUpperCase()}</span>
+              <span className="text-[#e4e4e7] text-[10px] tracking-widest">INFO</span>
+              <span className="text-[#e4e4e7] text-[11px]">VIDEO PORTFOLIO / {siteConfig.description.toUpperCase()}</span>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="border border-zinc-700 px-3 py-3" style={flicker("0.15s")}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[#D2D7D5] text-[10px] tracking-widest">PROGRESS</span>
-              <span className="text-[#D2D7D5] text-[10px]">{Math.min(100, Math.floor(progress))}%</span>
+              <span className="text-[#e4e4e7] text-[10px] tracking-widest">PROGRESS</span>
+              <span className="text-[#e4e4e7] text-[10px]">{Math.min(100, Math.floor(progress))}%</span>
             </div>
             <div className="w-full h-px bg-zinc-800 relative">
               <div
-                className="absolute left-0 top-0 h-full bg-[#D2D7D5] transition-all duration-150"
+                className="absolute left-0 top-0 h-full bg-[#e4e4e7] transition-all duration-150"
                 style={{ width: `${Math.min(100, progress)}%` }}
               />
             </div>
@@ -116,8 +116,8 @@ export function LoadingScreen({
 
           {/* Footer */}
           <div className="flex items-center justify-between" style={flicker("0.2s")}>
-            <span className="text-[#D2D7D5] text-xs animate-pulse">© {new Date().getFullYear()}</span>
-            <span className="text-[#D2D7D5] text-xs">MADE WITH LOVE</span>
+            <span className="text-[#e4e4e7] text-xs animate-pulse">© {new Date().getFullYear()}</span>
+            <span className="text-[#e4e4e7] text-xs">MADE WITH LOVE</span>
           </div>
         </div>
       </div>

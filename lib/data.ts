@@ -21,3 +21,9 @@ export const getShowreel = unstable_cache(
   ["showreel"],
   { tags: ["showreel"] }
 );
+
+export const getPosts = unstable_cache(
+  async () => db.post.findMany({ orderBy: { date: "desc" } }),
+  ["posts"],
+  { tags: ["posts"] }
+);
