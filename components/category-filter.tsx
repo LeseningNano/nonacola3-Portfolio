@@ -18,7 +18,7 @@ export function CategoryFilter({
         className={`px-5 py-2.5 text-sm transition-all duration-300 border flex items-center gap-2 ${
           selected === "全部"
             ? "text-white border-white"
-            : "text-zinc-300 border-zinc-400 hover:text-white hover:border-white"
+            : "text-neutral-300 border-neutral-400 hover:text-white hover:border-white"
         }`}
       >
         全部
@@ -30,7 +30,7 @@ export function CategoryFilter({
           className={`px-5 py-2.5 text-sm transition-all duration-300 border flex items-center gap-2 ${
             selected === cat
               ? "text-white border-white"
-              : "text-zinc-300 border-zinc-400 hover:text-white hover:border-white"
+              : "text-neutral-300 border-neutral-400 hover:text-white hover:border-white"
           }`}
         >
           {cat}

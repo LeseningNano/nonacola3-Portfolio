@@ -13,13 +13,13 @@ export function Navbar() {
         <div className="flex items-center gap-6">
           <Link
             href="/about"
-            className="text-sm text-zinc-400 hover:text-white transition-colors"
+            className="text-sm text-neutral-400 hover:text-white transition-colors"
           >
             关于
           </Link>
           <Link
             href="/dashboard"
-            className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors"
           >
             管理
           </Link>

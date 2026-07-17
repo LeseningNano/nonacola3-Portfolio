@@ -36,7 +36,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-[400px] bg-zinc-900 border-zinc-800">
+      <Card className="w-[400px] bg-neutral-900 border-neutral-800">
         <CardHeader>
           <CardTitle className="text-center">管理员登录</CardTitle>
         </CardHeader>
@@ -51,7 +51,7 @@ export default function LoginPage() {
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="bg-zinc-800 border-zinc-700"
+                className="bg-neutral-800 border-neutral-700"
               />
             </div>
             <div className="space-y-2">
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-zinc-800 border-zinc-700"
+                className="bg-neutral-800 border-neutral-700"
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>

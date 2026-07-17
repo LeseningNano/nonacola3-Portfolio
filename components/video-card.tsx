@@ -23,7 +23,7 @@ export function VideoCard({
 }) {
   return (
     <div
-      className="group relative aspect-video bg-zinc-900 overflow-hidden cursor-pointer"
+      className="group relative aspect-video bg-neutral-900 overflow-hidden cursor-pointer"
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -44,19 +44,19 @@ export function VideoCard({
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
       ) : (
-        <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-          <Play className="w-12 h-12 text-zinc-600" />
+        <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
+          <Play className="w-12 h-12 text-neutral-600" />
         </div>
       )}
       {/* Gradient overlay — stronger on hover for description readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent transition-all duration-300" />
       {/* Always visible: category + title at bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
-        <span className="text-[10px] md:text-xs lg:text-sm text-zinc-400 mb-1 block">{video.category}</span>
+        <span className="text-[10px] md:text-xs lg:text-sm text-neutral-400 mb-1 block">{video.category}</span>
         <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
         {video.summary && (
           <div className="grid transition-[grid-template-rows] duration-300 ease-in-out grid-rows-[1fr] md:grid-rows-[0fr] md:group-hover:grid-rows-[1fr]">
-            <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm lg:text-base line-clamp-1 md:line-clamp-2 overflow-hidden">
+            <p className="text-neutral-300 text-[10px] sm:text-xs md:text-sm lg:text-base line-clamp-1 md:line-clamp-2 overflow-hidden">
               <span className="block mt-1">{video.summary}</span>
             </p>
           </div>

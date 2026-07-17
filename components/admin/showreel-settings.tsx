@@ -106,35 +106,35 @@ export function ShowreelSettings() {
 
   if (loading) {
     return (
-      <div className="p-6 border border-zinc-800 rounded-lg bg-zinc-900 flex items-center justify-center h-32">
-        <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+      <div className="p-6 border border-neutral-800 rounded-lg bg-neutral-900 flex items-center justify-center h-32">
+        <Loader2 className="w-6 h-6 animate-spin text-neutral-500" />
       </div>
     );
   }
 
   return (
-    <div className="p-6 border border-zinc-800 rounded-lg bg-zinc-900 space-y-4">
+    <div className="p-6 border border-neutral-800 rounded-lg bg-neutral-900 space-y-4">
       <div>
-        <h3 className="text-sm font-semibold text-zinc-200">Showreel 视频</h3>
-        <p className="text-xs text-zinc-500 mt-1">
+        <h3 className="text-sm font-semibold text-neutral-200">Showreel 视频</h3>
+        <p className="text-xs text-neutral-500 mt-1">
           更换首页展示的 Showreel 视频
         </p>
       </div>
 
       <div className="flex items-center gap-2">
         <Label className="text-sm">来源：</Label>
-        <div className="flex rounded-md overflow-hidden border border-zinc-700">
+        <div className="flex rounded-md overflow-hidden border border-neutral-700">
           <button
             type="button"
             onClick={() => setVideoType("url")}
-            className={`px-3 py-1 text-xs transition-colors ${videoType === "url" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}
+            className={`px-3 py-1 text-xs transition-colors ${videoType === "url" ? "bg-neutral-600 text-white" : "bg-neutral-800 text-neutral-400 hover:text-neutral-200"}`}
           >
             嵌入链接
           </button>
           <button
             type="button"
             onClick={() => setVideoType("upload")}
-            className={`px-3 py-1 text-xs transition-colors ${videoType === "upload" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}
+            className={`px-3 py-1 text-xs transition-colors ${videoType === "upload" ? "bg-neutral-600 text-white" : "bg-neutral-800 text-neutral-400 hover:text-neutral-200"}`}
           >
             本地上传
           </button>
@@ -150,7 +150,7 @@ export function ShowreelSettings() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="粘贴嵌入代码或链接"
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-neutral-800 border-neutral-700"
             />
           </>
         ) : (
@@ -158,15 +158,15 @@ export function ShowreelSettings() {
             <Label>上传视频文件</Label>
             {savedUrl && (
               <div className="space-y-2 mb-3">
-                <p className="text-xs text-zinc-400">当前已保存的视频：</p>
+                <p className="text-xs text-neutral-400">当前已保存的视频：</p>
                 <video
                   src={savedUrl}
-                  className="w-full max-h-48 object-contain rounded border border-zinc-700"
+                  className="w-full max-h-48 object-contain rounded border border-neutral-700"
                   controls
                   muted
                   playsInline
                 />
-                <p className="text-xs text-zinc-500 truncate">{savedUrl}</p>
+                <p className="text-xs text-neutral-500 truncate">{savedUrl}</p>
               </div>
             )}
             <div className="flex items-center gap-3">
@@ -193,20 +193,20 @@ export function ShowreelSettings() {
                 从 Blob 选择
               </Button>
               {url && url !== savedUrl && (
-                <span className="text-xs text-zinc-500 truncate max-w-xs">
+                <span className="text-xs text-neutral-500 truncate max-w-xs">
                   {url}
                 </span>
               )}
             </div>
             {uploading && (
               <div className="space-y-1">
-                <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-neutral-800 rounded-full h-2 overflow-hidden">
                   <div
                     className="bg-white h-full rounded-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <p className="text-xs text-zinc-400 text-right">{progress}%</p>
+                <p className="text-xs text-neutral-400 text-right">{progress}%</p>
               </div>
             )}
           </>
@@ -214,7 +214,7 @@ export function ShowreelSettings() {
       </div>
 
       {url && videoType === "url" && (
-        <div className="rounded overflow-hidden border border-zinc-700">
+        <div className="rounded overflow-hidden border border-neutral-700">
           <iframe
             src={url}
             className="w-full aspect-video"
@@ -225,8 +225,8 @@ export function ShowreelSettings() {
 
       {url && videoType === "upload" && url !== savedUrl && (
         <div className="space-y-1">
-          <p className="text-xs text-zinc-400">新上传的视频预览：</p>
-          <div className="rounded overflow-hidden border border-zinc-700">
+          <p className="text-xs text-neutral-400">新上传的视频预览：</p>
+          <div className="rounded overflow-hidden border border-neutral-700">
             <video src={url} controls className="w-full max-h-48 object-contain" />
           </div>
         </div>
@@ -243,24 +243,24 @@ export function ShowreelSettings() {
       </Button>
 
       <Dialog open={showBlobPicker} onOpenChange={setShowBlobPicker}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 max-w-2xl max-h-[70vh] flex flex-col">
+        <DialogContent className="bg-neutral-900 border-neutral-800 max-w-2xl max-h-[70vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>选择已上传的文件</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto space-y-2 pr-1">
             {blobLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-neutral-500" />
               </div>
             ) : blobFiles.length === 0 ? (
-              <p className="text-zinc-500 text-sm text-center py-8">暂无已上传的文件</p>
+              <p className="text-neutral-500 text-sm text-center py-8">暂无已上传的文件</p>
             ) : (
               blobFiles.map((file) => (
                 <button
                   key={file.url}
                   type="button"
                   onClick={() => selectBlobFile(file)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/50 transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-neutral-800 hover:border-neutral-600 hover:bg-neutral-800/50 transition-colors text-left"
                 >
                   {file.pathname.match(/\.(mp4|webm|mov|avi)$/i) ? (
                     <video
@@ -275,13 +275,13 @@ export function ShowreelSettings() {
                       className="w-24 h-16 object-cover rounded flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-24 h-16 bg-zinc-800 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs text-zinc-500">文件</span>
+                    <div className="w-24 h-16 bg-neutral-800 rounded flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs text-neutral-500">文件</span>
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-zinc-200 truncate">{file.pathname}</p>
-                    <p className="text-xs text-zinc-500">{file.sizeMB} MB</p>
+                    <p className="text-sm text-neutral-200 truncate">{file.pathname}</p>
+                    <p className="text-xs text-neutral-500">{file.sizeMB} MB</p>
                   </div>
                 </button>
               ))

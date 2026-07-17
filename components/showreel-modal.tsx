@@ -50,13 +50,13 @@ export function ShowreelModal({ onClose }: ShowreelModalProps) {
       onWheel={(e) => e.stopPropagation()}
     >
       <div
-        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-zinc-700 ${
+        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-neutral-700 ${
           isClosing ? "animate-modal-content-out" : "animate-modal-content"
         }`}
       >
         <button
           onClick={handleClose}
-          className="absolute -top-12 right-0 text-zinc-400 hover:text-white transition-colors"
+          className="absolute -top-12 right-0 text-neutral-400 hover:text-white transition-colors"
         >
           <X className="w-8 h-8" />
         </button>
@@ -64,8 +64,8 @@ export function ShowreelModal({ onClose }: ShowreelModalProps) {
         {/* Video */}
         <div className="aspect-video w-full overflow-hidden bg-black">
           {loading ? (
-            <div className="w-full h-full flex items-center justify-center bg-zinc-900">
-              <div className="w-8 h-8 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+            <div className="w-full h-full flex items-center justify-center bg-neutral-900">
+              <div className="w-8 h-8 border-2 border-neutral-600 border-t-white rounded-full animate-spin" />
             </div>
           ) : videoType === "upload" ? (
             <video

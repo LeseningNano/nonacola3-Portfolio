@@ -102,7 +102,7 @@ export function VideoForm({
   }
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800">
+    <Card className="bg-neutral-900 border-neutral-800">
       <CardHeader>
         <CardTitle>{mode === "edit" ? "编辑视频" : "添加视频"}</CardTitle>
       </CardHeader>
@@ -115,7 +115,7 @@ export function VideoForm({
               required
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-neutral-800 border-neutral-700"
             />
           </div>
           <div className="space-y-2">
@@ -126,7 +126,7 @@ export function VideoForm({
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
               placeholder="如：商业广告、短片、纪录片"
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-neutral-800 border-neutral-700"
             />
           </div>
           <div className="space-y-2">
@@ -137,24 +137,24 @@ export function VideoForm({
               value={form.embedUrl}
               onChange={(e) => setForm({ ...form, embedUrl: e.target.value })}
               placeholder="YouTube 或 Bilibili 嵌入链接"
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-neutral-800 border-neutral-700"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="thumbnail">封面图</Label>
-              <div className="flex rounded-md overflow-hidden border border-zinc-700">
+              <div className="flex rounded-md overflow-hidden border border-neutral-700">
                 <button
                   type="button"
                   onClick={() => setThumbMode("url")}
-                  className={`px-3 py-1 text-xs transition-colors ${thumbMode === "url" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}
+                  className={`px-3 py-1 text-xs transition-colors ${thumbMode === "url" ? "bg-neutral-600 text-white" : "bg-neutral-800 text-neutral-400 hover:text-neutral-200"}`}
                 >
                   链接
                 </button>
                 <button
                   type="button"
                   onClick={() => setThumbMode("upload")}
-                  className={`px-3 py-1 text-xs transition-colors ${thumbMode === "upload" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"}`}
+                  className={`px-3 py-1 text-xs transition-colors ${thumbMode === "upload" ? "bg-neutral-600 text-white" : "bg-neutral-800 text-neutral-400 hover:text-neutral-200"}`}
                 >
                   上传
                 </button>
@@ -166,7 +166,7 @@ export function VideoForm({
                 value={form.thumbnail}
                 onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
                 placeholder="https://example.com/image.jpg"
-                className="bg-zinc-800 border-zinc-700"
+                className="bg-neutral-800 border-neutral-700"
               />
             ) : (
               <div className="space-y-2">
@@ -187,18 +187,18 @@ export function VideoForm({
                     {uploading ? "上传中..." : "选择文件"}
                   </Button>
                   {form.thumbnail && !uploading && (
-                    <span className="text-xs text-zinc-500 truncate max-w-xs">
+                    <span className="text-xs text-neutral-500 truncate max-w-xs">
                       {form.thumbnail}
                     </span>
                   )}
                 </div>
                 {uploading && (
                   <div className="w-full">
-                    <div className="flex justify-between text-xs text-zinc-400 mb-1">
+                    <div className="flex justify-between text-xs text-neutral-400 mb-1">
                       <span>上传中</span>
                       <span>{uploadProgress}%</span>
                     </div>
-                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="w-full h-1.5 bg-neutral-800 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-white transition-all duration-200 rounded-full"
                         style={{ width: `${uploadProgress}%` }}
@@ -213,7 +213,7 @@ export function VideoForm({
                 <img
                   src={form.thumbnail}
                   alt="封面预览"
-                  className="w-40 h-24 object-cover rounded border border-zinc-700"
+                  className="w-40 h-24 object-cover rounded border border-neutral-700"
                 />
               </div>
             )}
@@ -228,7 +228,7 @@ export function VideoForm({
                 setForm({ ...form, summary: e.target.value })
               }
               placeholder="简短的概要文字，显示在视频卡片上"
-              className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm"
+              className="w-full rounded-md bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm"
             />
           </div>
           <div className="space-y-2">
@@ -241,7 +241,7 @@ export function VideoForm({
                 setForm({ ...form, description: e.target.value })
               }
               placeholder="详细的视频简介，支持换行"
-              className="w-full rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-sm"
+              className="w-full rounded-md bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm"
             />
           </div>
           <div className="space-y-2">
@@ -251,7 +251,7 @@ export function VideoForm({
               type="date"
               value={form.date}
               onChange={(e) => setForm({ ...form, date: e.target.value })}
-              className="bg-zinc-800 border-zinc-700"
+              className="bg-neutral-800 border-neutral-700"
             />
           </div>
           <div className="flex items-center space-x-4">
@@ -276,7 +276,7 @@ export function VideoForm({
                 onChange={(e) =>
                   setForm({ ...form, order: parseInt(e.target.value) || 0 })
                 }
-                className="w-24 bg-zinc-800 border-zinc-700"
+                className="w-24 bg-neutral-800 border-neutral-700"
               />
             </div>
           </div>

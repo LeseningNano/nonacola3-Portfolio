@@ -107,7 +107,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
               src={videoUrl}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-b from-zinc-900 to-[#0a0a0a]" />
+            <div className="w-full h-full bg-gradient-to-b from-neutral-900 to-[#0a0a0a]" />
           )}
         </div>
 
@@ -126,7 +126,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.name}
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-zinc-400 font-light" style={{ fontFamily: "var(--font-montserrat)" }}>
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-neutral-400 font-light" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.title}
           </p>
         </div>
@@ -146,7 +146,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
               window.scrollTo({ top: target, behavior: "smooth" });
             }
           }}
-          className="group absolute bottom-20 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white flex items-center gap-2"
+          className="group absolute bottom-20 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
           跳转至 works.

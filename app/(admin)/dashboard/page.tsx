@@ -18,7 +18,7 @@ export default async function DashboardPage() {
       {/* 页面设置 */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-zinc-300">页面设置</h2>
+          <h2 className="text-lg font-semibold text-neutral-300">页面设置</h2>
           <BlobUsage />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -30,13 +30,13 @@ export default async function DashboardPage() {
       {/* 作品管理 */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-zinc-300">作品管理</h2>
+          <h2 className="text-lg font-semibold text-neutral-300">作品管理</h2>
           <Link href="/videos/new">
             <Button>添加视频</Button>
           </Link>
         </div>
         {videos.length === 0 ? (
-          <p className="text-zinc-500">暂无视频，点击添加视频开始。</p>
+          <p className="text-neutral-500">暂无视频，点击添加视频开始。</p>
         ) : (
           <VideoTable videos={videos} />
         )}

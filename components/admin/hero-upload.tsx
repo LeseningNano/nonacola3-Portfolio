@@ -103,20 +103,20 @@ export function HeroUpload() {
   }
 
   return (
-    <div className="p-6 border border-zinc-800 rounded-lg bg-zinc-900 space-y-4">
+    <div className="p-6 border border-neutral-800 rounded-lg bg-neutral-900 space-y-4">
       <div>
-        <h3 className="text-sm font-semibold text-zinc-200">Hero 背景视频</h3>
-        <p className="text-xs text-zinc-500 mt-1">
+        <h3 className="text-sm font-semibold text-neutral-200">Hero 背景视频</h3>
+        <p className="text-xs text-neutral-500 mt-1">
           建议上传 10-20 秒、低码率的 MP4 视频以保证加载速度。
         </p>
       </div>
 
       {currentUrl && (
         <div className="space-y-2">
-          <p className="text-xs text-zinc-400">当前背景视频预览：</p>
+          <p className="text-xs text-neutral-400">当前背景视频预览：</p>
           <video
             src={currentUrl}
-            className="w-full max-h-[200px] object-cover rounded-md border border-zinc-800"
+            className="w-full max-h-[200px] object-cover rounded-md border border-neutral-800"
             muted
             controls
             playsInline
@@ -130,7 +130,7 @@ export function HeroUpload() {
           accept="video/mp4"
           onChange={handleUpload}
           disabled={uploading}
-          className="bg-zinc-950 border-zinc-800 cursor-pointer text-zinc-300 file:text-zinc-200"
+          className="bg-neutral-950 border-neutral-800 cursor-pointer text-neutral-300 file:text-neutral-200"
         />
 
         <Button
@@ -145,13 +145,13 @@ export function HeroUpload() {
 
         {uploading && (
           <div className="space-y-1">
-            <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-neutral-800 rounded-full h-2 overflow-hidden">
               <div
                 className="bg-white h-full rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="text-xs text-zinc-400 text-right">{progress}%</p>
+            <p className="text-xs text-neutral-400 text-right">{progress}%</p>
           </div>
         )}
 
@@ -163,24 +163,24 @@ export function HeroUpload() {
       </div>
 
       <Dialog open={showBlobPicker} onOpenChange={setShowBlobPicker}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 max-w-2xl max-h-[70vh] flex flex-col">
+        <DialogContent className="bg-neutral-900 border-neutral-800 max-w-2xl max-h-[70vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>选择已上传的文件</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto space-y-2 pr-1">
             {blobLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-neutral-500" />
               </div>
             ) : blobFiles.length === 0 ? (
-              <p className="text-zinc-500 text-sm text-center py-8">暂无已上传的文件</p>
+              <p className="text-neutral-500 text-sm text-center py-8">暂无已上传的文件</p>
             ) : (
               blobFiles.map((file) => (
                 <button
                   key={file.url}
                   type="button"
                   onClick={() => selectBlobFile(file)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-zinc-800 hover:border-zinc-600 hover:bg-zinc-800/50 transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-neutral-800 hover:border-neutral-600 hover:bg-neutral-800/50 transition-colors text-left"
                 >
                   {file.pathname.match(/\.(mp4|webm|mov|avi)$/i) ? (
                     <video
@@ -195,13 +195,13 @@ export function HeroUpload() {
                       className="w-24 h-16 object-cover rounded flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-24 h-16 bg-zinc-800 rounded flex items-center justify-center flex-shrink-0">
-                      <span className="text-xs text-zinc-500">文件</span>
+                    <div className="w-24 h-16 bg-neutral-800 rounded flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs text-neutral-500">文件</span>
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-zinc-200 truncate">{file.pathname}</p>
-                    <p className="text-xs text-zinc-500">{file.sizeMB} MB</p>
+                    <p className="text-sm text-neutral-200 truncate">{file.pathname}</p>
+                    <p className="text-xs text-neutral-500">{file.sizeMB} MB</p>
                   </div>
                 </button>
               ))
