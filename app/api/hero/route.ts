@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   const hero = await db.heroVideo.findUnique({
@@ -9,6 +11,11 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { blobUrl } = await req.json();
 
   const hero = await db.heroVideo.upsert({
@@ -17,5 +24,6 @@ export async function PUT(req: NextRequest) {
     create: { id: "singleton", blobUrl },
   });
 
+  revalidateTag("hero", "max");
   return NextResponse.json(hero);
 }

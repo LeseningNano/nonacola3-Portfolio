@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Play } from "lucide-react";
 
 interface Video {
@@ -24,12 +25,23 @@ export function VideoCard({
     <div
       className="group relative aspect-video bg-zinc-900 overflow-hidden cursor-pointer"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      aria-label={video.title}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
     >
       {video.thumbnail ? (
-        <img
+        <Image
           src={video.thumbnail}
           alt={video.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          sizes="(max-width: 1024px) 50vw, 25vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
         />
       ) : (
         <div className="w-full h-full bg-zinc-800 flex items-center justify-center">

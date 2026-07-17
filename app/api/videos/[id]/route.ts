@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 
@@ -40,6 +41,7 @@ export async function PUT(
     },
   });
 
+  revalidateTag("videos", "max");
   return NextResponse.json(video);
 }
 
@@ -54,5 +56,6 @@ export async function DELETE(
 
   const { id } = await params;
   await db.video.delete({ where: { id } });
+  revalidateTag("videos", "max");
   return NextResponse.json({ success: true });
 }

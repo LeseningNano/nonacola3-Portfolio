@@ -1,35 +1,59 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { siteConfig } from "@/lib/config";
 
-export function LoadingScreen({ onReady }: { onReady: () => void }) {
+const MIN_DISPLAY_MS = 1200;
+
+export function LoadingScreen({
+  ready,
+  onReady,
+}: {
+  ready: boolean;
+  onReady: () => void;
+}) {
   const [fadeOut, setFadeOut] = useState(false);
   const [progress, setProgress] = useState(0);
+  const startTime = useRef(Date.now());
+  const doneRef = useRef(false);
 
+  // Crawl toward 90% while waiting; snap to 100% when ready
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((p) => {
-        if (p >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return p + Math.random() * 15 + 5;
+        if (ready) return Math.min(100, p + 8);
+        // Asymptotic crawl: fast at first, stalls near 90
+        return p + (90 - p) * 0.04;
       });
-    }, 200);
-
+    }, 50);
     return () => clearInterval(interval);
-  }, []);
+  }, [ready]);
 
   useEffect(() => {
-    if (progress >= 100) {
+    if (doneRef.current) return;
+    if (progress >= 100 && ready) {
+      const elapsed = Date.now() - startTime.current;
+      const wait = Math.max(0, MIN_DISPLAY_MS - elapsed);
+      doneRef.current = true;
       const timer = setTimeout(() => {
         setFadeOut(true);
         setTimeout(onReady, 500);
-      }, 600);
+      }, wait + 200);
       return () => clearTimeout(timer);
     }
-  }, [progress, onReady]);
+  }, [progress, ready, onReady]);
+
+  // Hard fallback: never trap the user more than 8s
+  useEffect(() => {
+    const fallback = setTimeout(() => {
+      if (!doneRef.current) {
+        doneRef.current = true;
+        setFadeOut(true);
+        setTimeout(onReady, 500);
+      }
+    }, 8000);
+    return () => clearTimeout(fallback);
+  }, [onReady]);
 
   const flicker = (delay: string) => ({
     animation: `flicker-in 0.08s ${delay} both`,
@@ -84,7 +108,7 @@ export function LoadingScreen({ onReady }: { onReady: () => void }) {
             </div>
             <div className="w-full h-px bg-zinc-800 relative">
               <div
-                className="absolute left-0 top-0 h-full bg-[#D2D7D5] transition-all duration-300"
+                className="absolute left-0 top-0 h-full bg-[#D2D7D5] transition-all duration-150"
                 style={{ width: `${Math.min(100, progress)}%` }}
               />
             </div>

@@ -40,12 +40,14 @@ export function VideoModal({
 
   return (
     <div
+      data-modal
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 ${
         isClosing ? "animate-modal-backdrop-out" : "animate-modal-backdrop"
       }`}
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
+      onWheel={(e) => e.stopPropagation()}
     >
       <div
         className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-zinc-700 bg-[#0a0a0a]/80 backdrop-blur-xl ${
@@ -66,6 +68,7 @@ export function VideoModal({
             <div className="aspect-video w-full overflow-hidden bg-black">
             <iframe
               src={`${getEmbedUrl(video.embedUrl)}${getEmbedUrl(video.embedUrl).includes("?") ? "&" : "?"}mute=1&muted=1`}
+              title={video.title}
               className="w-full h-full"
                 allowFullScreen
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

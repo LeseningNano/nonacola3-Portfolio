@@ -4,49 +4,62 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { LoadingScreen } from "./loading-screen";
+import { SCROLL_CONTAINER_ID } from "./home-client";
 
-export function HeroVideo() {
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [isFetched, setIsFetched] = useState(false);
+export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
-  const [parallaxY, setParallaxY] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const videoWrapRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const loadTriggered = useRef(false);
+  const rafId = useRef(0);
 
+  // Parallax + scroll-driven styles: write to DOM directly, no React re-render
   useEffect(() => {
-    fetch("/api/hero")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.blobUrl) {
-          setVideoUrl(data.blobUrl);
-        }
-      })
-      .finally(() => {
-        setIsFetched(true);
-      });
-  }, []);
-
-  // Parallax effect: video moves slower than scroll
-  useEffect(() => {
-    function getScrollContainer() {
-      return document.querySelector("div.h-screen") || document.documentElement;
+    function getScrollTop() {
+      const container = document.getElementById(SCROLL_CONTAINER_ID);
+      if (container) return container.scrollTop;
+      return window.scrollY;
     }
 
-    function handleScroll() {
-      const container = getScrollContainer();
-      const scrollTop = container === document.documentElement ? window.scrollY : (container as HTMLElement).scrollTop;
+    function apply() {
+      rafId.current = 0;
+      const scrollTop = getScrollTop();
       const heroHeight = window.innerHeight;
-      if (scrollTop <= heroHeight) {
-        setParallaxY(scrollTop * 0.4);
-        setScrollProgress(scrollTop / heroHeight);
+      if (scrollTop > heroHeight) return;
+
+      const progress = scrollTop / heroHeight;
+
+      if (videoWrapRef.current) {
+        videoWrapRef.current.style.transform = `translateY(${scrollTop * 0.4}px)`;
+      }
+      if (videoRef.current) {
+        videoRef.current.style.filter = `blur(4px) brightness(${0.5 - progress * 0.3})`;
+      }
+      const fade = Math.max(0, 1 - progress * 2.5);
+      if (contentRef.current) {
+        contentRef.current.style.opacity = String(fade);
+      }
+      if (buttonRef.current) {
+        buttonRef.current.style.opacity = String(fade);
+        buttonRef.current.style.pointerEvents = progress > 0.45 ? "none" : "auto";
       }
     }
 
-    const container = getScrollContainer();
-    container.addEventListener("scroll", handleScroll, { passive: true });
-    return () => container.removeEventListener("scroll", handleScroll);
+    function onScroll() {
+      if (!rafId.current) rafId.current = requestAnimationFrame(apply);
+    }
+
+    const container = document.getElementById(SCROLL_CONTAINER_ID);
+    const target: HTMLElement | Window = container ?? window;
+    target.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      target.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(rafId.current);
+    };
   }, []);
 
   // After loading screen finishes, fade out
@@ -62,38 +75,40 @@ export function HeroVideo() {
     <>
       {/* Full-screen loading overlay */}
       {showLoader && (
-        <LoadingScreen onReady={handleLoadReady} />
+        <LoadingScreen ready={isVideoReady || !videoUrl} onReady={handleLoadReady} />
       )}
 
       <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]">
         {/* Background / Video Layer */}
         <div
+          ref={videoWrapRef}
           className="absolute z-0"
           style={{
             top: "-10%",
             left: "-5%",
             right: "-5%",
             bottom: "-10%",
-            transform: `translateY(${parallaxY}px)`,
             willChange: "transform",
           }}
         >
           {videoUrl ? (
             <video
+              ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
+              preload="auto"
               onCanPlay={() => setIsVideoReady(true)}
               className={`w-full h-full object-cover scale-110 transition-opacity duration-1000 ${
                 isVideoReady ? "opacity-100" : "opacity-0"
               }`}
-              style={{ filter: `blur(4px) brightness(${0.5 - scrollProgress * 0.3})` }}
+              style={{ filter: "blur(4px) brightness(0.5)" }}
               src={videoUrl}
             />
-          ) : isFetched ? (
+          ) : (
             <div className="w-full h-full bg-gradient-to-b from-zinc-900 to-[#0a0a0a]" />
-          ) : null}
+          )}
         </div>
 
         {/* Halftone Texture Layer */}
@@ -107,7 +122,7 @@ export function HeroVideo() {
         />
 
         {/* Content Layer */}
-        <div className="absolute bottom-20 md:bottom-28 left-4 md:left-20 z-10 text-left">
+        <div ref={contentRef} className="absolute bottom-20 md:bottom-28 left-4 md:left-20 z-10 text-left">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.name}
           </h1>
@@ -115,26 +130,24 @@ export function HeroVideo() {
             {siteConfig.title}
           </p>
         </div>
-        
+
         <button
+          ref={buttonRef}
           onClick={() => {
-            const container = document.querySelector("div.h-screen");
             const works = document.getElementById("works");
-            if (works) {
-              if (container) {
-                const worksTop = works.offsetTop;
-                const target = worksTop * 0.90;
-                container.dispatchEvent(
-                  new CustomEvent("smooth-scroll-to", { detail: { target } })
-                );
-              } else {
-                const worksTop = works.offsetTop;
-                window.scrollTo({ top: worksTop * 0.90, behavior: "smooth" });
-              }
+            if (!works) return;
+            const container = document.getElementById(SCROLL_CONTAINER_ID);
+            const target = works.offsetTop * 0.9;
+            if (container) {
+              container.dispatchEvent(
+                new CustomEvent("smooth-scroll-to", { detail: { target } })
+              );
+            } else {
+              window.scrollTo({ top: target, behavior: "smooth" });
             }
           }}
           className="group absolute bottom-20 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-zinc-300 hover:text-white transition-all duration-300 cursor-pointer border border-zinc-400 hover:border-white flex items-center gap-2"
-          style={{ fontFamily: "'Bitcount Grid Single', sans-serif", opacity: Math.max(0, 1 - scrollProgress * 2.5), pointerEvents: scrollProgress > 0.45 ? "none" as const : "auto" as const }}
+          style={{ fontFamily: "var(--font-bitcount)" }}
         >
           跳转至 works.
           <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 transition-transform duration-300 group-hover:translate-x-0.5" />

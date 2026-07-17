@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { AlertCircle } from "lucide-react";
+import { useState, useMemo } from "react";
 import { VideoCard } from "./video-card";
 import { VideoModal } from "./video-modal";
 import { ShowreelModal } from "./showreel-modal";
@@ -21,29 +20,10 @@ interface Video {
   date: string | null;
 }
 
-interface YearGroup {
-  year: string;
-  videos: Video[];
-}
-
-export function VideoGrid() {
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function VideoGrid({ videos }: { videos: Video[] }) {
   const [selectedYear, setSelectedYear] = useState("全部");
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [showShowreel, setShowShowreel] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/videos")
-      .then((res) => {
-        if (!res.ok) throw new Error("加载作品失败");
-        return res.json();
-      })
-      .then((data) => setVideos(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
 
   const years = useMemo(() => {
     const set = new Set<string>();
@@ -76,7 +56,7 @@ export function VideoGrid() {
     <section id="works" className="w-full bg-[#0a0a0a]">
       <div className="pt-16">
         <div className="mb-6 px-6 md:px-12 lg:px-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>works.</h2>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>works.</h2>
           <p className="text-base md:text-lg text-zinc-400 font-light mt-1">精选视频作品与创作项目</p>
         </div>
         <div className="px-6 md:px-12 lg:px-16 mb-6">
@@ -94,44 +74,31 @@ export function VideoGrid() {
             className="w-full h-10 bg-zinc-900 hover:bg-zinc-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
           >
             <div className="flex items-center gap-3">
-              <span className="text-zinc-500 text-xs md:text-sm tracking-wider translate-y-px" style={{ fontFamily: "'Bitcount Grid Single', sans-serif" }}>REEL</span>
+              <span className="text-zinc-500 text-xs md:text-sm tracking-wider translate-y-px" style={{ fontFamily: "var(--font-bitcount)" }}>REEL</span>
               <span className="text-sm text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
             </div>
             <span className="text-zinc-600 group-hover:text-zinc-400 text-xs transition-colors duration-300">▶</span>
           </button>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1 px-6 md:px-12 lg:px-16">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-video bg-zinc-900 animate-pulse" />
-            ))}
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
-            <AlertCircle className="w-8 h-8 mb-3" />
-            <p>{error}</p>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {yearGroups.map((group) => (
-              <div key={group.year}>
-                <div className="px-6 md:px-12 lg:px-16 mb-3">
-                  <span className="text-sm font-medium text-zinc-500 tracking-wider">{group.year}</span>
-                </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
-                  {group.videos.map((video) => (
-                    <VideoCard
-                      key={video.id}
-                      video={video}
-                      onClick={() => setSelectedVideo(video)}
-                    />
-                  ))}
-                </div>
+        <div className="space-y-8">
+          {yearGroups.map((group) => (
+            <div key={group.year}>
+              <div className="px-6 md:px-12 lg:px-16 mb-3">
+                <span className="text-sm font-medium text-zinc-500 tracking-wider">{group.year}</span>
               </div>
-            ))}
-          </div>
-        )}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
+                {group.videos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    video={video}
+                    onClick={() => setSelectedVideo(video)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
 
         {selectedVideo && (
           <VideoModal

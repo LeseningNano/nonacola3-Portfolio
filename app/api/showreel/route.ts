@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
       create: { showreelId: "showreelId", showreelUrl, videoType: videoType || "url" },
     });
 
+    revalidateTag("showreel", "max");
     return NextResponse.json({
       success: true,
       showreelUrl: showreel.showreelUrl,

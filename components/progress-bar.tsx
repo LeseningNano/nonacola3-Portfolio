@@ -53,8 +53,13 @@ export function PageTransition() {
         return;
       }
 
+      // Let browser handle new-tab / download / modified clicks natively
+      if (e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
       const anchor = (e.target as HTMLElement).closest("a");
       if (!anchor) return;
+      if (anchor.target === "_blank" || anchor.hasAttribute("download")) return;
 
       const href = anchor.getAttribute("href");
       if (!href) return;
