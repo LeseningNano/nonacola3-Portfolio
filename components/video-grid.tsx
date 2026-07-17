@@ -38,28 +38,14 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
       ? videos
       : videos.filter((v) => v.date && new Date(v.date).getFullYear().toString() === selectedYear);
 
-  const yearGroups = useMemo(() => {
-    const groups: Record<string, Video[]> = {};
-    for (const v of filteredVideos) {
-      const year = v.date
-        ? new Date(v.date).getFullYear().toString()
-        : "未分类";
-      if (!groups[year]) groups[year] = [];
-      groups[year].push(v);
-    }
-    return Object.entries(groups)
-      .sort(([a], [b]) => b.localeCompare(a))
-      .map(([year, vids]) => ({ year, videos: vids }));
-  }, [filteredVideos]);
-
   return (
     <section id="works" className="w-full bg-[#0a0a0a]">
       <div className="pt-16">
-        <div className="mb-6 px-6 md:px-12 lg:px-16">
+        <div className="mb-8 px-6 md:px-12 lg:px-16">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>works.</h2>
           <p className="text-base md:text-lg text-zinc-400 font-light mt-1">精选视频作品与创作项目</p>
         </div>
-        <div className="px-6 md:px-12 lg:px-16 mb-6">
+        <div className="px-6 md:px-12 lg:px-16 mb-8">
           <CategoryFilter
             categories={years}
             selected={selectedYear}
@@ -68,35 +54,26 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
         </div>
 
         {/* Showreel strip */}
-        <div className="mb-6">
+        <div className="mb-10">
           <button
             onClick={() => setShowShowreel(true)}
-            className="w-full h-10 bg-zinc-900 hover:bg-zinc-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
+            className="w-full h-12 bg-zinc-900 hover:bg-zinc-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
           >
             <div className="flex items-center gap-3">
-              <span className="text-zinc-500 text-xs md:text-sm tracking-wider translate-y-px" style={{ fontFamily: "var(--font-bitcount)" }}>REEL</span>
-              <span className="text-sm text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
+              <span className="text-zinc-500 text-sm md:text-base tracking-wider translate-y-px" style={{ fontFamily: "var(--font-bitcount)" }}>REEL</span>
+              <span className="text-sm md:text-base text-zinc-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
             </div>
             <span className="text-zinc-600 group-hover:text-zinc-400 text-xs transition-colors duration-300">▶</span>
           </button>
         </div>
 
-        <div className="space-y-8">
-          {yearGroups.map((group) => (
-            <div key={group.year}>
-              <div className="px-6 md:px-12 lg:px-16 mb-3">
-                <span className="text-sm font-medium text-zinc-500 tracking-wider">{group.year}</span>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
-                {group.videos.map((video) => (
-                  <VideoCard
-                    key={video.id}
-                    video={video}
-                    onClick={() => setSelectedVideo(video)}
-                  />
-                ))}
-              </div>
-            </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+          {filteredVideos.map((video) => (
+            <VideoCard
+              key={video.id}
+              video={video}
+              onClick={() => setSelectedVideo(video)}
+            />
           ))}
         </div>
 

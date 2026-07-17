@@ -7,8 +7,8 @@ export default function AboutPage() {
     <div className="min-h-screen bg-[#0a0a0a] flex items-center">
       <div className="py-20 px-6 md:px-12 lg:px-16 max-w-7xl mx-auto w-full">
         <div className="mb-12">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">关于我 & 联系</h2>
-          <p className="text-base md:text-lg text-zinc-400 font-light mt-3">了解更多 & 合作洽谈</p>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>关于我 & 联系</h2>
+          <p className="text-base md:text-lg text-zinc-400 font-light mt-1">了解更多 & 合作洽谈</p>
         </div>
         <p className="text-lg md:text-xl text-zinc-300 mb-14 max-w-2xl leading-relaxed">
           我是nonacola3，是一名业余PV师，正在努力进步中。热爱影像创作（也爱打游戏），喜欢用视觉语言讲述故事。期待通过每一个作品不断打磨技术，也希望能与更多志同道合的朋友交流合作。
