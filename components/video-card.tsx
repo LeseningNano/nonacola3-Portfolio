@@ -24,6 +24,7 @@ export function VideoCard({
     <div
       className="group relative aspect-video bg-zinc-900 overflow-hidden cursor-pointer"
       onClick={onClick}
+      data-cuelume-hover="tick" data-cuelume-press
     >
       {video.thumbnail ? (
         <img

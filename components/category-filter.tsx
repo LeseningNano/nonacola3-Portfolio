@@ -15,6 +15,7 @@ export function CategoryFilter({
     <div className="flex flex-wrap gap-2.5">
       <button
         onClick={() => onSelect("全部")}
+        data-cuelume-hover="tick" data-cuelume-press
         className={`px-5 py-2.5 text-sm transition-all duration-300 border flex items-center gap-2 ${
           selected === "全部"
             ? "text-white border-white"
@@ -27,6 +28,7 @@ export function CategoryFilter({
         <button
           key={cat}
           onClick={() => onSelect(cat)}
+          data-cuelume-hover="tick" data-cuelume-press
           className={`px-5 py-2.5 text-sm transition-all duration-300 border flex items-center gap-2 ${
             selected === cat
               ? "text-white border-white"

@@ -4,6 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
 
 import { ServerNotice } from "@/components/server-notice";
+import { CuelumeProvider } from "@/components/cuelume-provider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -25,6 +26,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@400&display=swap" rel="stylesheet" />
       </head>
       <body className={`${inter.className} ${montserrat.variable} bg-[#0a0a0a] text-white antialiased`}>
+        <CuelumeProvider />
         <PageTransition />
         <ServerNotice />
         <Navbar />
