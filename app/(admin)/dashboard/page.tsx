@@ -5,6 +5,7 @@ import { VideoTable } from "@/components/admin/video-table";
 import { HeroUpload } from "@/components/admin/hero-upload";
 import { ShowreelSettings } from "@/components/admin/showreel-settings";
 import { BlobUsage } from "@/components/admin/blob-usage";
+import { PostManager } from "@/components/admin/post-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,14 @@ export default async function DashboardPage() {
   const videos = await db.video.findMany({
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
   });
+  const posts = await db.post.findMany({ orderBy: { createdAt: "desc" } });
+  const serializedPosts = posts.map((p) => ({
+    id: p.id,
+    title: p.title,
+    body: p.body,
+    tag: p.tag,
+    createdAt: p.createdAt.toISOString(),
+  }));
 
   return (
     <div className="min-h-screen pt-24 pb-8 px-8 max-w-6xl mx-auto space-y-12">
@@ -40,6 +49,12 @@ export default async function DashboardPage() {
         ) : (
           <VideoTable videos={videos} />
         )}
+      </section>
+
+      {/* News 管理 */}
+      <section>
+        <h2 className="text-lg font-semibold text-neutral-300 mb-4">News 管理</h2>
+        <PostManager initialPosts={serializedPosts} />
       </section>
     </div>
   );
