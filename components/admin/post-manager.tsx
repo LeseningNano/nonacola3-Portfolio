@@ -130,6 +130,7 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
               )}
               <button
                 onClick={() => handleDelete(post.id)}
+                aria-label="删除动态"
                 className="text-neutral-500 hover:text-red-400 transition-colors flex-shrink-0"
               >
                 <Trash2 className="w-4 h-4" />
