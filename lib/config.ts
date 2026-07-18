@@ -6,8 +6,8 @@ export const siteConfig = {
 };
 
 export const socialLinks = [
-  { name: "Bilibili", url: "https://bilibili.com/your-id", icon: "bilibili" },
-  { name: "YouTube", url: "https://youtube.com/@your-id", icon: "youtube" },
-  { name: "小红书", url: "https://xiaohongshu.com/user/your-id", icon: "xiaohongshu" },
-  { name: "X", url: "https://x.com/your-id", icon: "twitter" },
+  { name: "Bilibili", url: "https://space.bilibili.com/13361398", icon: "bilibili" },
+  { name: "YouTube", url: "https://www.youtube.com/@nonacola3", icon: "youtube" },
+  { name: "X", url: "https://x.com/nonacola3", icon: "twitter" },
+  { name: "小红书", url: "https://xhslink.com/m/4oYQKJkJs3z", icon: "xiaohongshu" },
 ] as const;
