@@ -50,7 +50,7 @@ export function VideoModal({
       onWheel={(e) => e.stopPropagation()}
     >
       <div
-        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] border border-neutral-700 bg-[#0a0a0a] ${
+        className={`relative w-[95vw] md:w-[90vw] 2xl:w-[85vw] max-w-[1600px] max-h-[85vh] flex flex-col border border-neutral-700 bg-[#0a0a0a] ${
           isClosing ? "animate-modal-content-out" : "animate-modal-content"
         }`}
       >
@@ -61,8 +61,8 @@ export function VideoModal({
           <X className="w-8 h-8" />
         </button>
 
-        {/* Video + About side by side */}
-        <div className="flex flex-col lg:flex-row border-b border-neutral-700">
+        {/* Video + About side by side (scrollable when content is tall) */}
+        <div className="flex flex-col lg:flex-row border-b border-neutral-700 overflow-y-auto min-h-0">
           {/* Video */}
           <div className="flex-1 min-w-0">
             <div className="aspect-video w-full overflow-hidden bg-black">
@@ -80,15 +80,15 @@ export function VideoModal({
           {video.description && (
             <div className="lg:w-[320px] xl:w-[380px] flex-shrink-0 px-6 py-5 border-t lg:border-t-0 lg:border-l border-neutral-700">
               <h4 className="text-sm font-medium text-neutral-400 mb-3">关于</h4>
-              <p className="text-neutral-300 leading-relaxed whitespace-pre-line">{video.description}</p>
+              <p className="text-neutral-300 leading-relaxed whitespace-pre-line break-words">{video.description}</p>
             </div>
           )}
         </div>
 
         {/* Title + info row */}
-        <div className="px-6 py-4 border-b border-neutral-700 flex items-center justify-between">
-          <div>
-            <h3 className="text-xl font-bold text-white">{video.title}</h3>
+        <div className="px-6 py-4 border-b border-neutral-700 flex items-center justify-between flex-shrink-0">
+          <div className="min-w-0">
+            <h3 className="text-xl font-bold text-white break-words">{video.title}</h3>
             <div className="flex items-center gap-3 mt-1">
               <span className="text-xs font-medium text-neutral-400 border border-neutral-700 px-2 py-0.5">
                 {video.category}
@@ -107,7 +107,7 @@ export function VideoModal({
           href={video.embedUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between px-6 py-4 text-neutral-300 hover:text-white hover:bg-neutral-800/50 transition-all duration-300 group"
+          className="flex items-center justify-between px-6 py-4 text-neutral-300 hover:text-white hover:bg-neutral-800/50 transition-all duration-300 group flex-shrink-0"
         >
           <span className="text-sm">跳转至视频</span>
           <ExternalLink className="w-4 h-4 text-neutral-500 group-hover:text-white transition-colors" />
