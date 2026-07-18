@@ -33,3 +33,11 @@ model Showreel {
   videoType   String   @default("url") // "url" or "upload"
   updatedAt   DateTime @updatedAt
 }
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String?              // 空 = 短动态；非空 = 文章（有详情页）
+  body      String               // 短动态的一句话 或 文章的 Markdown 全文
+  tag       String?              // 可选分类标签（作品/日常/活动…）
+  createdAt DateTime @default(now())
+}
