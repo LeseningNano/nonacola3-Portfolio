@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { VideoCard } from "./video-card";
-import { VideoModal } from "./video-modal";
 import { ShowreelModal } from "./showreel-modal";
 import { CategoryFilter } from "./category-filter";
 import { Footer } from "./footer";
@@ -22,7 +21,6 @@ interface Video {
 
 export function VideoGrid({ videos }: { videos: Video[] }) {
   const [selectedYear, setSelectedYear] = useState("全部");
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [showShowreel, setShowShowreel] = useState(false);
 
   const years = useMemo(() => {
@@ -69,20 +67,9 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
           {filteredVideos.map((video) => (
-            <VideoCard
-              key={video.id}
-              video={video}
-              onClick={() => setSelectedVideo(video)}
-            />
+            <VideoCard key={video.id} video={video} />
           ))}
         </div>
-
-        {selectedVideo && (
-          <VideoModal
-            video={selectedVideo}
-            onClose={() => setSelectedVideo(null)}
-          />
-        )}
 
         {showShowreel && (
           <ShowreelModal onClose={() => setShowShowreel(false)} />
