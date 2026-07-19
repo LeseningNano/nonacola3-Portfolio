@@ -69,6 +69,30 @@ export function PageTransition() {
         // Don't intercept if already on this page
         if (href === pathname) return;
 
+        // 作品卡片 → 详情页：优先 View Transitions 共享元素过渡
+        if (href.startsWith("/works/") && "startViewTransition" in document) {
+          e.preventDefault();
+          e.stopPropagation();
+          const vtEl = anchor.querySelector("[data-vt-id]") as HTMLElement | null;
+          if (vtEl) vtEl.style.viewTransitionName = `video-${vtEl.dataset.vtId}`;
+          const vt = (document as Document & {
+            startViewTransition: (cb: () => Promise<void>) => { finished: Promise<void> };
+          }).startViewTransition(() => {
+            router.push(href);
+            return new Promise<void>((resolve) => {
+              const check = () => {
+                if (window.location.pathname === href) resolve();
+                else requestAnimationFrame(check);
+              };
+              check();
+            });
+          });
+          vt.finished.finally(() => {
+            if (vtEl) vtEl.style.viewTransitionName = "";
+          });
+          return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
         startTransition(href);
