@@ -8,13 +8,7 @@ import { SCROLL_CONTAINER_ID } from "./home-client";
 
 export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
-  // 加载动画只在本次会话首次进入时显示
-  const [showLoader, setShowLoader] = useState(() => {
-    if (typeof window !== "undefined" && sessionStorage.getItem("hero-loaded")) {
-      return false;
-    }
-    return true;
-  });
+  const [showLoader, setShowLoader] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -66,6 +60,13 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
       target.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(rafId.current);
     };
+  }, []);
+
+  // 加载动画只在本次会话首次进入时显示（挂载后跳过，避免水合不一致）
+  useEffect(() => {
+    if (sessionStorage.getItem("hero-loaded")) {
+      setShowLoader(false);
+    }
   }, []);
 
   // After loading screen finishes, fade out
