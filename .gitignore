@@ -50,3 +50,5 @@ next-env.d.ts
 /public/uploads/
 
 .superpowers/
+
+dev-server.log
