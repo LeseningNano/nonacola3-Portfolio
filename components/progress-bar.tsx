@@ -64,6 +64,9 @@ export function PageTransition() {
       const href = anchor.getAttribute("href");
       if (!href) return;
 
+      // 页内锚点（/#works 等）由导航栏自行处理，不做黑场过渡
+      if (href.includes("#")) return;
+
       if (href.startsWith("/") && !href.startsWith("//")) {
         if (href.startsWith("/dashboard") || href.startsWith("/login")) return;
         // Don't intercept if already on this page

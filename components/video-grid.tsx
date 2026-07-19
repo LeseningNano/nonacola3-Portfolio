@@ -59,24 +59,26 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
           </button>
         </div>
 
-        {showAll ? (
-          <>
-            <div className="px-6 md:px-12 lg:px-16 mb-8">
-              <CategoryFilter
-                categories={years}
-                selected={selectedYear}
-                onSelect={setSelectedYear}
-              />
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
-              {filteredVideos.map((video) => (
-                <VideoCard key={video.id} video={video} />
-              ))}
-            </div>
-          </>
-        ) : (
-          <WorksMarquee videos={videos} />
-        )}
+        <div key={showAll ? "grid" : "marquee"} className="animate-fade-slide-in">
+          {showAll ? (
+            <>
+              <div className="px-6 md:px-12 lg:px-16 mb-8">
+                <CategoryFilter
+                  categories={years}
+                  selected={selectedYear}
+                  onSelect={setSelectedYear}
+                />
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
+                {filteredVideos.map((video) => (
+                  <VideoCard key={video.id} video={video} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <WorksMarquee videos={videos} />
+          )}
+        </div>
 
         {/* 展开/收起开关 */}
         <div className="flex justify-center mt-8">

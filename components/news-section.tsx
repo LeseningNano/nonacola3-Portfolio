@@ -16,7 +16,7 @@ function formatDate(iso: string) {
 export function NewsSection({ posts }: { posts: PostItem[] }) {
   const recent = posts.slice(0, 5);
   return (
-    <section id="news" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16">
+    <section id="news" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
       <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
         news.
       </h2>
@@ -32,7 +32,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
                 <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12">
                   {formatDate(post.createdAt)}
                 </span>
-                <span className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors truncate">
+                <span className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors truncate min-w-0 flex-1">
                   {post.title ?? post.body}
                 </span>
                 {post.tag && (
@@ -48,7 +48,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
               </>
             );
             const rowClass =
-              "group relative flex items-center gap-4 py-3.5 border-b border-neutral-900 hover:bg-white/5 transition-colors duration-200 before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-white before:scale-y-0 hover:before:scale-y-100 before:transition-transform before:duration-200 before:origin-center";
+              "group relative flex items-center gap-4 px-3 md:px-4 py-3.5 border-b border-neutral-900 hover:bg-white/5 transition-colors duration-200 before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-white before:scale-y-0 hover:before:scale-y-100 before:transition-transform before:duration-200 before:origin-center";
             return post.title ? (
               <Link key={post.id} href={`/news/${post.id}`} className={rowClass}>
                 {inner}

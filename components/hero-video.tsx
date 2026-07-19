@@ -8,7 +8,13 @@ import { SCROLL_CONTAINER_ID } from "./home-client";
 
 export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
-  const [showLoader, setShowLoader] = useState(true);
+  // 加载动画只在本次会话首次进入时显示
+  const [showLoader, setShowLoader] = useState(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("hero-loaded")) {
+      return false;
+    }
+    return true;
+  });
   const [fadeOut, setFadeOut] = useState(false);
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -66,6 +72,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const handleLoadReady = () => {
     if (!loadTriggered.current) {
       loadTriggered.current = true;
+      sessionStorage.setItem("hero-loaded", "1");
       setFadeOut(true);
       setTimeout(() => setShowLoader(false), 500);
     }
