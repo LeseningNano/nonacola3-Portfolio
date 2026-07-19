@@ -5,7 +5,6 @@ import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
 import { CategoryFilter } from "./category-filter";
-import { Footer } from "./footer";
 
 interface Video {
   id: string;
@@ -93,7 +92,6 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
           <ShowreelModal onClose={() => setShowShowreel(false)} />
         )}
 
-        <Footer />
       </div>
     </section>
   );

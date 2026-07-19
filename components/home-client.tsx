@@ -5,6 +5,8 @@ import { HeroVideo } from "@/components/hero-video";
 import { VideoGrid } from "@/components/video-grid";
 import { NewsSection } from "@/components/news-section";
 import type { PostItem } from "@/components/news-section";
+import { AboutSection } from "@/components/about-section";
+import { Footer } from "@/components/footer";
 
 interface Video {
   id: string;
@@ -161,6 +163,8 @@ export function HomeClient({
       <HeroVideo videoUrl={heroVideoUrl} />
       <VideoGrid videos={videos} />
       <NewsSection posts={posts} />
+      <AboutSection />
+      <Footer />
     </div>
   );
 }
