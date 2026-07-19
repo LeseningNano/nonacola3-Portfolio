@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { HeroVideo } from "@/components/hero-video";
 import { VideoGrid } from "@/components/video-grid";
+import { NewsSection } from "@/components/news-section";
+import type { PostItem } from "@/components/news-section";
 
 interface Video {
   id: string;
@@ -22,9 +24,11 @@ export const SCROLL_CONTAINER_ID = "main-scroll";
 export function HomeClient({
   heroVideoUrl,
   videos,
+  posts,
 }: {
   heroVideoUrl: string | null;
   videos: Video[];
+  posts: PostItem[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const targetScroll = useRef(0);
@@ -156,6 +160,7 @@ export function HomeClient({
     >
       <HeroVideo videoUrl={heroVideoUrl} />
       <VideoGrid videos={videos} />
+      <NewsSection posts={posts} />
     </div>
   );
 }
