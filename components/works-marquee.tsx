@@ -19,9 +19,11 @@ export function WorksMarquee({ videos }: { videos: Video[] }) {
   const repeat = Math.max(1, Math.ceil(4200 / (videos.length * 324)));
   const sets = Array.from({ length: repeat }, () => videos).flat();
   const halves = [0, 1];
+  // 速度恒定 ~36px/s：时长随半份宽度（份数）等比放大
+  const duration = videos.length * repeat * 9;
   return (
     <div className="marquee-container overflow-hidden w-full">
-      <div className="animate-marquee flex w-max">
+      <div className="animate-marquee flex w-max" style={{ animationDuration: `${duration}s` }}>
         {halves.map((half) => (
           <div key={half} className="flex gap-1 pr-1" aria-hidden={half === 1}>
             {sets.map((video, i) => (
