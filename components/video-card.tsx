@@ -15,7 +15,7 @@ interface Video {
 
 export function VideoCard({ video }: { video: Video }) {
   return (
-    <Link href={`/works/${video.id}`} aria-label={video.title} className="block">
+    <Link href={`/works/${video.id}`} aria-label={video.title} className="block outline-none focus-visible:ring-1 focus-visible:ring-neutral-400">
       <div
         data-vt-id={video.id}
         className="group relative aspect-video bg-neutral-900 overflow-hidden cursor-pointer"
@@ -26,15 +26,15 @@ export function VideoCard({ video }: { video: Video }) {
             alt={video.title}
             fill
             sizes="(max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
             <Play className="w-12 h-12 text-neutral-600" />
           </div>
         )}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent transition-all duration-300" />
+        {/* Gradient overlay (顶部轻微压暗，避免缩略图亮边) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/10 transition-all duration-300" />
         {/* Always visible: category + title at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
           <span className="text-[10px] md:text-xs lg:text-sm text-neutral-400 mb-1 block">{video.category}</span>

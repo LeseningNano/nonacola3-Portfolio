@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -103,7 +102,7 @@ export function HeroUpload() {
   }
 
   return (
-    <div className="p-6 border border-neutral-800 rounded-lg bg-neutral-900 space-y-4">
+    <div className="border border-neutral-800 p-4 space-y-3">
       <div>
         <h3 className="text-sm font-semibold text-neutral-200">Hero 背景视频</h3>
         <p className="text-xs text-neutral-500 mt-1">
@@ -116,7 +115,7 @@ export function HeroUpload() {
           <p className="text-xs text-neutral-400">当前背景视频预览：</p>
           <video
             src={currentUrl}
-            className="w-full max-h-[200px] object-cover rounded-md border border-neutral-800"
+            className="w-full max-h-[200px] object-cover border border-neutral-800"
             muted
             controls
             playsInline
@@ -133,21 +132,20 @@ export function HeroUpload() {
           className="bg-neutral-950 border-neutral-800 cursor-pointer text-neutral-300 file:text-neutral-200"
         />
 
-        <Button
+        <button
           type="button"
-          variant="outline"
           onClick={openBlobPicker}
           disabled={uploading}
-          className="w-full"
+          className="w-full px-4 py-2 text-sm border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors disabled:opacity-50"
         >
           从 Blob 选择
-        </Button>
+        </button>
 
         {uploading && (
           <div className="space-y-1">
-            <div className="w-full bg-neutral-800 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-neutral-800 h-2 overflow-hidden">
               <div
-                className="bg-white h-full rounded-full transition-all duration-300"
+                className="bg-white h-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -156,7 +154,7 @@ export function HeroUpload() {
         )}
 
         {error && (
-          <p className="text-sm text-red-500 bg-red-950/20 border border-red-900/50 p-2 rounded">
+          <p className="text-sm text-red-500 bg-red-950/20 border border-red-900/50 p-2">
             {error}
           </p>
         )}
@@ -180,22 +178,22 @@ export function HeroUpload() {
                   key={file.url}
                   type="button"
                   onClick={() => selectBlobFile(file)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-neutral-800 hover:border-neutral-600 hover:bg-neutral-800/50 transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 border border-neutral-800 hover:border-neutral-600 hover:bg-neutral-800/50 transition-colors text-left"
                 >
                   {file.pathname.match(/\.(mp4|webm|mov|avi)$/i) ? (
                     <video
                       src={file.url}
-                      className="w-24 h-16 object-cover rounded flex-shrink-0"
+                      className="w-24 h-16 object-cover flex-shrink-0"
                       muted
                     />
                   ) : file.pathname.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                     <img
                       src={file.url}
                       alt={file.pathname}
-                      className="w-24 h-16 object-cover rounded flex-shrink-0"
+                      className="w-24 h-16 object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-24 h-16 bg-neutral-800 rounded flex items-center justify-center flex-shrink-0">
+                    <div className="w-24 h-16 bg-neutral-800 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs text-neutral-500">文件</span>
                     </div>
                   )}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
 
 interface Post {
   id: string;
@@ -22,30 +22,57 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
   const [body, setBody] = useState("");
   const [tag, setTag] = useState("");
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  function resetForm() {
+    setEditingId(null);
+    setTitle("");
+    setBody("");
+    setTag("");
+    setMode("short");
+  }
+
+  function handleEdit(post: Post) {
+    setEditingId(post.id);
+    setMode(post.title ? "article" : "short");
+    setTitle(post.title || "");
+    setBody(post.body);
+    setTag(post.tag || "");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   async function handlePublish() {
     if (!body.trim() || saving) return;
     if (mode === "article" && !title.trim()) return;
     setSaving(true);
     try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: mode === "article" ? title : null,
-          body,
-          tag: tag || null,
-        }),
-      });
+      const payload = {
+        title: mode === "article" ? title : null,
+        body,
+        tag: tag || null,
+      };
+      const res = editingId
+        ? await fetch(`/api/posts/${editingId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+        : await fetch("/api/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
       if (!res.ok) throw new Error();
       const post = await res.json();
-      setPosts((p) => [{ ...post, createdAt: post.createdAt }, ...p]);
-      setTitle("");
-      setBody("");
-      setTag("");
+      if (editingId) {
+        setPosts((p) => p.map((x) => (x.id === editingId ? { ...post, createdAt: post.createdAt } : x)));
+      } else {
+        setPosts((p) => [{ ...post, createdAt: post.createdAt }, ...p]);
+      }
+      resetForm();
       router.refresh();
     } catch {
-      alert("发布失败");
+      alert(editingId ? "更新失败" : "发布失败");
     } finally {
       setSaving(false);
     }
@@ -105,9 +132,20 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
             className="bg-neutral-900 border-neutral-700 max-w-xs"
           />
           <Button onClick={handlePublish} disabled={saving}>
-            {saving ? "发布中…" : "发布"}
+            {saving ? "保存中…" : editingId ? "更新" : "发布"}
           </Button>
+          {editingId && (
+            <button
+              onClick={resetForm}
+              className="px-4 py-1.5 text-sm border border-neutral-700 text-neutral-400 hover:text-white transition-colors"
+            >
+              取消编辑
+            </button>
+          )}
         </div>
+        {editingId && (
+          <p className="text-xs text-neutral-500">正在编辑一条动态，更新后点击「更新」保存。</p>
+        )}
       </div>
 
       {/* 列表 */}
@@ -128,6 +166,13 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
                   {post.tag}
                 </span>
               )}
+              <button
+                onClick={() => handleEdit(post)}
+                aria-label="编辑动态"
+                className="text-neutral-500 hover:text-white transition-colors flex-shrink-0"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
               <button
                 onClick={() => handleDelete(post.id)}
                 aria-label="删除动态"

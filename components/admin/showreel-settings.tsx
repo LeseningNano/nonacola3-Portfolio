@@ -106,14 +106,14 @@ export function ShowreelSettings() {
 
   if (loading) {
     return (
-      <div className="p-6 border border-neutral-800 rounded-lg bg-neutral-900 flex items-center justify-center h-32">
+      <div className="border border-neutral-800 p-4 flex items-center justify-center h-32">
         <Loader2 className="w-6 h-6 animate-spin text-neutral-500" />
       </div>
     );
   }
 
   return (
-    <div className="p-6 border border-neutral-800 rounded-lg bg-neutral-900 space-y-4">
+    <div className="border border-neutral-800 p-4 space-y-3">
       <div>
         <h3 className="text-sm font-semibold text-neutral-200">Showreel 视频</h3>
         <p className="text-xs text-neutral-500 mt-1">
@@ -121,47 +121,43 @@ export function ShowreelSettings() {
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Label className="text-sm">来源：</Label>
-        <div className="flex rounded-md overflow-hidden border border-neutral-700">
-          <button
-            type="button"
-            onClick={() => setVideoType("url")}
-            className={`px-3 py-1 text-xs transition-colors ${videoType === "url" ? "bg-neutral-600 text-white" : "bg-neutral-800 text-neutral-400 hover:text-neutral-200"}`}
-          >
-            嵌入链接
-          </button>
-          <button
-            type="button"
-            onClick={() => setVideoType("upload")}
-            className={`px-3 py-1 text-xs transition-colors ${videoType === "upload" ? "bg-neutral-600 text-white" : "bg-neutral-800 text-neutral-400 hover:text-neutral-200"}`}
-          >
-            本地上传
-          </button>
-        </div>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setVideoType("url")}
+          className={`px-4 py-1.5 text-sm border transition-colors ${videoType === "url" ? "border-white text-white" : "border-neutral-700 text-neutral-400 hover:text-white"}`}
+        >
+          嵌入链接
+        </button>
+        <button
+          type="button"
+          onClick={() => setVideoType("upload")}
+          className={`px-4 py-1.5 text-sm border transition-colors ${videoType === "upload" ? "border-white text-white" : "border-neutral-700 text-neutral-400 hover:text-white"}`}
+        >
+          本地上传
+        </button>
       </div>
 
       <div className="space-y-2">
         {videoType === "url" ? (
           <>
-            <Label htmlFor="showreelUrl">嵌入链接 (YouTube / Bilibili)</Label>
+            <Label htmlFor="showreelUrl" className="text-xs text-neutral-400">嵌入链接 (YouTube / Bilibili)</Label>
             <Input
               id="showreelUrl"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="粘贴嵌入代码或链接"
-              className="bg-neutral-800 border-neutral-700"
+              className="bg-neutral-900 border-neutral-700"
             />
           </>
         ) : (
           <>
-            <Label>上传视频文件</Label>
             {savedUrl && (
               <div className="space-y-2 mb-3">
                 <p className="text-xs text-neutral-400">当前已保存的视频：</p>
                 <video
                   src={savedUrl}
-                  className="w-full max-h-48 object-contain rounded border border-neutral-700"
+                  className="w-full max-h-48 object-contain border border-neutral-800"
                   controls
                   muted
                   playsInline
@@ -169,7 +165,7 @@ export function ShowreelSettings() {
                 <p className="text-xs text-neutral-500 truncate">{savedUrl}</p>
               </div>
             )}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -177,21 +173,21 @@ export function ShowreelSettings() {
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <Button
+              <button
                 type="button"
-                variant="outline"
                 disabled={uploading}
                 onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-1.5 text-sm border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors disabled:opacity-50"
               >
-                {uploading ? "上传中..." : "选择视频文件"}
-              </Button>
-              <Button
+                {uploading ? "上传中…" : "选择视频文件"}
+              </button>
+              <button
                 type="button"
-                variant="outline"
                 onClick={openBlobPicker}
+                className="px-4 py-1.5 text-sm border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors"
               >
                 从 Blob 选择
-              </Button>
+              </button>
               {url && url !== savedUrl && (
                 <span className="text-xs text-neutral-500 truncate max-w-xs">
                   {url}
@@ -200,9 +196,9 @@ export function ShowreelSettings() {
             </div>
             {uploading && (
               <div className="space-y-1">
-                <div className="w-full bg-neutral-800 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-neutral-800 h-2 overflow-hidden">
                   <div
-                    className="bg-white h-full rounded-full transition-all duration-300"
+                    className="bg-white h-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -214,7 +210,7 @@ export function ShowreelSettings() {
       </div>
 
       {url && videoType === "url" && (
-        <div className="rounded overflow-hidden border border-neutral-700">
+        <div className="overflow-hidden border border-neutral-800">
           <iframe
             src={url}
             className="w-full aspect-video"
@@ -226,7 +222,7 @@ export function ShowreelSettings() {
       {url && videoType === "upload" && url !== savedUrl && (
         <div className="space-y-1">
           <p className="text-xs text-neutral-400">新上传的视频预览：</p>
-          <div className="rounded overflow-hidden border border-neutral-700">
+          <div className="overflow-hidden border border-neutral-800">
             <video src={url} controls className="w-full max-h-48 object-contain" />
           </div>
         </div>
@@ -260,22 +256,22 @@ export function ShowreelSettings() {
                   key={file.url}
                   type="button"
                   onClick={() => selectBlobFile(file)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-neutral-800 hover:border-neutral-600 hover:bg-neutral-800/50 transition-colors text-left"
+                  className="w-full flex items-center gap-3 p-3 border border-neutral-800 hover:border-neutral-600 hover:bg-neutral-800/50 transition-colors text-left"
                 >
                   {file.pathname.match(/\.(mp4|webm|mov|avi)$/i) ? (
                     <video
                       src={file.url}
-                      className="w-24 h-16 object-cover rounded flex-shrink-0"
+                      className="w-24 h-16 object-cover flex-shrink-0"
                       muted
                     />
                   ) : file.pathname.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
                     <img
                       src={file.url}
                       alt={file.pathname}
-                      className="w-24 h-16 object-cover rounded flex-shrink-0"
+                      className="w-24 h-16 object-cover flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-24 h-16 bg-neutral-800 rounded flex items-center justify-center flex-shrink-0">
+                    <div className="w-24 h-16 bg-neutral-800 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs text-neutral-500">文件</span>
                     </div>
                   )}
