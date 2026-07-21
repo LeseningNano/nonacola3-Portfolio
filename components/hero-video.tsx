@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { LoadingScreen } from "./loading-screen";
@@ -17,9 +17,11 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const loadTriggered = useRef(false);
   const rafId = useRef(0);
+  const introDoneRef = useRef(false);
+  const nudgeRaf = useRef(0);
 
   // Parallax + scroll-driven styles: write to DOM directly, no React re-render
-  useEffect(() => {
+  useLayoutEffect(() => {
     function getScrollTop() {
       const container = document.getElementById(SCROLL_CONTAINER_ID);
       if (container) return container.scrollTop;
@@ -45,8 +47,10 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         contentRef.current.style.opacity = String(fade);
       }
       if (buttonRef.current) {
-        buttonRef.current.style.opacity = String(fade);
-        buttonRef.current.style.pointerEvents = progress > 0.45 ? "none" : "auto";
+        const baseFade = Math.max(0, 1 - progress * 2.5);
+        buttonRef.current.style.opacity = introDoneRef.current ? String(baseFade) : "0";
+        buttonRef.current.style.pointerEvents =
+          introDoneRef.current && progress <= 0.45 ? "auto" : "none";
       }
     }
 
@@ -57,9 +61,15 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     const container = document.getElementById(SCROLL_CONTAINER_ID);
     const target: HTMLElement | Window = container ?? window;
     target.addEventListener("scroll", onScroll, { passive: true });
+
+    // 刷新/后续进入：跳过开场动画，按钮直接显示
+    if (sessionStorage.getItem("hero-loaded")) introDoneRef.current = true;
+    apply();
+
     return () => {
       target.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(rafId.current);
+      cancelAnimationFrame(nudgeRaf.current);
     };
   }, []);
 
@@ -74,13 +84,66 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     }
   }, []);
 
-  // After loading screen finishes, fade out
+  // 开场轻推：滚动条轻推一下示意可滑动，随后按钮淡入。仅首次进入触发。
+  const playNudge = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finishIntro();
+      return;
+    }
+    const peak = 120;
+    const downMs = 420;
+    const upMs = 480;
+    const start = performance.now();
+
+    const setY = (y: number) => {
+      const c = document.getElementById(SCROLL_CONTAINER_ID);
+      if (c) c.scrollTop = y;
+      else window.scrollTo(0, y);
+    };
+
+    const frame = (now: number) => {
+      const t = now - start;
+      let y: number;
+      if (t < downMs) {
+        const p = t / downMs;
+        y = peak * (1 - Math.pow(1 - p, 3)); // easeOutCubic 下探
+      } else if (t < downMs + upMs) {
+        const p = (t - downMs) / upMs;
+        const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; // easeInOutQuad 回弹
+        y = peak * (1 - e);
+      } else {
+        setY(0);
+        finishIntro();
+        return;
+      }
+      setY(y);
+      nudgeRaf.current = requestAnimationFrame(frame);
+    };
+    nudgeRaf.current = requestAnimationFrame(frame);
+  };
+
+  const finishIntro = () => {
+    introDoneRef.current = true;
+    if (buttonRef.current) {
+      buttonRef.current.style.transition = "opacity 700ms ease";
+      buttonRef.current.style.opacity = "1";
+      buttonRef.current.style.pointerEvents = "auto";
+      setTimeout(() => {
+        if (buttonRef.current) buttonRef.current.style.transition = "";
+      }, 720);
+    }
+  };
+
+  // After loading screen finishes, fade out + 触发开场轻推
   const handleLoadReady = () => {
     if (!loadTriggered.current) {
       loadTriggered.current = true;
       sessionStorage.setItem("hero-loaded", "1");
       setFadeOut(true);
-      setTimeout(() => setShowLoader(false), 450);
+      setTimeout(() => {
+        setShowLoader(false);
+        playNudge();
+      }, 450);
     }
   };
 
