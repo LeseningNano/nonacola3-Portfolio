@@ -90,9 +90,9 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
       finishIntro();
       return;
     }
-    const peak = 120;
-    const downMs = 420;
-    const upMs = 480;
+    const peak = 320;
+    const downMs = 620;
+    const upMs = 720;
     const start = performance.now();
 
     const setY = (y: number) => {
