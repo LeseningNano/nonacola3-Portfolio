@@ -92,6 +92,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     }
     const peak = 320;
     const downMs = 620;
+    const pauseMs = 500;
     const upMs = 720;
     const start = performance.now();
 
@@ -107,8 +108,10 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
       if (t < downMs) {
         const p = t / downMs;
         y = peak * (1 - Math.pow(1 - p, 3)); // easeOutCubic 下探
-      } else if (t < downMs + upMs) {
-        const p = (t - downMs) / upMs;
+      } else if (t < downMs + pauseMs) {
+        y = peak; // 停顿
+      } else if (t < downMs + pauseMs + upMs) {
+        const p = (t - downMs - pauseMs) / upMs;
         const e = 1 - Math.pow(1 - p, 3); // easeOutCubic 回弹
         y = peak * (1 - e);
       } else {
