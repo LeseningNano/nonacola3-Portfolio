@@ -83,9 +83,13 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
       setShowLoader(false);
       return;
     }
-    setLoaderVisible(true);
-    const p = document.getElementById("pre-loader");
-    if (p) p.remove();
+    // 首访：淡入加载层（200ms），pre-loader 在淡入完成后才移除，
+    // 期间两者同为黑色，pre-loader 兜底盖住内容直到 React 加载层完全显形。
+    requestAnimationFrame(() => setLoaderVisible(true));
+    setTimeout(() => {
+      const p = document.getElementById("pre-loader");
+      if (p) p.remove();
+    }, 260);
   }, []);
 
   // 开场轻推：复用滚轮的指数追逐动画通道，轻推一下示意可滑动，随后按钮淡入。
@@ -170,7 +174,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           className="fixed inset-0 z-[9999]"
           style={{
             opacity: fadeOut ? 0 : loaderVisible ? 1 : 0,
-            transition: fadeOut ? "opacity 450ms ease" : "none",
+            transition: "opacity 200ms ease",
             pointerEvents: loaderVisible && !fadeOut ? "auto" : "none",
           }}
         >
