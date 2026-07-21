@@ -73,15 +73,19 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     };
   }, []);
 
-  // 加载动画只在本次会话首次进入时显示。
-  // 初始渲染（含 SSR）始终隐藏加载层，挂载后决定：已加载过 → 直接移除（无闪现）；
-  // 首次访问 → 淡入加载层，避免刷新时短暂出现再硬切消失。
-  useEffect(() => {
+  // 加载层显隐：用 useLayoutEffect 在浏览器首帧绘制前决定，
+  // 避免内容在首访时于加载层淡入前闪现。
+  // - 刷新/返回（sessionStorage 有 hero-loaded）：无 pre-loader、加载层立即卸载，内容直显。
+  // - 首访：inline <head> 脚本已注入 #pre-loader 在 SSR 绘制期间盖住内容；
+  //   此处设 loaderVisible=true（瞬时，无 transition）让 React 接管覆盖，移除 pre-loader。
+  useLayoutEffect(() => {
     if (sessionStorage.getItem("hero-loaded")) {
       setShowLoader(false);
-    } else {
-      requestAnimationFrame(() => setLoaderVisible(true));
+      return;
     }
+    setLoaderVisible(true);
+    const p = document.getElementById("pre-loader");
+    if (p) p.remove();
   }, []);
 
   // 开场轻推：复用滚轮的指数追逐动画通道，轻推一下示意可滑动，随后按钮淡入。
@@ -166,7 +170,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           className="fixed inset-0 z-[9999]"
           style={{
             opacity: fadeOut ? 0 : loaderVisible ? 1 : 0,
-            transition: "opacity 400ms ease",
+            transition: fadeOut ? "opacity 450ms ease" : "none",
             pointerEvents: loaderVisible && !fadeOut ? "auto" : "none",
           }}
         >

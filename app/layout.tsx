@@ -36,6 +36,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" className="dark" style={{ backgroundColor: "#0a0a0a" }}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{if(!sessionStorage.getItem('hero-loaded')){var p=document.createElement('div');p.id='pre-loader';p.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a0a0a;';document.documentElement.appendChild(p);}}catch(e){}})();",
+          }}
+        />
+      </head>
       <body className={`${inter.className} ${montserrat.variable} ${bitcount.variable} bg-[#0a0a0a] text-white antialiased`}>
         <PageTransition />
         <ServerNotice />
