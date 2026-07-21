@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
@@ -22,16 +22,7 @@ interface Video {
 export function VideoGrid({ videos }: { videos: Video[] }) {
   const [selectedYear, setSelectedYear] = useState("全部");
   const [showShowreel, setShowShowreel] = useState(false);
-  const [view, setView] = useState<"marquee" | "grid">("marquee");
-  const [animPhase, setAnimPhase] = useState<"exit" | "enter" | null>(null);
-  const [wrapHeight, setWrapHeight] = useState<string>("auto");
-  const contentRef = useRef<HTMLDivElement>(null);
-  const timers = useRef<number[]>([]);
-
-  useEffect(() => {
-    const t = timers.current;
-    return () => t.forEach(clearTimeout);
-  }, []);
+  const [showAll, setShowAll] = useState(false);
 
   const years = useMemo(() => {
     const set = new Set<string>();
@@ -45,34 +36,6 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
     selectedYear === "全部"
       ? videos
       : videos.filter((v) => v.date && new Date(v.date).getFullYear().toString() === selectedYear);
-
-  // 编舞：当前内容向下加速沉出+淡出 → 锁定高度 → 换内容 → 高度推撑下方区域 + 新内容向下减速落入+淡入
-  function toggleView() {
-    if (animPhase) return; // 动画期间锁定
-    const current = contentRef.current;
-    if (current) setWrapHeight(`${current.offsetHeight}px`);
-    setAnimPhase("exit");
-
-    timers.current.push(
-      window.setTimeout(() => {
-        setView((v) => (v === "marquee" ? "grid" : "marquee"));
-        setAnimPhase("enter");
-        // 等新内容渲染后测量高度，推撑下方区域
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            const el = contentRef.current;
-            if (el) setWrapHeight(`${el.scrollHeight}px`);
-          });
-        });
-        timers.current.push(
-          window.setTimeout(() => {
-            setWrapHeight("auto");
-            setAnimPhase(null);
-          }, 750)
-        );
-      }, 400)
-    );
-  }
 
   return (
     <section id="works" className="w-full bg-[#0a0a0a]">
@@ -96,51 +59,34 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
           </button>
         </div>
 
-        <div
-          style={{
-            height: wrapHeight,
-            transition: wrapHeight === "auto" ? undefined : "height 500ms cubic-bezier(0.4, 0, 0.2, 1)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            ref={contentRef}
-            className={
-              animPhase === "exit"
-                ? "animate-works-exit"
-                : animPhase === "enter"
-                  ? "animate-works-enter"
-                  : ""
-            }
-          >
-            {view === "grid" ? (
-              <>
-                <div className="px-6 md:px-12 lg:px-16 mb-8">
-                  <CategoryFilter
-                    categories={years}
-                    selected={selectedYear}
-                    onSelect={setSelectedYear}
-                  />
-                </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
-                  {filteredVideos.map((video) => (
-                    <VideoCard key={video.id} video={video} />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <WorksMarquee videos={videos} />
-            )}
-          </div>
+        <div key={showAll ? "grid" : "marquee"} className="animate-fade-slide-in">
+          {showAll ? (
+            <>
+              <div className="px-6 md:px-12 lg:px-16 mb-8">
+                <CategoryFilter
+                  categories={years}
+                  selected={selectedYear}
+                  onSelect={setSelectedYear}
+                />
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
+                {filteredVideos.map((video) => (
+                  <VideoCard key={video.id} video={video} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <WorksMarquee videos={videos} />
+          )}
         </div>
 
         {/* 展开/收起开关 */}
         <div className="flex justify-center mt-8">
           <button
-            onClick={toggleView}
+            onClick={() => setShowAll((v) => !v)}
             className="text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
           >
-            {view === "grid" ? "收起 ⌃" : `显示全部作品 ⌄ ${videos.length}`}
+            {showAll ? "收起 ⌃" : `显示全部作品 ⌄ ${videos.length}`}
           </button>
         </div>
 

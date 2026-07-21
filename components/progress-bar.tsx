@@ -1,22 +1,41 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
+
+const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function PageTransition() {
   const router = useRouter();
   const pathname = usePathname();
   const [opacity, setOpacity] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [instant, setInstant] = useState(false);
   const isTransitioning = useRef(false);
   const prevPathname = useRef(pathname);
   const cloneRef = useRef<HTMLImageElement | null>(null);
 
   // 路由变化完成 → 克隆图飞向播放器 / 黑场淡出
-  useEffect(() => {
+  // useLayoutEffect：在浏览器绘制新页面前就位，保证后退导航也能被黑场覆盖
+  useIsomorphicLayoutEffect(() => {
     if (pathname === prevPathname.current) return;
     prevPathname.current = pathname;
-    if (!isTransitioning.current) return;
+
+    // 未经拦截的导航（浏览器前进/后退、外部跳转）：
+    // 立即盖上黑场（无过渡），再淡出揭示新页面
+    if (!isTransitioning.current) {
+      setInstant(true);
+      setVisible(true);
+      setOpacity(1);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setInstant(false);
+          setOpacity(0);
+          setTimeout(() => setVisible(false), 220);
+        });
+      });
+      return;
+    }
 
     const clone = cloneRef.current;
 
@@ -174,7 +193,7 @@ export function PageTransition() {
   return (
     <div
       className="fixed inset-0 z-[9999] bg-[#0a0a0a] pointer-events-none"
-      style={{ opacity, transition: "opacity 200ms ease-in-out" }}
+      style={{ opacity, transition: instant ? "none" : "opacity 200ms ease-in-out" }}
     />
   );
 }
