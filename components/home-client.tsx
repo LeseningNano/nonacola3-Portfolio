@@ -134,9 +134,9 @@ export function HomeClient({
     }
 
     function handleSmoothScroll(e: Event) {
-      const detail = (e as CustomEvent<{ target: number }>).detail;
+      const detail = (e as CustomEvent<{ target: number; easing?: number }>).detail;
       if (typeof detail?.target !== "number") return;
-      scrollEasing.current = 8;
+      scrollEasing.current = detail.easing ?? 8;
       clampTarget(detail.target);
       startAnimation();
     }

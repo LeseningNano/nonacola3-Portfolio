@@ -84,42 +84,50 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     }
   }, []);
 
-  // 开场轻推：滚动条轻推一下示意可滑动，随后按钮淡入。仅首次进入触发。
+  // 开场轻推：复用滚轮的指数追逐动画通道，轻推一下示意可滑动，随后按钮淡入。
+  // 仅首次进入触发。与滚轮体感完全一致（同一段 rAF 动画代码、同一 easing）。
   const playNudge = () => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobile = window.matchMedia("(max-width: 768px)").matches;
+    const container = document.getElementById(SCROLL_CONTAINER_ID);
+    if (reduce || mobile || !container) {
       finishIntro();
       return;
     }
     const peak = 320;
-    const downMs = 620;
     const pauseMs = 500;
-    const upMs = 720;
-    const start = performance.now();
+    const easing = 10; // 与滚轮一致
 
-    const setY = (y: number) => {
-      const c = document.getElementById(SCROLL_CONTAINER_ID);
-      if (c) c.scrollTop = y;
-      else window.scrollTo(0, y);
+    const dispatch = (target: number) => {
+      container.dispatchEvent(
+        new CustomEvent("smooth-scroll-to", { detail: { target, easing } })
+      );
     };
+    const getY = () => container.scrollTop;
+
+    let phase: "down" | "pause" | "up" = "down";
+    let pauseStart = 0;
+    // 容差：滚轮动画在差值 <0.5px 时判定结束
+    const EPS = 1;
+    dispatch(peak);
 
     const frame = (now: number) => {
-      const t = now - start;
-      let y: number;
-      if (t < downMs) {
-        const p = t / downMs;
-        y = peak * (1 - Math.pow(1 - p, 3)); // easeOutCubic 下探
-      } else if (t < downMs + pauseMs) {
-        y = peak; // 停顿
-      } else if (t < downMs + pauseMs + upMs) {
-        const p = (t - downMs - pauseMs) / upMs;
-        const e = 1 - Math.pow(1 - p, 3); // easeOutCubic 回弹
-        y = peak * (1 - e);
+      if (phase === "down") {
+        if (Math.abs(getY() - peak) < EPS) {
+          phase = "pause";
+          pauseStart = now;
+        }
+      } else if (phase === "pause") {
+        if (now - pauseStart >= pauseMs) {
+          phase = "up";
+          dispatch(0);
+        }
       } else {
-        setY(0);
-        finishIntro();
-        return;
+        if (Math.abs(getY()) < EPS) {
+          finishIntro();
+          return;
+        }
       }
-      setY(y);
       nudgeRaf.current = requestAnimationFrame(frame);
     };
     nudgeRaf.current = requestAnimationFrame(frame);
