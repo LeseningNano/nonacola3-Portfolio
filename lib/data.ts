@@ -17,7 +17,7 @@ export const getHero = unstable_cache(
 );
 
 export const getShowreel = unstable_cache(
-  async () => db.showreel.findUnique({ where: { showreelId: "showreelId" } }),
+  async () => db.showreel.findUnique({ where: { id: "singleton" } }),
   ["showreel"],
   { tags: ["showreel"] }
 );

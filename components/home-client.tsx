@@ -4,22 +4,9 @@ import { useEffect, useRef } from "react";
 import { HeroVideo } from "@/components/hero-video";
 import { VideoGrid } from "@/components/video-grid";
 import { NewsSection } from "@/components/news-section";
-import type { PostItem } from "@/components/news-section";
 import { AboutSection } from "@/components/about-section";
 import { Footer } from "@/components/footer";
-
-interface Video {
-  id: string;
-  title: string;
-  description: string | null;
-  summary: string | null;
-  category: string;
-  embedUrl: string;
-  thumbnail: string | null;
-  featured: boolean;
-  order: number;
-  date: string | null;
-}
+import type { VideoRow, PostItem } from "@/lib/types";
 
 export const SCROLL_CONTAINER_ID = "main-scroll";
 
@@ -29,7 +16,7 @@ export function HomeClient({
   posts,
 }: {
   heroVideoUrl: string | null;
-  videos: Video[];
+  videos: VideoRow[];
   posts: PostItem[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);

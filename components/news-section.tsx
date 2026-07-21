@@ -1,12 +1,7 @@
 import Link from "next/link";
+import type { PostItem } from "@/lib/types";
 
-export interface PostItem {
-  id: string;
-  title: string | null;
-  body: string;
-  tag: string | null;
-  createdAt: string;
-}
+export type { PostItem };
 
 function formatDate(iso: string) {
   const d = new Date(iso);

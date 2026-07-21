@@ -1,19 +1,7 @@
 import { VideoCard } from "./video-card";
+import type { VideoRow } from "@/lib/types";
 
-interface Video {
-  id: string;
-  title: string;
-  description: string | null;
-  summary: string | null;
-  category: string;
-  embedUrl: string;
-  thumbnail: string | null;
-  featured: boolean;
-  order: number;
-  date: string | null;
-}
-
-export function WorksMarquee({ videos }: { videos: Video[] }) {
+export function WorksMarquee({ videos }: { videos: VideoRow[] }) {
   // 卡片约 324px 宽（w-80 + 间距），半份至少 ~4200px 才能保证超宽屏下
   // translateX(-50%) 循环时右端不露底。按视频数计算每半份的重复次数。
   const repeat = Math.max(1, Math.ceil(4200 / (videos.length * 324)));

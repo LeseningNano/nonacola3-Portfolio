@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, ArrowUp, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/toast";
 
 interface Video {
   id: string;
@@ -15,6 +16,7 @@ interface Video {
 
 export function VideoTable({ videos }: { videos: Video[] }) {
   const router = useRouter();
+  const { error: toastError } = useToast();
   const [items, setItems] = useState<Video[]>(videos);
   const [saving, setSaving] = useState(false);
 
@@ -41,7 +43,7 @@ export function VideoTable({ videos }: { videos: Video[] }) {
       router.refresh();
     } catch (err) {
       setItems(items); // rollback
-      alert(err instanceof Error ? err.message : "保存排序失败");
+      toastError(err instanceof Error ? err.message : "保存排序失败");
     } finally {
       setSaving(false);
     }
@@ -49,7 +51,11 @@ export function VideoTable({ videos }: { videos: Video[] }) {
 
   async function handleDelete(id: string) {
     if (!confirm("确定删除这个视频吗？")) return;
-    await fetch(`/api/videos/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/videos/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      toastError("删除失败");
+      return;
+    }
     setItems((prev) => prev.filter((v) => v.id !== id));
     router.refresh();
   }

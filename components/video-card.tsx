@@ -1,19 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Play } from "lucide-react";
+import type { VideoRow } from "@/lib/types";
 
-interface Video {
-  id: string;
-  title: string;
-  description: string | null;
-  summary: string | null;
-  category: string;
-  embedUrl: string;
-  thumbnail: string | null;
-  date: string | null;
-}
-
-export function VideoCard({ video }: { video: Video }) {
+export function VideoCard({ video }: { video: VideoRow }) {
   return (
     <Link href={`/works/${video.id}`} aria-label={video.title} className="block outline-none focus-visible:ring-1 focus-visible:ring-neutral-400">
       <div

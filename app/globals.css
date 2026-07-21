@@ -143,6 +143,12 @@ body::after {
 }
 
 @layer utilities {
+  /* 触摸端（<769px）启用原生平滑滚动，补齐桌面 lerp 滚动在移动端的缺失 */
+  @media (max-width: 768px) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

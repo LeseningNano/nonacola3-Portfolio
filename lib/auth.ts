@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { ADMIN_USERNAME, ADMIN_PASSWORD } from "@/lib/env";
 
 declare module "@auth/core/types" {
   interface User {
@@ -28,10 +29,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        const user = ADMIN_USERNAME;
+        const pass = ADMIN_PASSWORD;
+        // 缺环境变量直接拒绝，避免与空输入做空串相等比较
+        if (!user || !pass) return null;
         if (
-          credentials.username === process.env.ADMIN_USERNAME &&
-          credentials.password === process.env.ADMIN_PASSWORD
+          typeof credentials?.username !== "string" ||
+          typeof credentials?.password !== "string" ||
+          credentials.username.length === 0 ||
+          credentials.password.length === 0
         ) {
+          return null;
+        }
+        // 长度上限防滥用
+        if (credentials.username.length > 64 || credentials.password.length > 256) return null;
+        if (credentials.username === user && credentials.password === pass) {
           return { id: "1", name: "Admin" };
         }
         return null;

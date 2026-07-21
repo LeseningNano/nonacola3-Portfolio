@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/components/toast";
 
 interface VideoData {
   id?: string;
@@ -28,6 +29,7 @@ export function VideoForm({
   mode: "create" | "edit";
 }) {
   const router = useRouter();
+  const { error: toastError } = useToast();
   const [loading, setLoading] = useState(false);
   const [thumbMode, setThumbMode] = useState<"url" | "upload">("url");
   const [uploading, setUploading] = useState(false);
@@ -65,7 +67,7 @@ export function VideoForm({
       setForm((prev) => ({ ...prev, thumbnail: blob.url }));
       setUploadProgress(100);
     } catch (err: any) {
-      console.error("Upload failed:", err);
+      toastError("封面上传失败");
     } finally {
       setTimeout(() => { setUploading(false); setUploadProgress(0); }, 300);
     }
@@ -88,15 +90,14 @@ export function VideoForm({
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "保存失败" }));
-        alert(err.error || `保存失败 (${res.status})`);
+        toastError(err.error || `保存失败 (${res.status})`);
         setLoading(false);
         return;
       }
 
       router.push("/dashboard");
-    } catch (err) {
-      console.error("Save failed:", err);
-      alert("保存失败，请检查网络连接");
+    } catch {
+      toastError("保存失败，请检查网络连接");
       setLoading(false);
     }
   }

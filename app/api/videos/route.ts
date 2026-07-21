@@ -1,40 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { ok, created, unauthorized, fail, revalidateTags } from "@/lib/api-utils";
+import { videoCreateSchema } from "@/lib/schemas";
 
 export async function GET() {
   const videos = await db.video.findMany({
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
   });
-  return NextResponse.json(videos);
+  return ok(videos);
 }
 
 export async function POST(req: NextRequest) {
-  console.log("[videos] POST received");
   const session = await auth();
-  if (!session) {
-    console.log("[videos] Unauthorized");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!session) return unauthorized();
 
-  const body = await req.json();
-  console.log("[videos] Creating video:", body.title);
+  const parsed = videoCreateSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? "参数无效", 422);
+  }
+  const b = parsed.data;
+
   const video = await db.video.create({
     data: {
-      title: body.title,
-      description: body.description,
-      summary: body.summary,
-      category: body.category,
-      embedUrl: body.embedUrl,
-      thumbnail: body.thumbnail,
-      featured: body.featured ?? false,
-      order: body.order ?? 0,
-      date: body.date ? new Date(body.date) : null,
+      title: b.title,
+      category: b.category,
+      embedUrl: b.embedUrl,
+      description: b.description ?? null,
+      summary: b.summary ?? null,
+      thumbnail: b.thumbnail ?? null,
+      featured: b.featured ?? false,
+      order: b.order ?? 0,
+      date: b.date ? new Date(b.date) : null,
     },
   });
 
-  console.log("[videos] Created:", video.id);
-  revalidateTag("videos", "max");
-  return NextResponse.json(video, { status: 201 });
+  revalidateTags("videos");
+  return created(video);
 }

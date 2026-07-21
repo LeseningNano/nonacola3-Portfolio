@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Pencil } from "lucide-react";
+import { useToast } from "@/components/toast";
 
 interface Post {
   id: string;
@@ -16,6 +17,7 @@ interface Post {
 
 export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
   const router = useRouter();
+  const { error: toastError, success: toastSuccess } = useToast();
   const [posts, setPosts] = useState(initialPosts);
   const [mode, setMode] = useState<"short" | "article">("short");
   const [title, setTitle] = useState("");
@@ -71,8 +73,9 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
       }
       resetForm();
       router.refresh();
+      toastSuccess(editingId ? "已更新" : "已发布");
     } catch {
-      alert(editingId ? "更新失败" : "发布失败");
+      toastError(editingId ? "更新失败" : "发布失败");
     } finally {
       setSaving(false);
     }
@@ -85,7 +88,7 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
     const res = await fetch(`/api/posts/${id}`, { method: "DELETE" });
     if (!res.ok) {
       setPosts(prev);
-      alert("删除失败");
+      toastError("删除失败");
     } else {
       router.refresh();
     }

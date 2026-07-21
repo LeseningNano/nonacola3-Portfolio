@@ -1,44 +1,40 @@
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { ok, success, unauthorized, fail, revalidateTags } from "@/lib/api-utils";
+import { showreelMutateSchema } from "@/lib/schemas";
 
 export async function GET() {
   try {
-    const showreel = await db.showreel.findUnique({
-      where: { showreelId: "showreelId" },
-    });
+    const showreel = await db.showreel.findUnique({ where: { id: "singleton" } });
     return NextResponse.json({
       showreelUrl: showreel?.showreelUrl || "",
       videoType: showreel?.videoType || "url",
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ showreelUrl: "", videoType: "url" });
   }
 }
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return unauthorized();
+
+  const parsed = showreelMutateSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? "参数无效", 422);
   }
+  const b = parsed.data;
 
   try {
-    const { showreelUrl, videoType } = await request.json();
-    
     const showreel = await db.showreel.upsert({
-      where: { showreelId: "showreelId" },
-      update: { showreelUrl, videoType: videoType || "url" },
-      create: { showreelId: "showreelId", showreelUrl, videoType: videoType || "url" },
+      where: { id: "singleton" },
+      update: { showreelUrl: b.showreelUrl, videoType: b.videoType ?? "url" },
+      create: { id: "singleton", showreelUrl: b.showreelUrl, videoType: b.videoType ?? "url" },
     });
-
-    revalidateTag("showreel", "max");
-    return NextResponse.json({
-      success: true,
-      showreelUrl: showreel.showreelUrl,
-      videoType: showreel.videoType,
-    });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
+    revalidateTags("showreel");
+    return success();
+  } catch {
+    return fail("Failed to update", 500);
   }
 }

@@ -5,21 +5,9 @@ import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
 import { CategoryFilter } from "./category-filter";
+import type { VideoRow } from "@/lib/types";
 
-interface Video {
-  id: string;
-  title: string;
-  description: string | null;
-  summary: string | null;
-  category: string;
-  embedUrl: string;
-  thumbnail: string | null;
-  featured: boolean;
-  order: number;
-  date: string | null;
-}
-
-export function VideoGrid({ videos }: { videos: Video[] }) {
+export function VideoGrid({ videos }: { videos: VideoRow[] }) {
   const [selectedYear, setSelectedYear] = useState("全部");
   const [showShowreel, setShowShowreel] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -69,7 +57,7 @@ export function VideoGrid({ videos }: { videos: Video[] }) {
                   onSelect={setSelectedYear}
                 />
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
                 {filteredVideos.map((video) => (
                   <VideoCard key={video.id} video={video} />
                 ))}

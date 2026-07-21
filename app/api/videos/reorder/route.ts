@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { success, unauthorized, fail, revalidateTags } from "@/lib/api-utils";
+import { reorderSchema } from "@/lib/schemas";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!session) return unauthorized();
 
-  const { items } = await req.json();
-  if (!Array.isArray(items)) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+  const parsed = reorderSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? "参数无效", 422);
   }
+  const { items } = parsed.data;
 
   await db.$transaction(
-    items.map((item: { id: string; order: number }) =>
+    items.map((item) =>
       db.video.update({
         where: { id: item.id },
         data: { order: item.order },
@@ -23,6 +23,6 @@ export async function POST(req: NextRequest) {
     )
   );
 
-  revalidateTag("videos", "max");
-  return NextResponse.json({ success: true });
+  revalidateTags("videos");
+  return success();
 }

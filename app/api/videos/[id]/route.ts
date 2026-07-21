@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
+import { ok, success, unauthorized, notFound, fail, revalidateTags } from "@/lib/api-utils";
+import { videoUpdateSchema } from "@/lib/schemas";
 
 export async function GET(
   _req: NextRequest,
@@ -9,10 +10,8 @@ export async function GET(
 ) {
   const { id } = await params;
   const video = await db.video.findUnique({ where: { id } });
-  if (!video) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-  return NextResponse.json(video);
+  if (!video) return notFound();
+  return ok(video);
 }
 
 export async function PUT(
@@ -20,29 +19,32 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!session) return unauthorized();
 
   const { id } = await params;
-  const body = await req.json();
+  const parsed = videoUpdateSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return fail(parsed.error.issues[0]?.message ?? "参数无效", 422);
+  }
+  const b = parsed.data;
+
   const video = await db.video.update({
     where: { id },
     data: {
-      title: body.title,
-      description: body.description,
-      summary: body.summary,
-      category: body.category,
-      embedUrl: body.embedUrl,
-      thumbnail: body.thumbnail,
-      featured: body.featured,
-      order: body.order,
-      date: body.date ? new Date(body.date) : null,
+      ...(b.title !== undefined && { title: b.title }),
+      ...(b.category !== undefined && { category: b.category }),
+      ...(b.embedUrl !== undefined && { embedUrl: b.embedUrl }),
+      description: b.description ?? null,
+      summary: b.summary ?? null,
+      thumbnail: b.thumbnail ?? null,
+      ...(b.featured !== undefined && { featured: b.featured }),
+      ...(b.order !== undefined && { order: b.order }),
+      date: b.date ? new Date(b.date) : null,
     },
   });
 
-  revalidateTag("videos", "max");
-  return NextResponse.json(video);
+  revalidateTags("videos");
+  return ok(video);
 }
 
 export async function DELETE(
@@ -50,12 +52,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  if (!session) return unauthorized();
 
   const { id } = await params;
   await db.video.delete({ where: { id } });
-  revalidateTag("videos", "max");
-  return NextResponse.json({ success: true });
+  revalidateTags("videos");
+  return success();
 }

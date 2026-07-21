@@ -4,6 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
 
 import { ServerNotice } from "@/components/server-notice";
+import { ToastProvider } from "@/components/toast";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -45,10 +46,12 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} ${montserrat.variable} ${bitcount.variable} bg-[#0a0a0a] text-white antialiased`}>
-        <PageTransition />
-        <ServerNotice />
-        <Navbar />
-        {children}
+        <ToastProvider>
+          <PageTransition />
+          <ServerNotice />
+          <Navbar />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

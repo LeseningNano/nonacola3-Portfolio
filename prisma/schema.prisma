@@ -19,6 +19,10 @@ model Video {
   date        DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([order])
+  @@index([order, createdAt])
+  @@index([category])
 }
 
 model HeroVideo {
@@ -28,7 +32,7 @@ model HeroVideo {
 }
 
 model Showreel {
-  showreelId  String   @id @default("showreelId")
+  id          String   @id @default("singleton")
   showreelUrl String   @default("")
   videoType   String   @default("url") // "url" or "upload"
   updatedAt   DateTime @updatedAt
@@ -36,8 +40,10 @@ model Showreel {
 
 model Post {
   id        String   @id @default(cuid())
-  title     String?              // 空 = 短动态；非空 = 文章（有详情页）
-  body      String               // 短动态的一句话 或 文章的 Markdown 全文
-  tag       String?              // 可选分类标签（作品/日常/活动…）
+  title     String?
+  body      String
+  tag       String?
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }

@@ -1,10 +1,11 @@
 import { getHero, getVideos, getPosts } from "@/lib/data";
 import { HomeClient } from "@/components/home-client";
+import type { VideoRow, PostItem } from "@/lib/types";
 
 export default async function Home() {
   const [hero, videos, posts] = await Promise.all([getHero(), getVideos(), getPosts()]);
 
-  const serializedVideos = videos.map((v) => ({
+  const serializedVideos: VideoRow[] = videos.map((v) => ({
     id: v.id,
     title: v.title,
     description: v.description,
@@ -17,7 +18,7 @@ export default async function Home() {
     date: v.date ? new Date(v.date).toISOString() : null,
   }));
 
-  const serializedPosts = posts.map((p) => ({
+  const serializedPosts: PostItem[] = posts.map((p) => ({
     id: p.id,
     title: p.title,
     body: p.body,
