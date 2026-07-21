@@ -240,6 +240,23 @@ body::after {
 .animate-fade-slide-in {
   animation: fade-slide-in 300ms ease-out;
 }
+
+/* works 展开/收起编舞：退出向下加速沉出 + 淡入向下减速落入 */
+@keyframes works-exit {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(90px); }
+}
+@keyframes works-enter {
+  from { opacity: 0; transform: translateY(-70px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-works-exit {
+  animation: works-exit 400ms cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+.animate-works-enter {
+  animation: works-enter 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }

@@ -10,6 +10,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  const [loaderVisible, setLoaderVisible] = useState(false);
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -62,10 +63,14 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     };
   }, []);
 
-  // 加载动画只在本次会话首次进入时显示（挂载后跳过，避免水合不一致）
+  // 加载动画只在本次会话首次进入时显示。
+  // 初始渲染（含 SSR）始终隐藏加载层，挂载后决定：已加载过 → 直接移除（无闪现）；
+  // 首次访问 → 淡入加载层，避免刷新时短暂出现再硬切消失。
   useEffect(() => {
     if (sessionStorage.getItem("hero-loaded")) {
       setShowLoader(false);
+    } else {
+      requestAnimationFrame(() => setLoaderVisible(true));
     }
   }, []);
 
@@ -75,7 +80,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
       loadTriggered.current = true;
       sessionStorage.setItem("hero-loaded", "1");
       setFadeOut(true);
-      setTimeout(() => setShowLoader(false), 500);
+      setTimeout(() => setShowLoader(false), 450);
     }
   };
 
@@ -83,7 +88,16 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     <>
       {/* Full-screen loading overlay */}
       {showLoader && (
-        <LoadingScreen ready={isVideoReady || !videoUrl} onReady={handleLoadReady} />
+        <div
+          className="fixed inset-0 z-[9999]"
+          style={{
+            opacity: fadeOut ? 0 : loaderVisible ? 1 : 0,
+            transition: "opacity 400ms ease",
+            pointerEvents: loaderVisible && !fadeOut ? "auto" : "none",
+          }}
+        >
+          <LoadingScreen ready={isVideoReady || !videoUrl} onReady={handleLoadReady} />
+        </div>
       )}
 
       <section id="hero" className="relative h-screen w-full overflow-hidden bg-[#0a0a0a]">
