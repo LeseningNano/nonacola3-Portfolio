@@ -109,7 +109,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         y = peak * (1 - Math.pow(1 - p, 3)); // easeOutCubic 下探
       } else if (t < downMs + upMs) {
         const p = (t - downMs) / upMs;
-        const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; // easeInOutQuad 回弹
+        const e = 1 - Math.pow(1 - p, 3); // easeOutCubic 回弹
         y = peak * (1 - e);
       } else {
         setY(0);
