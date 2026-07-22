@@ -28,10 +28,10 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
 
   return (
     <section id="works" className="w-full bg-[#0a0a0a]">
-      <div className="pt-16">
+      <div className="pt-16 pb-8">
         <div className="mb-8 px-6 md:px-12 lg:px-16">
           <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">works.</h2>
-          <p className="text-base md:text-lg text-neutral-400 font-light mt-1">精选视频作品与创作项目</p>
+          <p className="text-base md:text-lg text-neutral-400 font-light mt-3 md:mt-4">精选视频作品与创作项目</p>
         </div>
 
         {/* Showreel strip */}

@@ -15,7 +15,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
       <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
         news.
       </h2>
-      <p className="text-base md:text-lg text-neutral-400 font-light mt-1">最新动态</p>
+      <p className="text-base md:text-lg text-neutral-400 font-light mt-3 md:mt-4">最新动态</p>
 
       {recent.length === 0 ? (
         <p className="text-neutral-600 text-sm mt-8">暂无动态。</p>

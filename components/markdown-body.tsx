@@ -22,9 +22,9 @@ export function MarkdownBody({ content }: { content: string }) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
         components={{
-          h1: (p) => <h1 className="text-2xl font-bold text-white mt-8 mb-4" {...p} />,
-          h2: (p) => <h2 className="text-xl font-bold text-white mt-8 mb-3" {...p} />,
-          h3: (p) => <h3 className="text-lg font-semibold text-white mt-6 mb-2" {...p} />,
+          h1: (p) => <h1 className="text-2xl md:text-3xl font-bold text-white mt-8 mb-4" {...p} />,
+          h2: (p) => <h2 className="text-xl md:text-2xl font-bold text-white mt-8 mb-3" {...p} />,
+          h3: (p) => <h3 className="text-lg md:text-xl font-semibold text-white mt-6 mb-2" {...p} />,
           p: (p) => <p className="mb-4" {...p} />,
           a: (p) => <a className="text-white underline underline-offset-4 hover:text-neutral-300" target="_blank" rel="noopener noreferrer" {...p} />,
           ul: (p) => <ul className="list-disc list-inside mb-4 space-y-1" {...p} />,

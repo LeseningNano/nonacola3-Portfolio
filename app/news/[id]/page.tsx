@@ -27,7 +27,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ id: s
             <span className="border border-neutral-700 px-2 py-0.5">{post.tag}</span>
           )}
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-white mt-4 mb-10 break-words">{post.title}</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-white mt-8 mb-10 break-words">{post.title}</h1>
         <MarkdownBody content={post.body} />
         <div className="mt-12">
           <Link
