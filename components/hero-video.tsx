@@ -24,7 +24,10 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   useLayoutEffect(() => {
     function getScrollTop() {
       const container = document.getElementById(SCROLL_CONTAINER_ID);
-      if (container) return container.scrollTop;
+      // 容器仅在 md+ 是滚动元素；移动端由 window 滚动
+      if (container && container.clientHeight < container.scrollHeight) {
+        return container.scrollTop;
+      }
       return window.scrollY;
     }
 
@@ -59,8 +62,12 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     }
 
     const container = document.getElementById(SCROLL_CONTAINER_ID);
-    const target: HTMLElement | Window = container ?? window;
+    // 移动端容器不滚动，监听 window；md+ 监听容器
+    const isContainerScroll = container && container.clientHeight < container.scrollHeight;
+    const target: HTMLElement | Window = isContainerScroll ? container! : window;
     target.addEventListener("scroll", onScroll, { passive: true });
+    // 移动端可能因 resize 切换滚动主体，兜底监听 window
+    if (isContainerScroll) window.addEventListener("scroll", onScroll, { passive: true });
 
     // 刷新/后续进入：跳过开场动画，按钮直接显示
     if (sessionStorage.getItem("hero-loaded")) introDoneRef.current = true;
@@ -68,6 +75,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
 
     return () => {
       target.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(rafId.current);
       cancelAnimationFrame(nudgeRaf.current);
     };
@@ -226,7 +234,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         />
 
         {/* Content Layer */}
-        <div ref={contentRef} className="absolute bottom-20 md:bottom-28 left-4 md:left-20 z-10 text-left">
+        <div ref={contentRef} className="absolute bottom-28 md:bottom-28 left-4 md:left-20 z-10 text-left">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.name}
           </h1>
@@ -250,7 +258,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
               window.scrollTo({ top: target, behavior: "smooth" });
             }
           }}
-          className="group absolute bottom-20 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
+          className="group absolute bottom-12 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
           跳转至 works.

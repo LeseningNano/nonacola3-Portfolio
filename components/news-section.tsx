@@ -24,26 +24,26 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
           {recent.map((post) => {
             const inner = (
               <>
-                <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12">
+                <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 md:w-12 pt-0.5 md:pt-0">
                   {formatDate(post.createdAt)}
                 </span>
-                <span className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors truncate min-w-0 flex-1">
+                <span className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors min-w-0 flex-1 line-clamp-2 md:line-clamp-1 md:truncate">
                   {post.title ?? post.body}
                 </span>
                 {post.tag && (
-                  <span className="text-[10px] text-neutral-500 border border-neutral-800 px-2 py-0.5 flex-shrink-0">
+                  <span className="hidden md:inline-block text-[10px] text-neutral-500 border border-neutral-800 px-2 py-0.5 flex-shrink-0">
                     {post.tag}
                   </span>
                 )}
                 {post.title && (
-                  <span className="text-xs text-neutral-500 group-hover:text-white transition-colors flex-shrink-0 ml-auto">
+                  <span className="hidden md:inline text-xs text-neutral-500 group-hover:text-white transition-colors flex-shrink-0 ml-auto">
                     阅读全文 →
                   </span>
                 )}
               </>
             );
             const rowClass =
-              "group relative flex items-center gap-4 px-3 md:px-4 py-3.5 border-b border-neutral-900 hover:bg-white/5 transition-colors duration-200 before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-white before:scale-y-0 hover:before:scale-y-100 before:transition-transform before:duration-200 before:origin-center";
+              "group relative flex items-start md:items-center gap-3 md:gap-4 px-3 md:px-4 py-3.5 border-b border-neutral-900 hover:bg-white/5 transition-colors duration-200 before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-white before:scale-y-0 hover:before:scale-y-100 before:transition-transform before:duration-200 before:origin-center";
             return post.title ? (
               <Link key={post.id} href={`/news/${post.id}`} className={rowClass}>
                 {inner}
