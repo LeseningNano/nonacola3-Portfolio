@@ -3,9 +3,9 @@ import { siteConfig, socialLinks } from "@/lib/config";
 export function AboutSection() {
   return (
     <section id="about" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
-        about.
-      </h2>
+<h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
+    about.
+  </h2>
       <p className="text-base md:text-lg text-neutral-400 font-light mt-1">了解更多 & 合作洽谈</p>
 
       <div className="mt-10 flex flex-col md:flex-row gap-12 md:gap-16">

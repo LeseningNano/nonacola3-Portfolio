@@ -30,7 +30,7 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
     <section id="works" className="w-full bg-[#0a0a0a]">
       <div className="pt-16">
         <div className="mb-8 px-6 md:px-12 lg:px-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>works.</h2>
+          <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">works.</h2>
           <p className="text-base md:text-lg text-neutral-400 font-light mt-1">精选视频作品与创作项目</p>
         </div>
 
@@ -41,7 +41,7 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
             className="w-full h-12 bg-neutral-900 hover:bg-neutral-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
           >
             <div className="flex items-center gap-3">
-              <span className="text-neutral-500 text-sm md:text-base tracking-wider translate-y-px" style={{ fontFamily: "var(--font-bitcount)" }}>REEL</span>
+              <span className="font-heading text-neutral-500 text-sm md:text-base tracking-wider translate-y-px">REEL</span>
               <span className="text-sm md:text-base text-neutral-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
             </div>
             <span className="text-neutral-600 group-hover:text-neutral-400 text-xs transition-colors duration-300">▶</span>

@@ -12,7 +12,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
   const recent = posts.slice(0, 5);
   return (
     <section id="news" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
+      <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
         news.
       </h2>
       <p className="text-base md:text-lg text-neutral-400 font-light mt-1">最新动态</p>
