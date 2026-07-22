@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { AlertTriangle, X } from "lucide-react";
+import Link from "next/link";
 
 export function ServerNotice() {
   const [show, setShow] = useState(false);
+  const [closing, setClosing] = useState(false);
 
   useEffect(() => {
     const dismissed = sessionStorage.getItem("server-notice-dismissed");
@@ -18,27 +20,34 @@ export function ServerNotice() {
   }, []);
 
   const dismiss = () => {
-    setShow(false);
+    setClosing(true);
     sessionStorage.setItem("server-notice-dismissed", "1");
+    setTimeout(() => setShow(false), 300);
   };
 
   if (!show) return null;
 
   return (
-    <div className="fixed top-20 right-6 z-50 max-w-sm animate-slide-in-right">
-      <div className="bg-neutral-900/95 border border-neutral-700 backdrop-blur-md px-4 py-3 shadow-xl flex items-start gap-3">
-        <AlertTriangle className="w-4 h-4 text-white mt-0.5 flex-shrink-0" />
-        <p className="text-sm text-neutral-300 leading-relaxed" style={{ whiteSpace: "pre-line" }}>
-          服务器位于海外，缩略图与视频资源加载可能较慢。
-          后期将迁移至阿里云对象存储提升加载速度，如有任何不便还请谅解。
+    <div
+      className={`fixed top-16 left-0 right-0 z-30 bg-neutral-900/95 backdrop-blur-md border-b border-neutral-700 ${closing ? "animate-fade-out" : "animate-fade-in-down"}`}
+    >
+      <Link
+        href="/news/cmrs2x02p000004jyhpbp2iki"
+        className="flex items-center gap-3 px-4 md:px-6 py-2.5 text-left hover:bg-neutral-800/60 transition-colors"
+      >
+        <AlertTriangle className="w-4 h-4 text-white flex-shrink-0" />
+        <p className="text-xs md:text-sm text-neutral-300 leading-relaxed flex-1 min-w-0">
+          服务器位于海外，缩略图与视频资源加载可能较慢。点击了解详情与后续优化计划。
         </p>
-        <button
-          onClick={dismiss}
-          className="text-neutral-500 hover:text-white transition-colors flex-shrink-0"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+        <X
+          className="w-4 h-4 text-neutral-500 hover:text-white transition-colors flex-shrink-0"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dismiss();
+          }}
+        />
+      </Link>
     </div>
   );
 }

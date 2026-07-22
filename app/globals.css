@@ -180,9 +180,25 @@ body::after {
   to { opacity: 1; }
 }
 
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out forwards;
+}
+.animate-fade-in-down {
+  animation: fade-in-down 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 @keyframes fade-out {
   from { opacity: 1; }
   to { opacity: 0; }
+}
+
+.animate-fade-out {
+  animation: fade-out 0.25s ease-in forwards;
 }
 
 @keyframes modal-up {

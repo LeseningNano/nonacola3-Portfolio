@@ -83,15 +83,15 @@ export function Navbar() {
 
       {/* 移动端下拉菜单 */}
       {open && (
-        <div className="md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm">
+        <div className="md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in">
           <div className="flex flex-col px-6 py-6 gap-1">
-            {SECTIONS.map((s) => (
+            {SECTIONS.map((s, i) => (
               <a
                 key={s.id}
                 href={`/#${s.id}`}
                 onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-2xl py-3 text-neutral-300 hover:text-white transition-colors border-b border-neutral-900"
-                style={{ fontFamily: "var(--font-bitcount)" }}
+                className="text-2xl py-3 text-neutral-300 hover:text-white transition-colors border-b border-neutral-900 animate-fade-in-down opacity-0"
+                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 50}ms` }}
               >
                 {s.label}
               </a>
@@ -99,7 +99,8 @@ export function Navbar() {
             <Link
               href="/dashboard"
               onClick={() => setOpen(false)}
-              className="text-lg py-3 text-neutral-500 hover:text-neutral-300 transition-colors"
+              className="text-lg py-3 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0"
+              style={{ animationDelay: `${SECTIONS.length * 50}ms` }}
             >
               管理
             </Link>

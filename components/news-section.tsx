@@ -22,6 +22,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
       ) : (
         <div className="mt-8 border-t border-neutral-800">
           {recent.map((post) => {
+            const isArticle = Boolean(post.title);
             const inner = (
               <>
                 <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 md:w-12 pt-0.5 md:pt-0">
@@ -39,6 +40,9 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
                   <span className="hidden md:inline text-xs text-neutral-500 group-hover:text-white transition-colors flex-shrink-0 ml-auto">
                     阅读全文 →
                   </span>
+                )}
+                {post.title && (
+                  <span className="md:hidden text-base text-neutral-600 group-hover:text-neutral-300 transition-colors duration-200 flex-shrink-0 leading-none">›</span>
                 )}
               </>
             );
