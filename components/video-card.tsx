@@ -26,16 +26,16 @@ export function VideoCard({ video }: { video: VideoRow }) {
           </div>
         ) : (
           <div className="absolute inset-0 bg-neutral-800 flex items-center justify-center">
-            <Play className="w-12 h-12 text-neutral-600" />
+            <Play className="w-12 h-12 text-neutral-500" />
           </div>
         )}
         {/* Always visible: category + title at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
-          <span className="text-[10px] md:text-xs lg:text-sm text-neutral-400 mb-1 block">{video.category}</span>
-          <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
+          <span className="text-xs md:text-sm lg:text-base text-neutral-400 mb-1 block">{video.category}</span>
+          <h3 className="font-medium text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
           {video.summary && (
             <div className="grid transition-[grid-template-rows] duration-300 ease-in-out grid-rows-[0fr] group-hover:grid-rows-[1fr]">
-              <p className="text-neutral-300 text-[10px] sm:text-xs md:text-sm lg:text-base line-clamp-2 overflow-hidden">
+              <p className="text-neutral-300 text-xs sm:text-sm md:text-base lg:text-lg line-clamp-2 overflow-hidden">
                 <span className="block mt-1">{video.summary}</span>
               </p>
             </div>

@@ -25,24 +25,26 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
       <div className="max-w-5xl mx-auto">
         <WorkPlayer videoId={video.id} embedUrl={video.embedUrl} title={video.title} />
 
-        <h1 className="text-2xl md:text-4xl font-bold text-white mt-8 break-words">{video.title}</h1>
+        <h1 className="text-2xl md:text-4xl font-bold text-white mt-8 mb-6 break-words">{video.title}</h1>
         <div className="flex items-center gap-3 mt-3">
           <span className="text-xs font-medium text-neutral-400 border border-neutral-700 px-2 py-0.5">
             {video.category}
           </span>
           {video.date && (
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-neutral-500 font-mono">
               {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
             </span>
           )}
         </div>
 
         {video.summary && (
-          <p className="text-neutral-300 mt-6 text-base md:text-lg leading-relaxed break-words">{video.summary}</p>
+          <div className="max-w-3xl">
+            <p className="text-neutral-300 mt-6 text-base md:text-lg leading-relaxed break-words">{video.summary}</p>
+          </div>
         )}
         {video.description && (
-          <div className="mt-8 border-t border-neutral-800 pt-6">
-            <h2 className="text-sm font-medium text-neutral-400 mb-3">关于</h2>
+          <div className="mt-8 border-t border-neutral-800 pt-6 max-w-3xl">
+            <h2 className="text-lg font-semibold text-neutral-400 mb-3">关于</h2>
             <MarkdownBody content={video.description} />
           </div>
         )}

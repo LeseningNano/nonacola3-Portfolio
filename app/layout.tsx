@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat, Bitcount_Grid_Single } from "next/font/google";
+import { Inter, Montserrat, Bitcount_Grid_Single, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
 
@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/toast";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" });
 const bitcount = Bitcount_Grid_Single({
   subsets: ["latin"],
@@ -45,7 +46,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} ${montserrat.variable} ${bitcount.variable} bg-[#0a0a0a] text-white antialiased`}>
+      <body className={`${inter.className} ${geistMono.variable} ${montserrat.variable} ${bitcount.variable} bg-[#0a0a0a] text-white antialiased`}>
         <ToastProvider>
           <PageTransition />
           <ServerNotice />

@@ -10,7 +10,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-6">
       <div className="max-w-md text-center">
-        <h1 className="text-3xl font-normal tracking-tight text-white mb-4" style={{ fontFamily: "var(--font-bitcount)" }}>
+        <h1 className="font-heading text-3xl font-normal tracking-tight text-white mb-4">
           出错了。
         </h1>
         <p className="text-neutral-400 mb-8">
