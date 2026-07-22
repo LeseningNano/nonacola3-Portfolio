@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/components/toast";
+import { MarkdownEditor } from "@/components/markdown-editor";
 
 interface Post {
   id: string;
@@ -120,13 +121,21 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
             className="bg-neutral-900 border-neutral-700"
           />
         )}
-        <textarea
-          placeholder={mode === "article" ? "正文（支持 Markdown）\n\n## 小标题\n**加粗** / *斜体* / `代码`\n- 列表项\n\n插入图片：\n![描述](https://图片URL)\n\n插入视频：\n<video controls src=\"https://视频URL.mp4\"></video>" : "一句话动态…"}
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          rows={mode === "article" ? 8 : 2}
-          className="w-full bg-neutral-900 border border-neutral-700 px-3 py-2 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-neutral-500"
-        />
+        {mode === "article" ? (
+          <MarkdownEditor
+            value={body}
+            onChange={setBody}
+            textareaProps={{ rows: 10, placeholder: "正文（支持 Markdown）" }}
+          />
+        ) : (
+          <textarea
+            placeholder="一句话动态…"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={2}
+            className="w-full bg-neutral-900 border border-neutral-700 px-3 py-2 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:border-neutral-500"
+          />
+        )}
         <div className="flex gap-3 items-center">
           <Input
             placeholder="标签（可选，如：作品/日常/活动）"

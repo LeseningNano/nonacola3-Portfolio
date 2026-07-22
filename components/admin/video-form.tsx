@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/toast";
+import { MarkdownEditor } from "@/components/markdown-editor";
 
 interface VideoData {
   id?: string;
@@ -234,15 +235,10 @@ export function VideoForm({
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">简介（选填，显示在详情页，支持 Markdown）</Label>
-            <textarea
-              id="description"
-              rows={6}
+            <MarkdownEditor
               value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-              placeholder={"详细的视频简介 / 幕后解析。支持 Markdown：\n\n## 小标题\n**加粗** / *斜体* / `代码`\n- 列表项\n\n插入图片：\n![描述](https://图片URL)\n\n插入视频：\n<video controls src=\"https://视频URL.mp4\"></video>"}
-              className="w-full rounded-md bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm font-mono"
+              onChange={(v) => setForm({ ...form, description: v })}
+              textareaProps={{ id: "description", rows: 6 }}
             />
           </div>
           <div className="space-y-2">
