@@ -32,7 +32,7 @@ export function VideoCard({ video }: { video: VideoRow }) {
         {/* Always visible: category + title at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
           <span className="text-xs md:text-sm lg:text-base text-neutral-400 mb-1 block">{video.category}</span>
-          <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
+          <h3 className="font-medium text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
           {video.summary && (
             <div className="grid transition-[grid-template-rows] duration-300 ease-in-out grid-rows-[0fr] group-hover:grid-rows-[1fr]">
               <p className="text-neutral-300 text-xs sm:text-sm md:text-base lg:text-lg line-clamp-2 overflow-hidden">

@@ -45,6 +45,10 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
                     阅读全文 →
                   </span>
                 )}
+
+                {post.title && (
+                  <span className="md:hidden text-base text-neutral-600 group-hover:text-neutral-300 transition-colors duration-200 flex-shrink-0 leading-none">›</span>
+                )}
               </>
             );
             const rowClass =
