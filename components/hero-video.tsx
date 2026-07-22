@@ -235,7 +235,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
 
         {/* Content Layer */}
         <div ref={contentRef} className="absolute bottom-28 md:bottom-28 left-6 md:left-20 z-10 text-left" style={{ fontFamily: "var(--font-montserrat), sans-serif" }}>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold tracking-tight mb-3">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3">
             {siteConfig.name}
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-neutral-400 font-light">
