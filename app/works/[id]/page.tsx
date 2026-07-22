@@ -31,7 +31,7 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
             {video.category}
           </span>
           {video.date && (
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-neutral-500 font-mono">
               {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
             </span>
           )}

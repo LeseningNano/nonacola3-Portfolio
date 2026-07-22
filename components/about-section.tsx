@@ -13,7 +13,7 @@ export function AboutSection() {
           我是nonacola3，是一名业余PV师，正在努力进步中。热爱影像创作（也爱打游戏），喜欢用视觉语言讲述故事。期待通过每一个作品不断打磨技术，也希望能与更多志同道合的朋友交流合作。
         </p>
         <div className="md:border-l md:border-neutral-800 md:pl-12 flex-shrink-0">
-          <p className="text-xs text-neutral-500 uppercase tracking-widest mb-3">Contact</p>
+          <h3 className="text-xs text-neutral-500 uppercase tracking-widest mb-3 font-normal">Contact</h3>
           <a
             href={`mailto:${siteConfig.email}`}
             className="text-lg md:text-xl text-neutral-300 hover:text-white transition-colors block mb-6"

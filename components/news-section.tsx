@@ -5,7 +5,12 @@ export type { PostItem };
 
 function formatDate(iso: string) {
   const d = new Date(iso);
-  return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+  const now = new Date();
+  const monthDay = `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+  // 非当年显示 YYYY.MM.DD，当年只显示 MM.DD
+  return d.getFullYear() === now.getFullYear()
+    ? monthDay
+    : `${d.getFullYear()}.${monthDay}`;
 }
 
 export function NewsSection({ posts }: { posts: PostItem[] }) {
@@ -27,9 +32,9 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
                 <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 pt-0.5 md:pt-0">
                   {formatDate(post.createdAt)}
                 </span>
-                <span className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors min-w-0 flex-1 line-clamp-2 md:line-clamp-1 md:truncate">
+                <h3 className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors min-w-0 flex-1 line-clamp-2 md:line-clamp-1 md:truncate leading-normal font-normal">
                   {post.title ?? post.body}
-                </span>
+                </h3>
                 {post.tag && (
                   <span className="hidden md:inline-block text-xs text-neutral-500 border border-neutral-800 px-2 py-0.5 flex-shrink-0">
                     {post.tag}
