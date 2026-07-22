@@ -40,21 +40,22 @@ export function Navbar() {
   useEffect(() => {
     function check() {
       const container = document.getElementById("main-scroll");
-      const isContainerScroll = container && container.clientHeight < container.scrollHeight;
-      const y = isContainerScroll ? container!.scrollTop : window.scrollY;
-      setScrolled(y > SCROLL_THRESHOLD);
+      const y = container ? container.scrollTop : window.scrollY;
+      const winY = window.scrollY;
+      setScrolled(y > SCROLL_THRESHOLD || winY > SCROLL_THRESHOLD);
     }
 
     const container = document.getElementById("main-scroll");
-    const isContainerScroll = container && container.clientHeight < container.scrollHeight;
-    const target: HTMLElement | Window = isContainerScroll ? container! : window;
-    target.addEventListener("scroll", check, { passive: true });
-    if (isContainerScroll) window.addEventListener("scroll", check, { passive: true });
+    if (container) container.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("scroll", check, { passive: true });
+    // 等渲染稳定后再校一次（防止初次挂载时数据还没到位）
+    const t = setTimeout(check, 300);
     check();
 
     return () => {
-      target.removeEventListener("scroll", check);
+      if (container) container.removeEventListener("scroll", check);
       window.removeEventListener("scroll", check);
+      clearTimeout(t);
     };
   }, [pathname]);
 
