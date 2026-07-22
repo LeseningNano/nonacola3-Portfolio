@@ -1,13 +1,26 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+
+// 允许 <video> 直接嵌入播放（用于幕后解析展示片段等）
+const sanitizeSchema = {
+  ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), "video", "source"],
+  attributes: {
+    ...defaultSchema.attributes,
+    video: ["controls", "src", "width", "height", " poster", "muted", "loop", "playsInline"],
+    source: ["src", "type"],
+    img: ["src", "alt", "title", "width", "height", "loading"],
+  },
+};
 
 export function MarkdownBody({ content }: { content: string }) {
   return (
     <div className="text-neutral-300 leading-relaxed">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSanitize]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
         components={{
           h1: (p) => <h1 className="text-2xl font-bold text-white mt-8 mb-4" {...p} />,
           h2: (p) => <h2 className="text-xl font-bold text-white mt-8 mb-3" {...p} />,

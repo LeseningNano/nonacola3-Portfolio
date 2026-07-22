@@ -233,16 +233,16 @@ export function VideoForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">简介（选填，显示在详情页）</Label>
+            <Label htmlFor="description">简介（选填，显示在详情页，支持 Markdown）</Label>
             <textarea
               id="description"
-              rows={5}
+              rows={6}
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
-              placeholder="详细的视频简介，支持换行"
-              className="w-full rounded-md bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm"
+              placeholder={"详细的视频简介 / 幕后解析。\n支持 Markdown：## 标题、![图](图片URL)、<video controls src=\"视频URL\"></video> 等"}
+              className="w-full rounded-md bg-neutral-800 border border-neutral-700 px-3 py-2 text-sm font-mono"
             />
           </div>
           <div className="space-y-2">

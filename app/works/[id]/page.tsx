@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { getVideo } from "@/lib/data";
 import { WorkPlayer } from "@/components/work-player";
+import { MarkdownBody } from "@/components/markdown-body";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -42,7 +43,7 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
         {video.description && (
           <div className="mt-8 border-t border-neutral-800 pt-6">
             <h2 className="text-sm font-medium text-neutral-400 mb-3">关于</h2>
-            <p className="text-neutral-300 leading-relaxed whitespace-pre-line break-words">{video.description}</p>
+            <MarkdownBody content={video.description} />
           </div>
         )}
 
