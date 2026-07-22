@@ -234,11 +234,11 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         />
 
         {/* Content Layer */}
-        <div ref={contentRef} className="absolute bottom-28 md:bottom-28 left-6 md:left-20 z-10 text-left" style={{ fontFamily: "var(--font-montserrat), sans-serif" }}>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3">
+        <div ref={contentRef} className="absolute bottom-28 md:bottom-28 left-4 md:left-20 z-10 text-left">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.name}
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-neutral-400 font-light">
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-neutral-400 font-light" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.title}
           </p>
         </div>
@@ -258,9 +258,10 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
               window.scrollTo({ top: target, behavior: "smooth" });
             }
           }}
-          className="group absolute bottom-12 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-xs md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
+          className="group absolute bottom-12 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
+          style={{ fontFamily: "var(--font-bitcount)" }}
         >
-          <span>跳转至 </span><span className="font-heading">works.</span>
+          跳转至 works.
           <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </button>
       </section>
