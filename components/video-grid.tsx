@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
@@ -72,9 +73,20 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
         <div className="flex justify-center mt-8">
           <button
             onClick={() => setShowAll((v) => !v)}
-            className="text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
+            className="inline-flex items-center gap-2 text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
           >
-            {showAll ? "收起 ⌃" : `显示全部作品 ⌄ ${videos.length}`}
+            {showAll ? (
+              <>
+                收起
+                <ChevronUp className="w-4 h-4" />
+              </>
+            ) : (
+              <>
+                显示全部作品
+                <span className="text-neutral-500">{videos.length}</span>
+                <ChevronDown className="w-4 h-4" />
+              </>
+            )}
           </button>
         </div>
 
