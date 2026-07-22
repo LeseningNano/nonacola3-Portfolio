@@ -87,16 +87,16 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* 全屏覆盖菜单（移动 + 桌面统一） */}
+      {/* 移动端：全屏覆盖菜单 */}
       {open && (
-        <div className="fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in flex flex-col">
-          <div className="flex-1 flex flex-col items-start md:items-center justify-center px-6 md:px-12 lg:px-16 gap-1 md:gap-2">
+        <div className="md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in flex flex-col">
+          <div className="flex-1 flex flex-col items-start justify-center px-6 gap-1">
             {SECTIONS.map((s, i) => (
               <a
                 key={s.id}
                 href={`/#${s.id}`}
                 onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-3xl md:text-5xl lg:text-6xl py-2 md:py-3 text-neutral-300 hover:text-white transition-colors animate-fade-in-down opacity-0"
+                className="text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in-down opacity-0"
                 style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
               >
                 {s.label}
@@ -105,7 +105,34 @@ export function Navbar() {
             <Link
               href="/dashboard"
               onClick={() => setOpen(false)}
-              className="text-base md:text-lg py-3 md:py-4 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0"
+              className="text-base py-3 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0"
+              style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
+            >
+              管理
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* 桌面端：右侧 1/4 宽面板 */}
+      {open && (
+        <div className="hidden md:block fixed top-16 right-0 bottom-0 w-1/4 min-w-[320px] z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in-down border-l border-white/5">
+          <div className="flex flex-col justify-center h-full px-8 lg:px-10 gap-2">
+            {SECTIONS.map((s, i) => (
+              <a
+                key={s.id}
+                href={`/#${s.id}`}
+                onClick={(e) => handleSectionClick(e, s.id)}
+                className="text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in-down opacity-0"
+                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
+              >
+                {s.label}
+              </a>
+            ))}
+            <Link
+              href="/dashboard"
+              onClick={() => setOpen(false)}
+              className="text-sm lg:text-base py-3 mt-2 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0 border-t border-white/5"
               style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
             >
               管理
