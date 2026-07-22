@@ -121,7 +121,7 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
           />
         )}
         <textarea
-          placeholder={mode === "article" ? "正文（支持 Markdown）" : "一句话动态…"}
+          placeholder={mode === "article" ? "正文（支持 Markdown）\n\n## 小标题\n**加粗** / *斜体* / `代码`\n- 列表项\n\n插入图片：\n![描述](https://图片URL)\n\n插入视频：\n<video controls src=\"https://视频URL.mp4\"></video>" : "一句话动态…"}
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={mode === "article" ? 8 : 2}
