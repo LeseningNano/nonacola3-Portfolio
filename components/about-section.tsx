@@ -16,7 +16,7 @@ export function AboutSection() {
           <p className="text-xs text-neutral-500 uppercase tracking-widest mb-3">Contact</p>
           <a
             href={`mailto:${siteConfig.email}`}
-            className="text-lg md:text-xl hover:text-neutral-300 transition-colors block mb-6"
+            className="text-lg md:text-xl text-neutral-300 hover:text-white transition-colors block mb-6"
           >
             {siteConfig.email}
           </a>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Play } from "lucide-react";
 import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
@@ -44,7 +44,7 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
               <span className="font-heading text-neutral-500 text-sm md:text-base tracking-wider translate-y-px">REEL</span>
               <span className="text-sm md:text-base text-neutral-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
             </div>
-            <span className="text-neutral-600 group-hover:text-neutral-400 text-xs transition-colors duration-300">▶</span>
+            <Play className="text-neutral-500 group-hover:text-neutral-400 w-3.5 h-3.5 transition-colors duration-300" />
           </button>
         </div>
 

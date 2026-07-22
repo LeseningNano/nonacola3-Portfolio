@@ -18,20 +18,20 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
       <p className="text-base md:text-lg text-neutral-400 font-light mt-3 md:mt-4">最新动态</p>
 
       {recent.length === 0 ? (
-        <p className="text-neutral-600 text-sm mt-8">暂无动态。</p>
+        <p className="text-neutral-500 text-sm mt-8">暂无动态。</p>
       ) : (
         <div className="mt-8 border-t border-neutral-800">
           {recent.map((post) => {
             const inner = (
               <>
-                <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 md:w-12 pt-0.5 md:pt-0">
+                <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 pt-0.5 md:pt-0">
                   {formatDate(post.createdAt)}
                 </span>
                 <span className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors min-w-0 flex-1 line-clamp-2 md:line-clamp-1 md:truncate">
                   {post.title ?? post.body}
                 </span>
                 {post.tag && (
-                  <span className="hidden md:inline-block text-[10px] text-neutral-500 border border-neutral-800 px-2 py-0.5 flex-shrink-0">
+                  <span className="hidden md:inline-block text-xs text-neutral-500 border border-neutral-800 px-2 py-0.5 flex-shrink-0">
                     {post.tag}
                   </span>
                 )}
