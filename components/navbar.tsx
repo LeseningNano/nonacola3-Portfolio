@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
@@ -12,9 +12,13 @@ const SECTIONS = [
   { id: "about", label: "ABOUT" },
 ];
 
+const SCROLL_THRESHOLD = 80;
+
 export function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   function handleSectionClick(e: React.MouseEvent, id: string) {
     e.preventDefault();
@@ -34,6 +38,29 @@ export function Navbar() {
     }
   }
 
+  // 监听滚动：桌面主页用 #main-scroll 容器，其他场景用 window
+  useEffect(() => {
+    function check() {
+      const container = document.getElementById("main-scroll");
+      const isContainerScroll = container && container.clientHeight < container.scrollHeight;
+      const y = isContainerScroll ? container!.scrollTop : window.scrollY;
+      setScrolled(y > SCROLL_THRESHOLD);
+    }
+
+    const container = document.getElementById("main-scroll");
+    const isContainerScroll = container && container.clientHeight < container.scrollHeight;
+    const target: HTMLElement | Window = isContainerScroll ? container! : window;
+    target.addEventListener("scroll", check, { passive: true });
+    // 兜底：移动端容器不滚动但 window 滚动
+    if (isContainerScroll) window.addEventListener("scroll", check, { passive: true });
+    check();
+
+    return () => {
+      target.removeEventListener("scroll", check);
+      window.removeEventListener("scroll", check);
+    };
+  }, [pathname]);
+
   // 菜单展开时禁用背景滚动
   useEffect(() => {
     if (open) {
@@ -46,7 +73,11 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40">
-      <div className="px-4 md:px-6 h-16 flex items-center justify-between">
+      <div
+        className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
+          scrolled ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
+        }`}
+      >
         <Link href="/" className="font-normal text-base md:text-lg" style={{ fontFamily: "var(--font-bitcount)" }}>
           {siteConfig.name}
         </Link>
