@@ -32,13 +32,11 @@ export function Navbar() {
     } else if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     } else {
-      // 不在主页：先记录目标板块，再导航回主页
       sessionStorage.setItem("pending-scroll", id);
       router.push("/");
     }
   }
 
-  // 监听滚动：桌面主页用 #main-scroll 容器，其他场景用 window
   useEffect(() => {
     function check() {
       const container = document.getElementById("main-scroll");
@@ -51,7 +49,6 @@ export function Navbar() {
     const isContainerScroll = container && container.clientHeight < container.scrollHeight;
     const target: HTMLElement | Window = isContainerScroll ? container! : window;
     target.addEventListener("scroll", check, { passive: true });
-    // 兜底：移动端容器不滚动但 window 滚动
     if (isContainerScroll) window.addEventListener("scroll", check, { passive: true });
     check();
 
@@ -61,7 +58,6 @@ export function Navbar() {
     };
   }, [pathname]);
 
-  // 菜单展开时禁用背景滚动
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -75,54 +71,33 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-40">
       <div
         className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
-          scrolled ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
+          scrolled || open ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
         }`}
       >
         <Link href="/" className="font-normal text-base md:text-lg" style={{ fontFamily: "var(--font-bitcount)" }}>
           {siteConfig.name}
         </Link>
 
-        {/* 桌面端导航 */}
-        <div className="hidden md:flex items-center gap-6">
-          {SECTIONS.map((s) => (
-            <a
-              key={s.id}
-              href={`/#${s.id}`}
-              onClick={(e) => handleSectionClick(e, s.id)}
-              className="link-sweep text-sm text-neutral-400 hover:text-white transition-colors"
-            >
-              {s.label}
-            </a>
-          ))}
-          <Link
-            href="/dashboard"
-            className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors"
-          >
-            管理
-          </Link>
-        </div>
-
-        {/* 移动端汉堡按钮 */}
         <button
           aria-label="菜单"
-          className="md:hidden text-neutral-300 hover:text-white transition-colors p-2 -mr-2"
+          className="text-neutral-300 hover:text-white transition-colors p-2 -mr-2"
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* 移动端下拉菜单 */}
+      {/* 全屏覆盖菜单（移动 + 桌面统一） */}
       {open && (
-        <div className="md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in">
-          <div className="flex flex-col px-6 py-6 gap-1">
+        <div className="fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in flex flex-col">
+          <div className="flex-1 flex flex-col items-start md:items-center justify-center px-6 md:px-12 lg:px-16 gap-1 md:gap-2">
             {SECTIONS.map((s, i) => (
               <a
                 key={s.id}
                 href={`/#${s.id}`}
                 onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-2xl py-3 text-neutral-300 hover:text-white transition-colors border-b border-neutral-900 animate-fade-in-down opacity-0"
-                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 50}ms` }}
+                className="text-3xl md:text-5xl lg:text-6xl py-2 md:py-3 text-neutral-300 hover:text-white transition-colors animate-fade-in-down opacity-0"
+                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
               >
                 {s.label}
               </a>
@@ -130,8 +105,8 @@ export function Navbar() {
             <Link
               href="/dashboard"
               onClick={() => setOpen(false)}
-              className="text-lg py-3 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0"
-              style={{ animationDelay: `${SECTIONS.length * 50}ms` }}
+              className="text-base md:text-lg py-3 md:py-4 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0"
+              style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
             >
               管理
             </Link>
