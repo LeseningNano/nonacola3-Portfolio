@@ -11,7 +11,7 @@ export function Footer() {
             <p className="text-sm text-neutral-500">
               &copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
             </p>
-            <p className="text-xs text-neutral-500 mt-1">
+            <p className="text-xs text-neutral-600 mt-1">
               Built with Next.js &middot; Deployed on Vercel
             </p>
           </div>

@@ -5,38 +5,33 @@ export type { PostItem };
 
 function formatDate(iso: string) {
   const d = new Date(iso);
-  const now = new Date();
-  const monthDay = `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
-  // 非当年显示 YYYY.MM.DD，当年只显示 MM.DD
-  return d.getFullYear() === now.getFullYear()
-    ? monthDay
-    : `${d.getFullYear()}.${monthDay}`;
+  return `${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
 }
 
 export function NewsSection({ posts }: { posts: PostItem[] }) {
   const recent = posts.slice(0, 5);
   return (
     <section id="news" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
-      <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight">
+      <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
         news.
       </h2>
-      <p className="text-base md:text-lg text-neutral-400 font-light mt-2 md:mt-3">最新动态</p>
+      <p className="text-base md:text-lg text-neutral-400 font-light mt-1">最新动态</p>
 
       {recent.length === 0 ? (
-        <p className="text-neutral-500 text-sm mt-8">暂无动态。</p>
+        <p className="text-neutral-600 text-sm mt-8">暂无动态。</p>
       ) : (
         <div className="mt-8 border-t border-neutral-800">
           {recent.map((post) => {
             const inner = (
               <>
-                <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 pt-0.5 md:pt-0">
+                <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 md:w-12 pt-0.5 md:pt-0">
                   {formatDate(post.createdAt)}
                 </span>
-                <h3 className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors min-w-0 flex-1 line-clamp-2 md:line-clamp-1 md:truncate leading-normal font-normal">
+                <span className="text-sm md:text-base text-neutral-300 group-hover:text-white transition-colors min-w-0 flex-1 line-clamp-2 md:line-clamp-1 md:truncate">
                   {post.title ?? post.body}
-                </h3>
+                </span>
                 {post.tag && (
-                  <span className="hidden md:inline-block text-xs text-neutral-500 border border-neutral-800 px-2 py-0.5 flex-shrink-0">
+                  <span className="hidden md:inline-block text-[10px] text-neutral-500 border border-neutral-800 px-2 py-0.5 flex-shrink-0">
                     {post.tag}
                   </span>
                 )}
@@ -44,10 +39,6 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
                   <span className="hidden md:inline text-xs text-neutral-500 group-hover:text-white transition-colors flex-shrink-0 ml-auto">
                     阅读全文 →
                   </span>
-                )}
-
-                {post.title && (
-                  <span className="md:hidden text-base text-neutral-600 group-hover:text-neutral-300 transition-colors duration-200 flex-shrink-0 leading-none">›</span>
                 )}
               </>
             );

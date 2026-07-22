@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat, Bitcount_Grid_Single, Geist_Mono, Noto_Sans_SC } from "next/font/google";
+import { Inter, Montserrat, Bitcount_Grid_Single } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
 
@@ -7,9 +7,7 @@ import { ServerNotice } from "@/components/server-notice";
 import { ToastProvider } from "@/components/toast";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans-inter" });
-const notoSansSC = Noto_Sans_SC({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-cjk" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+const inter = Inter({ subsets: ["latin"] });
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" });
 const bitcount = Bitcount_Grid_Single({
   subsets: ["latin"],
@@ -47,7 +45,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${notoSansSC.variable} ${geistMono.variable} ${montserrat.variable} ${bitcount.variable} font-sans bg-[#0a0a0a] text-white antialiased`}>
+      <body className={`${inter.className} ${montserrat.variable} ${bitcount.variable} bg-[#0a0a0a] text-white antialiased`}>
         <ToastProvider>
           <PageTransition />
           <ServerNotice />

@@ -141,25 +141,6 @@ export function HomeClient({
     };
   }, []);
 
-  // 移动端：桌面 lerp 滚动 effect 已 early-return，
-  // 但跳转按钮 / 导航 / 锚点跳回仍会 dispatch smooth-scroll-to 到容器，
-  // 此处单独兜底，用 window 原生 smooth 滚动落地。
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const mq = window.matchMedia("(min-width: 769px)");
-    function handle(e: Event) {
-      const detail = (e as CustomEvent<{ target: number }>).detail;
-      if (typeof detail?.target !== "number") return;
-      if (mq.matches) return; // 桌面端由 lerp effect 处理
-      const max = document.body.scrollHeight - window.innerHeight;
-      const t = Math.max(0, Math.min(max, detail.target));
-      window.scrollTo({ top: t, behavior: "smooth" });
-    }
-    container.addEventListener("smooth-scroll-to", handle);
-    return () => container.removeEventListener("smooth-scroll-to", handle);
-  }, []);
-
   // 从其他页面带锚点跳回主页时，滚动到目标板块
   useEffect(() => {
     const id = sessionStorage.getItem("pending-scroll");
