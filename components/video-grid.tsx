@@ -47,7 +47,7 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
           </button>
         </div>
 
-        <div key={showAll ? "grid" : "marquee"} className="animate-fade-slide-in">
+        <div key={showAll ? "grid" : "marquee"} className={showAll ? "animate-works-expand" : "animate-works-collapse"}>
           {showAll ? (
             <>
               <div className="px-6 md:px-12 lg:px-16 mb-8">
