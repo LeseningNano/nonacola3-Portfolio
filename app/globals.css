@@ -289,7 +289,7 @@ body::after {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .animate-works-expand {
-  animation: works-expand 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: works-expand 400ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* 收起回到 marquee：从上方落入并恢复，表「回到轨道」的回落感 */
@@ -298,7 +298,7 @@ body::after {
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-works-collapse {
-  animation: works-collapse 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: works-collapse 400ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes marquee {
