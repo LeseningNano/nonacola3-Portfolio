@@ -154,6 +154,17 @@ export function Navbar() {
         </div>
       )}
 
+      {/* 桌面端：遮罩压黑 */}
+      {mounted && (
+        <div
+          className={`hidden md:block fixed inset-0 top-16 z-20 bg-black/60 transition-opacity duration-300 ${
+            open ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ transitionTimingFunction: "var(--ease-menu)" }}
+          onClick={closeMenu}
+        />
+      )}
+
       {/* 桌面端：右侧 1/4 宽面板 */}
       {mounted && (
         <div

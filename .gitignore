@@ -52,3 +52,5 @@ next-env.d.ts
 .superpowers/
 
 dev-server.log
+
+handoff-mobile-layout.json
