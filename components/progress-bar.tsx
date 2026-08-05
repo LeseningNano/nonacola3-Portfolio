@@ -62,7 +62,7 @@ export function PageTransition() {
       if (target) {
         const r = target.getBoundingClientRect();
         clone.style.transition =
-          "left 350ms ease, top 350ms ease, width 350ms ease, height 350ms ease, opacity 250ms ease";
+          "left 300ms cubic-bezier(0.22, 1, 0.36, 1), top 300ms cubic-bezier(0.22, 1, 0.36, 1), width 300ms cubic-bezier(0.22, 1, 0.36, 1), height 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 250ms ease";
         clone.style.left = `${r.left}px`;
         clone.style.top = `${r.top}px`;
         clone.style.width = `${r.width}px`;
@@ -72,7 +72,7 @@ export function PageTransition() {
         setTimeout(() => {
           clone.style.opacity = "0";
           setTimeout(finish, 260);
-        }, 350);
+        }, 300);
       } else if (attempts > 0) {
         requestAnimationFrame(() => tryPlace(attempts - 1));
       } else {
