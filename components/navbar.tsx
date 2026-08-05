@@ -125,9 +125,10 @@ export function Navbar() {
       {/* 移动端：全屏覆盖菜单 */}
       {mounted && (
         <div
-          className={`md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm flex flex-col transition-transform duration-300 ease-out ${
+          className={`md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm flex flex-col transition-transform duration-300 ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
+          style={{ transitionTimingFunction: "var(--ease-menu)" }}
         >
           <div className="flex-1 flex flex-col items-start justify-center px-6 gap-1">
             {SECTIONS.map((s, i) => (
@@ -156,9 +157,10 @@ export function Navbar() {
       {/* 桌面端：右侧 1/4 宽面板 */}
       {mounted && (
         <div
-          className={`hidden md:block fixed top-16 right-0 bottom-0 w-1/4 min-w-[320px] z-30 bg-[#0a0a0a]/95 backdrop-blur-sm border-l border-white/5 transition-transform duration-300 ease-out ${
+          className={`hidden md:block fixed top-16 right-0 bottom-0 w-1/4 min-w-[320px] z-30 bg-[#0a0a0a]/95 backdrop-blur-sm border-l border-white/5 transition-transform duration-300 ${
             open ? "translate-x-0" : "translate-x-full"
           }`}
+          style={{ transitionTimingFunction: "var(--ease-menu)" }}
         >
           <div className="flex flex-col justify-center h-full px-8 lg:px-10 gap-2">
             {SECTIONS.map((s, i) => (
