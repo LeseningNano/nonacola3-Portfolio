@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 
@@ -18,11 +18,33 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function openMenu() {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setClosing(false);
+    setOpen(true);
+  }
+
+  function closeMenu() {
+    if (closing) return;
+    setOpen(false);
+    setClosing(true);
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      setClosing(false);
+      closeTimerRef.current = null;
+    }, 320);
+  }
 
   function handleSectionClick(e: React.MouseEvent, id: string) {
     e.preventDefault();
-    setOpen(false);
+    closeMenu();
     const container = document.getElementById("main-scroll");
     const el = document.getElementById(id);
     if (container && el) {
@@ -60,19 +82,25 @@ export function Navbar() {
   }, [pathname]);
 
   useEffect(() => {
-    if (open) {
+    if (open || closing) {
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = "";
       };
     }
-  }, [open]);
+  }, [open, closing]);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40">
       <div
         className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
-          scrolled || open ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
+          scrolled || open || closing ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
         }`}
       >
         <Link href="/" className="font-normal text-base md:text-lg" style={{ fontFamily: "var(--font-bitcount)" }}>
@@ -82,22 +110,26 @@ export function Navbar() {
         <button
           aria-label="菜单"
           className="text-neutral-300 hover:text-white transition-colors p-2 -mr-2"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => (open ? closeMenu() : openMenu())}
         >
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {/* 移动端：全屏覆盖菜单 */}
-      {open && (
-        <div className="md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in flex flex-col">
+      {(open || closing) && (
+        <div
+          className={`md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm flex flex-col transition-transform duration-300 ease-out ${
+            open ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
           <div className="flex-1 flex flex-col items-start justify-center px-6 gap-1">
             {SECTIONS.map((s, i) => (
               <a
                 key={s.id}
                 href={`/#${s.id}`}
                 onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in-down opacity-0"
+                className="text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
                 style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
               >
                 {s.label}
@@ -105,8 +137,8 @@ export function Navbar() {
             ))}
             <Link
               href="/dashboard"
-              onClick={() => setOpen(false)}
-              className="text-base py-3 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0"
+              onClick={closeMenu}
+              className="text-base py-3 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in opacity-0"
               style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
             >
               管理
@@ -116,15 +148,19 @@ export function Navbar() {
       )}
 
       {/* 桌面端：右侧 1/4 宽面板 */}
-      {open && (
-        <div className="hidden md:block fixed top-16 right-0 bottom-0 w-1/4 min-w-[320px] z-30 bg-[#0a0a0a]/95 backdrop-blur-sm animate-fade-in-down border-l border-white/5">
+      {(open || closing) && (
+        <div
+          className={`hidden md:block fixed top-16 right-0 bottom-0 w-1/4 min-w-[320px] z-30 bg-[#0a0a0a]/95 backdrop-blur-sm border-l border-white/5 transition-transform duration-300 ease-out ${
+            open ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
           <div className="flex flex-col justify-center h-full px-8 lg:px-10 gap-2">
             {SECTIONS.map((s, i) => (
               <a
                 key={s.id}
                 href={`/#${s.id}`}
                 onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in-down opacity-0"
+                className="text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
                 style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
               >
                 {s.label}
@@ -132,8 +168,8 @@ export function Navbar() {
             ))}
             <Link
               href="/dashboard"
-              onClick={() => setOpen(false)}
-              className="text-sm lg:text-base py-3 mt-2 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in-down opacity-0 border-t border-white/5"
+              onClick={closeMenu}
+              className="text-sm lg:text-base py-3 mt-2 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in opacity-0 border-t border-white/5"
               style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
             >
               管理
