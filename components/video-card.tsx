@@ -13,7 +13,7 @@ export function VideoCard({ video }: { video: VideoRow }) {
         {video.thumbnail ? (
           /* 缩略图 + 渐变遮罩共用一个缩放 wrapper，作为同一合成层一起 scale，
              避免 marquee 父级 transform 动画下子像素错位导致遮罩与封面不齐出现白边。 */
-          <div className="absolute inset-0 transition-transform duration-300 group-hover:scale-105">
+          <div className="absolute inset-0 transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105">
             <Image
               src={video.thumbnail}
               alt={video.title}
@@ -34,7 +34,7 @@ export function VideoCard({ video }: { video: VideoRow }) {
           <span className="text-[10px] md:text-xs lg:text-sm text-neutral-400 mb-1 block">{video.category}</span>
           <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
           {video.summary && (
-            <div className="grid transition-[grid-template-rows] duration-300 ease-in-out grid-rows-[0fr] group-hover:grid-rows-[1fr]">
+            <div className="grid transition-[grid-template-rows] duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] grid-rows-[0fr] group-hover:grid-rows-[1fr]">
               <p className="text-neutral-300 text-[10px] sm:text-xs md:text-sm lg:text-base line-clamp-2 overflow-hidden">
                 <span className="block mt-1">{video.summary}</span>
               </p>
