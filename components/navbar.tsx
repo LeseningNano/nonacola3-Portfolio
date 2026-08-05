@@ -18,26 +18,31 @@ export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [closing, setClosing] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openRafRef = useRef(0);
 
   function openMenu() {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
-    setClosing(false);
-    setOpen(true);
+    cancelAnimationFrame(openRafRef.current);
+    // 先以收起态挂载（面板在屏幕外），等浏览器绘制该帧后再切到展开态，让滑入过渡能播放
+    setMounted(true);
+    openRafRef.current = requestAnimationFrame(() => {
+      openRafRef.current = requestAnimationFrame(() => setOpen(true));
+    });
   }
 
   function closeMenu() {
-    if (closing) return;
+    if (!mounted) return;
+    cancelAnimationFrame(openRafRef.current);
     setOpen(false);
-    setClosing(true);
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     closeTimerRef.current = setTimeout(() => {
-      setClosing(false);
+      setMounted(false);
       closeTimerRef.current = null;
     }, 320);
   }
@@ -82,17 +87,18 @@ export function Navbar() {
   }, [pathname]);
 
   useEffect(() => {
-    if (open || closing) {
+    if (mounted) {
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = "";
       };
     }
-  }, [open, closing]);
+  }, [mounted]);
 
   useEffect(() => {
     return () => {
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+      cancelAnimationFrame(openRafRef.current);
     };
   }, []);
 
@@ -100,7 +106,7 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-40">
       <div
         className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
-          scrolled || open || closing ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
+          scrolled || mounted ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
         }`}
       >
         <Link href="/" className="font-normal text-base md:text-lg" style={{ fontFamily: "var(--font-bitcount)" }}>
@@ -117,7 +123,7 @@ export function Navbar() {
       </div>
 
       {/* 移动端：全屏覆盖菜单 */}
-      {(open || closing) && (
+      {mounted && (
         <div
           className={`md:hidden fixed inset-0 top-16 z-30 bg-[#0a0a0a]/95 backdrop-blur-sm flex flex-col transition-transform duration-300 ease-out ${
             open ? "translate-x-0" : "translate-x-full"
@@ -148,7 +154,7 @@ export function Navbar() {
       )}
 
       {/* 桌面端：右侧 1/4 宽面板 */}
-      {(open || closing) && (
+      {mounted && (
         <div
           className={`hidden md:block fixed top-16 right-0 bottom-0 w-1/4 min-w-[320px] z-30 bg-[#0a0a0a]/95 backdrop-blur-sm border-l border-white/5 transition-transform duration-300 ease-out ${
             open ? "translate-x-0" : "translate-x-full"
