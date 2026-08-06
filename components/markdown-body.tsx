@@ -37,7 +37,17 @@ export function MarkdownBody({ content }: { content: string }) {
           ),
           pre: (p) => <pre className="bg-neutral-900 border border-neutral-800 p-4 overflow-x-auto my-4 text-sm" {...p} />,
           hr: () => <hr className="border-neutral-800 my-8" />,
-          img: (p) => <img className="max-w-full my-4" {...p} alt={p.alt ?? ""} />,
+          img: ({ alt, title, ...p }) => (
+            <figure className="my-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="max-w-full" {...p} alt={alt ?? ""} title={title} />
+              {(title ?? alt) && (
+                <figcaption className="mt-2 text-center text-sm text-neutral-500">
+                  {title ?? alt}
+                </figcaption>
+              )}
+            </figure>
+          ),
         }}
       >
         {content}
