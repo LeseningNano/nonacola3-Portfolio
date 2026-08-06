@@ -66,22 +66,26 @@ export function Navbar() {
 
   useEffect(() => {
     function check() {
+      // capture 阶段监听，无论哪个元素在滚动都能收到；
+      // 每次都重新查 #main-scroll，避免 hydration 后节点替换导致监听失效。
       const container = document.getElementById("main-scroll");
       const y = container ? container.scrollTop : window.scrollY;
       const winY = window.scrollY;
       setScrolled(y > SCROLL_THRESHOLD || winY > SCROLL_THRESHOLD);
     }
 
+    // 用 document capture 兜住所有滚动（桌面 #main-scroll、移动端 window），
+    // 并对 #main-scroll 额外挂一个直接监听，双保险。
+    document.addEventListener("scroll", check, { capture: true, passive: true });
     const container = document.getElementById("main-scroll");
     if (container) container.addEventListener("scroll", check, { passive: true });
-    window.addEventListener("scroll", check, { passive: true });
     // 等渲染稳定后再校一次（防止初次挂载时数据还没到位）
     const t = setTimeout(check, 300);
     check();
 
     return () => {
+      document.removeEventListener("scroll", check, { capture: true });
       if (container) container.removeEventListener("scroll", check);
-      window.removeEventListener("scroll", check);
       clearTimeout(t);
     };
   }, [pathname]);
