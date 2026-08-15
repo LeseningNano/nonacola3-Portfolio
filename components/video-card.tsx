@@ -29,9 +29,14 @@ export function VideoCard({ video }: { video: VideoRow }) {
             <Play className="w-12 h-12 text-neutral-600" />
           </div>
         )}
-        {/* Always visible: category + title at bottom */}
+        {/* 分类标签：左上角 box（独立于缩放 wrapper，hover 时保持稳定） */}
+        {video.category && (
+          <span className="absolute top-2 left-2 md:top-3 md:left-3 z-10 inline-flex items-center px-2 py-0.5 md:px-2.5 md:py-1 text-[11px] md:text-xs font-medium tracking-wide text-white/90 bg-black/60 backdrop-blur-sm border border-white/25 transition-colors duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] group-hover:bg-black/75 group-hover:border-white/40">
+            {video.category}
+          </span>
+        )}
+        {/* Always visible: title at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
-          <span className="text-[10px] md:text-xs lg:text-sm text-neutral-400 mb-1 block">{video.category}</span>
           <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg leading-tight">{video.title}</h3>
           {video.summary && (
             <div className="grid transition-[grid-template-rows] duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] grid-rows-[0fr] group-hover:grid-rows-[1fr]">
