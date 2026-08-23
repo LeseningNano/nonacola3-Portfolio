@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { getVideo } from "@/lib/data";
+import { getVideo, getVideos } from "@/lib/data";
 import { WorkPlayer } from "@/components/work-player";
 import { MarkdownBody } from "@/components/markdown-body";
+import { VideoCard } from "@/components/video-card";
+import { pickRelatedVideos } from "@/lib/utils";
+import type { VideoRow } from "@/lib/types";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -17,8 +20,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function WorkPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const video = await getVideo(id);
+  const [video, allVideos] = await Promise.all([getVideo(id), getVideos()]);
   if (!video) notFound();
+
+  const serializedAll: VideoRow[] = allVideos.map((v) => ({
+    id: v.id,
+    title: v.title,
+    description: v.description,
+    summary: v.summary,
+    category: v.category,
+    embedUrl: v.embedUrl,
+    thumbnail: v.thumbnail,
+    featured: v.featured,
+    order: v.order,
+    date: v.date ? new Date(v.date).toISOString() : null,
+  }));
+  const related = pickRelatedVideos(serializedAll, video, 4);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-16 px-6 md:px-12">
@@ -65,6 +82,20 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
             返回主页
           </Link>
         </div>
+
+        {related.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl md:text-3xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
+              more.
+            </h2>
+            <p className="text-sm md:text-base text-neutral-400 font-light mt-1">相关作品</p>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+              {related.map((v) => (
+                <VideoCard key={v.id} video={v} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

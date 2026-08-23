@@ -1,3 +1,4 @@
+import type { VideoRow } from "@/lib/types";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -39,4 +40,20 @@ export function getEmbedUrl(url: string): string {
   }
 
   return url;
+}
+
+export function pickRelatedVideos(
+  videos: VideoRow[],
+  current: { id: string; category: string },
+  n = 4
+): VideoRow[] {
+  const others = videos.filter((v) => v.id !== current.id);
+  const sameCategory = others.filter((v) => v.category === current.category);
+  const picked: VideoRow[] = [];
+  // 同分类优先（保持原排序），不足用其余最新补齐；引用去重
+  for (const v of [...sameCategory, ...others]) {
+    if (picked.length >= n) break;
+    if (!picked.includes(v)) picked.push(v);
+  }
+  return picked;
 }
