@@ -43,6 +43,7 @@ model Post {
   title     String?
   body      String
   tag       String?
+  published Boolean  @default(true)
   createdAt DateTime @default(now())
 
   @@index([createdAt])
