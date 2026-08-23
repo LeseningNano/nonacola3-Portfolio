@@ -34,5 +34,6 @@ export interface PostItem {
   title: string | null;
   body: string;
   tag: string | null;
+  published: boolean;
   createdAt: string; // ISO
 }

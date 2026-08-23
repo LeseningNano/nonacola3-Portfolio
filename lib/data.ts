@@ -28,6 +28,16 @@ export const getPosts = unstable_cache(
   { tags: ["posts"] }
 );
 
+export const getPublishedPosts = unstable_cache(
+  async () =>
+    db.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+    }),
+  ["posts"],
+  { tags: ["posts"] }
+);
+
 export const getPost = unstable_cache(
   async (id: string) => db.post.findUnique({ where: { id } }),
   ["post"],
