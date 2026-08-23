@@ -28,6 +28,7 @@ export const postMutateSchema = z.object({
   title: z.string().max(200).nullish(),
   body: z.string().min(1).max(50000),
   tag: z.string().max(50).nullish(),
+  published: z.boolean().optional(),
 });
 
 export const showreelMutateSchema = z.object({

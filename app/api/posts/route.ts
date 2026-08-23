@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const title = b.title?.trim() || null;
   const tag = b.tag?.trim() || null;
 
-  const post = await db.post.create({ data: { title, body, tag } });
+  const post = await db.post.create({ data: { title, body, tag, published: b.published ?? true } });
   revalidateTags("posts");
   return created(post);
 }

@@ -22,7 +22,14 @@ export async function PUT(
   const title = b.title?.trim() || null;
   const tag = b.tag?.trim() || null;
 
-  const post = await db.post.update({ where: { id }, data: { title, body, tag } });
+  const data: { title: string | null; body: string; tag: string | null; published?: boolean } = {
+    title,
+    body,
+    tag,
+  };
+  if (typeof b.published === "boolean") data.published = b.published;
+
+  const post = await db.post.update({ where: { id }, data });
   revalidateTags("posts");
   return ok(post);
 }
