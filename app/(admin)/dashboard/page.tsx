@@ -19,6 +19,7 @@ export default async function DashboardPage() {
     title: p.title,
     body: p.body,
     tag: p.tag,
+    published: p.published,
     createdAt: p.createdAt.toISOString(),
   }));
 

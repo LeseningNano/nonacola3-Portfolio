@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/components/toast";
 import { MarkdownEditor } from "@/components/markdown-editor";
 
@@ -13,6 +13,7 @@ interface Post {
   title: string | null;
   body: string;
   tag: string | null;
+  published: boolean;
   createdAt: string;
 }
 
@@ -44,7 +45,7 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function handlePublish() {
+  async function handleSave(published: boolean) {
     if (!body.trim() || saving) return;
     if (mode === "article" && !title.trim()) return;
     setSaving(true);
@@ -53,6 +54,7 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
         title: mode === "article" ? title : null,
         body,
         tag: tag || null,
+        published,
       };
       const res = editingId
         ? await fetch(`/api/posts/${editingId}`, {
@@ -74,7 +76,7 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
       }
       resetForm();
       router.refresh();
-      toastSuccess(editingId ? "已更新" : "已发布");
+      toastSuccess(editingId ? "已更新" : published ? "已发布" : "已存草稿");
     } catch {
       toastError(editingId ? "更新失败" : "发布失败");
     } finally {
@@ -93,6 +95,29 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
     } else {
       router.refresh();
     }
+  }
+
+  async function handleTogglePublished(post: Post) {
+    const target = !post.published;
+    const prev = posts;
+    setPosts((p) => p.map((x) => (x.id === post.id ? { ...x, published: target } : x)));
+    const res = await fetch(`/api/posts/${post.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: post.title,
+        body: post.body,
+        tag: post.tag,
+        published: target,
+      }),
+    });
+    if (!res.ok) {
+      setPosts(prev);
+      toastError("操作失败");
+      return;
+    }
+    router.refresh();
+    toastSuccess(target ? "已发布" : "已转为草稿");
   }
 
   return (
@@ -143,9 +168,16 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
             onChange={(e) => setTag(e.target.value)}
             className="bg-neutral-900 border-neutral-700 max-w-xs"
           />
-          <Button onClick={handlePublish} disabled={saving}>
-            {saving ? "保存中…" : editingId ? "更新" : "发布"}
+          <Button onClick={() => handleSave(true)} disabled={saving}>
+            {saving ? "保存中…" : "发布"}
           </Button>
+          <button
+            onClick={() => handleSave(false)}
+            disabled={saving}
+            className="px-4 py-1.5 text-sm border border-neutral-700 text-neutral-400 hover:text-white transition-colors disabled:opacity-50"
+          >
+            存草稿
+          </button>
           {editingId && (
             <button
               onClick={resetForm}
@@ -178,6 +210,18 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
                   {post.tag}
                 </span>
               )}
+              {!post.published && (
+                <span className="text-xs border border-yellow-600/60 text-yellow-500 px-2 py-0.5 flex-shrink-0">
+                  草稿
+                </span>
+              )}
+              <button
+                onClick={() => handleTogglePublished(post)}
+                aria-label={post.published ? "撤回为草稿" : "发布"}
+                className="text-neutral-500 hover:text-white transition-colors flex-shrink-0"
+              >
+                {post.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
               <button
                 onClick={() => handleEdit(post)}
                 aria-label="编辑动态"
