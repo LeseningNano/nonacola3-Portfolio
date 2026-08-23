@@ -5,6 +5,9 @@ import { ok, created, unauthorized, fail, revalidateTags } from "@/lib/api-utils
 import { postMutateSchema } from "@/lib/schemas";
 
 export async function GET() {
+  const session = await auth();
+  if (!session) return unauthorized();
+
   const posts = await db.post.findMany({ orderBy: { createdAt: "desc" } });
   return ok(posts);
 }

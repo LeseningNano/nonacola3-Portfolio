@@ -188,7 +188,7 @@ export function PostManager({ initialPosts }: { initialPosts: Post[] }) {
           )}
         </div>
         {editingId && (
-          <p className="text-xs text-neutral-500">正在编辑一条动态，更新后点击「更新」保存。</p>
+          <p className="text-xs text-neutral-500">正在编辑一条动态，可选择「发布」或「存草稿」。</p>
         )}
       </div>
 
