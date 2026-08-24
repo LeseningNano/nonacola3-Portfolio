@@ -35,9 +35,9 @@ export function WorksClient({ videos }: { videos: VideoRow[] }) {
         {/* 标题行 */}
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
               works.
-            </h2>
+            </h1>
             <p className="text-base md:text-lg text-neutral-400 font-light mt-1">全部视频作品与创作项目</p>
           </div>
           <button
@@ -70,7 +70,7 @@ export function WorksClient({ videos }: { videos: VideoRow[] }) {
           <div key={view} className={view === "grid" ? "animate-works-expand" : "animate-works-collapse"}>
             {view === "immersive" ? (
               <div className="flex flex-col gap-6">
-                {filteredVideos.map((video) => (
+                {videos.map((video) => (
                   <ImmersiveCard key={video.id} video={video} />
                 ))}
               </div>
