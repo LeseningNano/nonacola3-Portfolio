@@ -99,21 +99,22 @@ function ImmersiveCard({ video }: { video: VideoRow }) {
   return (
     <Link
       href={`/works/${video.id}`}
-      data-vt-id={video.id}
       aria-label={video.title}
       className="group relative block aspect-video md:aspect-[21/9] overflow-hidden transform-gpu"
     >
-      {video.thumbnail ? (
-        <div className="absolute inset-0 transition-transform duration-300 group-hover:scale-[1.03]">
-          <Image src={video.thumbnail} alt={video.title} fill sizes="(max-width: 1152px) 100vw, 1152px" className="object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      <div data-vt-id={video.id} className="absolute inset-0">
+        {video.thumbnail ? (
+          <div className="absolute inset-0 transition-transform duration-300 group-hover:scale-[1.03]">
+            <Image src={video.thumbnail} alt={video.title} fill sizes="(max-width: 1152px) 100vw, 1152px" className="object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-neutral-800" />
+        )}
+        <div className="absolute bottom-0 left-0 p-4 md:p-6 z-10">
+          <span className="block text-xs md:text-sm text-neutral-400 mb-1">{video.category}</span>
+          <span className="block text-base md:text-xl lg:text-2xl text-white font-medium">{video.title}</span>
         </div>
-      ) : (
-        <div className="absolute inset-0 bg-neutral-800" />
-      )}
-      <div className="absolute bottom-0 left-0 p-4 md:p-6 z-10">
-        <span className="block text-xs md:text-sm text-neutral-400 mb-1">{video.category}</span>
-        <span className="block text-base md:text-xl lg:text-2xl text-white font-medium">{video.title}</span>
       </div>
     </Link>
   );

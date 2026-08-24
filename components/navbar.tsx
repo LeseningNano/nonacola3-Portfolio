@@ -93,6 +93,12 @@ export function Navbar() {
     };
   }, [pathname]);
 
+  // 路由变化时收起菜单。WORKS 等路由项的点击被全局过渡监听
+  // preventDefault+stopPropagation 拦截，React onClick 收不到，需此处兜底。
+  useEffect(() => {
+    closeMenu();
+  }, [pathname]);
+
   useEffect(() => {
     if (mounted) {
       document.body.style.overflow = "hidden";
