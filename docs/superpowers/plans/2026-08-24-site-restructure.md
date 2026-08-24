@@ -1,27 +1,20 @@
-# 站点重构 Implementation Plan（Hero 入场简化 + /works 独立页 + 首页重组）
-
+﻿# 绔欑偣閲嶆瀯 Implementation Plan锛圚ero 鍏ュ満绠€鍖?+ /works 鐙珛椤?+ 棣栭〉閲嶇粍锛?
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 首屏入场简化为「logo 淡入 → 页面淡入」；works 拆为 `/works` 独立页（默认沉浸纵向流，可切换紧凑网格）；首页重排为 Hero→about→news→works预览→footer；导航改混合模型并新增 CONTACT。
-
-**Architecture:** `/works` 为独立 Server Component 页（window 滚动，不复用首页 `#main-scroll` lerp 机制）；首页删 VideoGrid 换轻量 WorksPreview；hero 入场层替换 LoadingScreen/nudge；navbar 从纯锚点改为 route/anchor 混合项。既有机制按需保留：lerp 滚动、pending-scroll 回跳、克隆飞入过渡（`data-vt-id`）、黑场路由过渡。
-
-**Tech Stack:** Next.js 16 (App Router/Turbopack)、Tailwind v4、lucide-react。验证：`npx tsc --noEmit` + `npx next build` + 手动清单（项目无测试框架）。
-
-**设计文档:** `docs/superpowers/specs/2026-08-24-site-restructure-design.md`
+**Goal:** 棣栧睆鍏ュ満绠€鍖栦负銆宭ogo 娣″叆 鈫?椤甸潰娣″叆銆嶏紱works 鎷嗕负 `/works` 鐙珛椤碉紙榛樿娌夋蹈绾靛悜娴侊紝鍙垏鎹㈢揣鍑戠綉鏍硷級锛涢椤甸噸鎺掍负 Hero鈫抋bout鈫抧ews鈫抴orks棰勮鈫抐ooter锛涘鑸敼娣峰悎妯″瀷骞舵柊澧?CONTACT銆?
+**Architecture:** `/works` 涓虹嫭绔?Server Component 椤碉紙window 婊氬姩锛屼笉澶嶇敤棣栭〉 `#main-scroll` lerp 鏈哄埗锛夛紱棣栭〉鍒?VideoGrid 鎹㈣交閲?WorksPreview锛沨ero 鍏ュ満灞傛浛鎹?LoadingScreen/nudge锛沶avbar 浠庣函閿氱偣鏀逛负 route/anchor 娣峰悎椤广€傛棦鏈夋満鍒舵寜闇€淇濈暀锛歭erp 婊氬姩銆乸ending-scroll 鍥炶烦銆佸厠闅嗛鍏ヨ繃娓★紙`data-vt-id`锛夈€侀粦鍦鸿矾鐢辫繃娓°€?
+**Tech Stack:** Next.js 16 (App Router/Turbopack)銆乀ailwind v4銆乴ucide-react銆傞獙璇侊細`npx tsc --noEmit` + `npx next build` + 鎵嬪姩娓呭崟锛堥」鐩棤娴嬭瘯妗嗘灦锛夈€?
+**璁捐鏂囨。:** `docs/superpowers/specs/2026-08-24-site-restructure-design.md`
 
 ---
 
-### Task 1: Hero 入场简化
-
+### Task 1: Hero 鍏ュ満绠€鍖?
 **Files:**
-- Modify: `components/hero-video.tsx`（大幅精简）
-- Delete: `components/loading-screen.tsx`
+- Modify: `components/hero-video.tsx`锛堝ぇ骞呯簿绠€锛?- Delete: `components/loading-screen.tsx`
 
-- [ ] **Step 1: 重写 hero-video.tsx**
+- [ ] **Step 1: 閲嶅啓 hero-video.tsx**
 
-整文件替换为：
-
+鏁存枃浠舵浛鎹负锛?
 ```tsx
 "use client";
 
@@ -46,7 +39,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   useLayoutEffect(() => {
     function getScrollTop() {
       const container = document.getElementById(SCROLL_CONTAINER_ID);
-      // 容器仅在 md+ 是滚动元素；移动端由 window 滚动
+      // 瀹瑰櫒浠呭湪 md+ 鏄粴鍔ㄥ厓绱狅紱绉诲姩绔敱 window 婊氬姩
       if (container && container.clientHeight < container.scrollHeight) {
         return container.scrollTop;
       }
@@ -97,9 +90,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     };
   }, []);
 
-  // Logo 入场层显隐：pre-loader 黑底兜底期间由 React 接管。
-  // 回访（sessionStorage 有 hero-loaded）直接跳过。
-  useLayoutEffect(() => {
+  // Logo 鍏ュ満灞傛樉闅愶細pre-loader 榛戝簳鍏滃簳鏈熼棿鐢?React 鎺ョ銆?  // 鍥炶锛坰essionStorage 鏈?hero-loaded锛夌洿鎺ヨ烦杩囥€?  useLayoutEffect(() => {
     if (sessionStorage.getItem("hero-loaded")) {
       setShowIntro(false);
       return;
@@ -111,8 +102,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     }, 260);
   }, []);
 
-  // 时间线：淡入 500ms → 停留 400ms → 淡出 450ms → 卸载并写入回访标记
-  useEffect(() => {
+  // 鏃堕棿绾匡細娣″叆 500ms 鈫?鍋滅暀 400ms 鈫?娣″嚭 450ms 鈫?鍗歌浇骞跺啓鍏ュ洖璁挎爣璁?  useEffect(() => {
     if (!showIntro || !introIn || introFading) return;
     const t1 = setTimeout(() => setIntroFading(true), 900);
     const t2 = setTimeout(() => {
@@ -127,7 +117,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
 
   return (
     <>
-      {/* Logo 入场层 */}
+      {/* Logo 鍏ュ満灞?*/}
       {showIntro && (
         <div
           className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex items-center justify-center"
@@ -202,7 +192,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           className="group absolute bottom-12 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
-          跳转至 works.
+          璺宠浆鑷?works.
           <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </Link>
       </section>
@@ -211,25 +201,23 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
 }
 ```
 
-要点：删除 LoadingScreen 引用、playNudge/finishIntro/handleLoadReady/introDoneRef/loadTriggered/nudgeRaf/fadeOut/showLoader/loaderVisible 全部相关代码；视频不再阻塞入场。
-
-- [ ] **Step 2: 删除 loading-screen.tsx**
+瑕佺偣锛氬垹闄?LoadingScreen 寮曠敤銆乸layNudge/finishIntro/handleLoadReady/introDoneRef/loadTriggered/nudgeRaf/fadeOut/showLoader/loaderVisible 鍏ㄩ儴鐩稿叧浠ｇ爜锛涜棰戜笉鍐嶉樆濉炲叆鍦恒€?
+- [ ] **Step 2: 鍒犻櫎 loading-screen.tsx**
 
 ```bash
 git rm components/loading-screen.tsx
 ```
 
-- [ ] **Step 3: 类型检查**
+- [ ] **Step 3: 绫诲瀷妫€鏌?*
 
 Run: `npx tsc --noEmit`
-Expected: 无输出。若报 loading-screen 相关残留引用，检查是否还有其他文件 import 它（应只有 hero-video 已移除）。
-
-- [ ] **Step 4: 构建验证**
+Expected: 鏃犺緭鍑恒€傝嫢鎶?loading-screen 鐩稿叧娈嬬暀寮曠敤锛屾鏌ユ槸鍚﹁繕鏈夊叾浠栨枃浠?import 瀹冿紙搴斿彧鏈?hero-video 宸茬Щ闄わ級銆?
+- [ ] **Step 4: 鏋勫缓楠岃瘉**
 
 Run: `npx next build 2>&1 | Select-String "Compiled|Failed|error" | Select-Object -First 10`
-Expected: 含 `Compiled successfully`
+Expected: 鍚?`Compiled successfully`
 
-- [ ] **Step 5: 提交**
+- [ ] **Step 5: 鎻愪氦**
 
 ```bash
 git add components/hero-video.tsx
@@ -238,13 +226,12 @@ git commit -m "refactor(hero): simplify intro to logo fade-in then page reveal"
 
 ---
 
-### Task 2: `/works` 独立页面（沉浸流 + 网格切换）
-
+### Task 2: `/works` 鐙珛椤甸潰锛堟矇娴告祦 + 缃戞牸鍒囨崲锛?
 **Files:**
 - Create: `components/works-client.tsx`
 - Create: `app/works/page.tsx`
 
-- [ ] **Step 1: 创建 `components/works-client.tsx`**
+- [ ] **Step 1: 鍒涘缓 `components/works-client.tsx`**
 
 ```tsx
 "use client";
@@ -262,7 +249,7 @@ type ViewMode = "immersive" | "grid";
 
 export function WorksClient({ videos }: { videos: VideoRow[] }) {
   const [view, setView] = useState<ViewMode>("immersive");
-  const [selectedYear, setSelectedYear] = useState("全部");
+  const [selectedYear, setSelectedYear] = useState("鍏ㄩ儴");
   const [showShowreel, setShowShowreel] = useState(false);
 
   const years = useMemo(() => {
@@ -274,23 +261,23 @@ export function WorksClient({ videos }: { videos: VideoRow[] }) {
   }, [videos]);
 
   const filteredVideos =
-    selectedYear === "全部"
+    selectedYear === "鍏ㄩ儴"
       ? videos
       : videos.filter((v) => v.date && new Date(v.date).getFullYear().toString() === selectedYear);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
-        {/* 标题行 */}
+        {/* 鏍囬琛?*/}
         <div className="flex items-end justify-between mb-8">
           <div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
               works.
             </h2>
-            <p className="text-base md:text-lg text-neutral-400 font-light mt-1">全部视频作品与创作项目</p>
+            <p className="text-base md:text-lg text-neutral-400 font-light mt-1">鍏ㄩ儴瑙嗛浣滃搧涓庡垱浣滈」鐩?/p>
           </div>
           <button
-            aria-label={view === "immersive" ? "切换到网格视图" : "切换到沉浸视图"}
+            aria-label={view === "immersive" ? "鍒囨崲鍒扮綉鏍艰鍥? : "鍒囨崲鍒版矇娴歌鍥?}
             onClick={() => setView((v) => (v === "immersive" ? "grid" : "immersive"))}
             className="text-neutral-400 hover:text-white border border-neutral-700 hover:border-neutral-400 p-2.5 transition-colors"
           >
@@ -298,7 +285,7 @@ export function WorksClient({ videos }: { videos: VideoRow[] }) {
           </button>
         </div>
 
-        {/* Showreel 横条 */}
+        {/* Showreel 妯潯 */}
         <div className="mb-10">
           <button
             onClick={() => setShowShowreel(true)}
@@ -306,15 +293,15 @@ export function WorksClient({ videos }: { videos: VideoRow[] }) {
           >
             <div className="flex items-center gap-3">
               <span className="text-neutral-500 text-sm md:text-base tracking-wider translate-y-px" style={{ fontFamily: "var(--font-bitcount)" }}>REEL</span>
-              <span className="text-sm md:text-base text-neutral-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
+              <span className="text-sm md:text-base text-neutral-400 group-hover:text-white transition-colors duration-300">瑙嗚鍒涗綔鎬荤粨</span>
             </div>
             <PlayGlyph />
           </button>
         </div>
 
-        {/* 视图主体 */}
+        {/* 瑙嗗浘涓讳綋 */}
         {videos.length === 0 ? (
-          <p className="text-neutral-600 text-sm mt-8">暂无作品。</p>
+          <p className="text-neutral-600 text-sm mt-8">鏆傛棤浣滃搧銆?/p>
         ) : (
           <div key={view} className={view === "grid" ? "animate-works-expand" : "animate-works-collapse"}>
             {view === "immersive" ? (
@@ -377,9 +364,8 @@ function PlayGlyph() {
 }
 ```
 
-说明：沉浸卡用原生 svg 三角而非 lucide Play，与旧横条的 ▶ 形态一致且更轻；`data-vt-id` 使详情页克隆飞入过渡生效。
-
-- [ ] **Step 2: 创建 `app/works/page.tsx`**
+璇存槑锛氭矇娴稿崱鐢ㄥ師鐢?svg 涓夎鑰岄潪 lucide Play锛屼笌鏃фí鏉＄殑 鈻?褰㈡€佷竴鑷翠笖鏇磋交锛沗data-vt-id` 浣胯鎯呴〉鍏嬮殕椋炲叆杩囨浮鐢熸晥銆?
+- [ ] **Step 2: 鍒涘缓 `app/works/page.tsx`**
 
 ```tsx
 import type { Metadata } from "next";
@@ -410,17 +396,16 @@ export default async function WorksPage() {
 }
 ```
 
-- [ ] **Step 3: 类型检查**
+- [ ] **Step 3: 绫诲瀷妫€鏌?*
 
 Run: `npx tsc --noEmit`
-Expected: 无输出
-
-- [ ] **Step 4: 构建验证**
+Expected: 鏃犺緭鍑?
+- [ ] **Step 4: 鏋勫缓楠岃瘉**
 
 Run: `npx next build 2>&1 | Select-String "Compiled|Failed|error" | Select-Object -First 10`
-Expected: 含 `Compiled successfully`，路由表出现 `/works`
+Expected: 鍚?`Compiled successfully`锛岃矾鐢辫〃鍑虹幇 `/works`
 
-- [ ] **Step 5: 提交**
+- [ ] **Step 5: 鎻愪氦**
 
 ```bash
 git add components/works-client.tsx app/works/page.tsx
@@ -429,16 +414,13 @@ git commit -m "feat(works): standalone /works page with immersive/grid views"
 
 ---
 
-### Task 3: 首页重组（about 上移 + works 预览 + 清理）
-
+### Task 3: 棣栭〉閲嶇粍锛坅bout 涓婄Щ + works 棰勮 + 娓呯悊锛?
 **Files:**
 - Create: `components/works-preview.tsx`
-- Modify: `components/home-client.tsx`（板块顺序与导入）
-- Modify: `components/about-section.tsx`（联系块加 id="contact"）
-- Delete: `components/video-grid.tsx`、`components/works-marquee.tsx`
-- Modify: `app/globals.css`（删 marquee/flicker 死样式）
+- Modify: `components/home-client.tsx`锛堟澘鍧楅『搴忎笌瀵煎叆锛?- Modify: `components/about-section.tsx`锛堣仈绯诲潡鍔?id="contact"锛?- Delete: `components/video-grid.tsx`銆乣components/works-marquee.tsx`
+- Modify: `app/globals.css`锛堝垹 marquee/flicker 姝绘牱寮忥級
 
-- [ ] **Step 1: 创建 `components/works-preview.tsx`**
+- [ ] **Step 1: 鍒涘缓 `components/works-preview.tsx`**
 
 ```tsx
 import Link from "next/link";
@@ -455,7 +437,7 @@ export function WorksPreview({ videos }: { videos: VideoRow[] }) {
       <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
         works.
       </h2>
-      <p className="text-base md:text-lg text-neutral-400 font-light mt-1">精选作品 · 完整列表见全部</p>
+      <p className="text-base md:text-lg text-neutral-400 font-light mt-1">绮鹃€変綔鍝?路 瀹屾暣鍒楄〃瑙佸叏閮?/p>
 
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
         {preview.map((video) => (
@@ -468,7 +450,7 @@ export function WorksPreview({ videos }: { videos: VideoRow[] }) {
           href="/works"
           className="inline-flex items-center gap-2 text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
         >
-          查看全部作品
+          鏌ョ湅鍏ㄩ儴浣滃搧
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -477,10 +459,9 @@ export function WorksPreview({ videos }: { videos: VideoRow[] }) {
 }
 ```
 
-- [ ] **Step 2: home-client.tsx 调整顺序与导入**
+- [ ] **Step 2: home-client.tsx 璋冩暣椤哄簭涓庡鍏?*
 
-导入区把 `import { VideoGrid } from "@/components/video-grid";` 替换为 `import { WorksPreview } from "@/components/works-preview";`；渲染区改为：
-
+瀵煎叆鍖烘妸 `import { VideoGrid } from "@/components/video-grid";` 鏇挎崲涓?`import { WorksPreview } from "@/components/works-preview";`锛涙覆鏌撳尯鏀逛负锛?
 ```tsx
       <HeroVideo videoUrl={heroVideoUrl} />
       <AboutSection />
@@ -489,35 +470,32 @@ export function WorksPreview({ videos }: { videos: VideoRow[] }) {
       <Footer />
 ```
 
-- [ ] **Step 3: about-section.tsx 联系块加锚点**
+- [ ] **Step 3: about-section.tsx 鑱旂郴鍧楀姞閿氱偣**
 
-将 `<div className="md:border-l md:border-neutral-800 md:pl-12 flex-shrink-0">` 改为：
-
+灏?`<div className="md:border-l md:border-neutral-800 md:pl-12 flex-shrink-0">` 鏀逛负锛?
 ```tsx
         <div id="contact" className="md:border-l md:border-neutral-800 md:pl-12 flex-shrink-0">
 ```
 
-- [ ] **Step 4: 删除废弃组件与死样式**
+- [ ] **Step 4: 鍒犻櫎搴熷純缁勪欢涓庢鏍峰紡**
 
 ```bash
 git rm components/video-grid.tsx components/works-marquee.tsx
 ```
 
-`app/globals.css` 删除以下三段（marquee 与 flicker 已无消费者；works-expand/collapse 保留给 /works 用）：
-- `@keyframes marquee { ... }`、`.animate-marquee { ... }`、`.marquee-container:hover .animate-marquee { ... }`
+`app/globals.css` 鍒犻櫎浠ヤ笅涓夋锛坢arquee 涓?flicker 宸叉棤娑堣垂鑰咃紱works-expand/collapse 淇濈暀缁?/works 鐢級锛?- `@keyframes marquee { ... }`銆乣.animate-marquee { ... }`銆乣.marquee-container:hover .animate-marquee { ... }`
 - `@keyframes flicker-in { ... }`
 
-- [ ] **Step 5: 类型检查**
+- [ ] **Step 5: 绫诲瀷妫€鏌?*
 
 Run: `npx tsc --noEmit`
-Expected: 无输出（若报 ShowreelModal/video-card 未用导出警告可忽略——它们被 /works 使用）
-
-- [ ] **Step 6: 构建验证**
+Expected: 鏃犺緭鍑猴紙鑻ユ姤 ShowreelModal/video-card 鏈敤瀵煎嚭璀﹀憡鍙拷鐣モ€斺€斿畠浠 /works 浣跨敤锛?
+- [ ] **Step 6: 鏋勫缓楠岃瘉**
 
 Run: `npx next build 2>&1 | Select-String "Compiled|Failed|error" | Select-Object -First 10`
-Expected: 含 `Compiled successfully`
+Expected: 鍚?`Compiled successfully`
 
-- [ ] **Step 7: 提交**
+- [ ] **Step 7: 鎻愪氦**
 
 ```bash
 git add -A
@@ -526,14 +504,13 @@ git commit -m "refactor(home): reorder sections, add works preview, drop video-g
 
 ---
 
-### Task 4: Navbar 混合导航（WORKS 路由 + CONTACT 锚点）
-
+### Task 4: Navbar 娣峰悎瀵艰埅锛圵ORKS 璺敱 + CONTACT 閿氱偣锛?
 **Files:**
 - Modify: `components/navbar.tsx`
 
-- [ ] **Step 1: 导航项模型替换**
+- [ ] **Step 1: 瀵艰埅椤规ā鍨嬫浛鎹?*
 
-将顶部 `const SECTIONS = [...]` 替换为：
+灏嗛《閮?`const SECTIONS = [...]` 鏇挎崲涓猴細
 
 ```tsx
 type NavItem = { label: string; kind: "route" | "anchor"; target: string };
@@ -546,10 +523,9 @@ const NAV_ITEMS: NavItem[] = [
 ];
 ```
 
-- [ ] **Step 2: 点击处理分流**
+- [ ] **Step 2: 鐐瑰嚮澶勭悊鍒嗘祦**
 
-现有 `handleSectionClick` 改造为两个函数：
-
+鐜版湁 `handleSectionClick` 鏀归€犱负涓や釜鍑芥暟锛?
 ```tsx
   function handleAnchorClick(e: React.MouseEvent, id: string) {
     e.preventDefault();
@@ -569,11 +545,10 @@ const NAV_ITEMS: NavItem[] = [
   }
 ```
 
-route 项不写专门处理函数：菜单项渲染为普通 `<a href={item.target}>` 且 onClick 只调 `closeMenu()`——不加 preventDefault，让全局 progress-bar 的 capture 监听接管（黑场过渡 + router.push），避免双重跳转。
+route 椤逛笉鍐欎笓闂ㄥ鐞嗗嚱鏁帮細鑿滃崟椤规覆鏌撲负鏅€?`<a href={item.target}>` 涓?onClick 鍙皟 `closeMenu()`鈥斺€斾笉鍔?preventDefault锛岃鍏ㄥ眬 progress-bar 鐨?capture 鐩戝惉鎺ョ锛堥粦鍦鸿繃娓?+ router.push锛夛紝閬垮厤鍙岄噸璺宠浆銆?
+- [ ] **Step 3: 涓ゅ鑿滃崟娓叉煋鏇挎崲**
 
-- [ ] **Step 3: 两处菜单渲染替换**
-
-移动端全屏菜单与桌面右侧面板中的 `{SECTIONS.map(...)}` 都改为：
+绉诲姩绔叏灞忚彍鍗曚笌妗岄潰鍙充晶闈㈡澘涓殑 `{SECTIONS.map(...)}` 閮芥敼涓猴細
 
 ```tsx
             {NAV_ITEMS.map((item, i) =>
@@ -582,8 +557,8 @@ route 项不写专门处理函数：菜单项渲染为普通 `<a href={item.targ
                   key={item.label}
                   href={item.target}
                   onClick={closeMenu}
-                  className="<原有 className 不变>"
-                  style={<原有 style 不变>}
+                  className="<鍘熸湁 className 涓嶅彉>"
+                  style={<鍘熸湁 style 涓嶅彉>}
                 >
                   {item.label}
                 </a>
@@ -592,8 +567,8 @@ route 项不写专门处理函数：菜单项渲染为普通 `<a href={item.targ
                   key={item.label}
                   href={`/#${item.target}`}
                   onClick={(e) => handleAnchorClick(e, item.target)}
-                  className="<原有 className 不变>"
-                  style={<原有 style 不变>}
+                  className="<鍘熸湁 className 涓嶅彉>"
+                  style={<鍘熸湁 style 涓嶅彉>}
                 >
                   {item.label}
                 </a>
@@ -601,19 +576,17 @@ route 项不写专门处理函数：菜单项渲染为普通 `<a href={item.targ
             )}
 ```
 
-注意两处的 `className`/`style` 各自保留原值（移动端 text-3xl py-2…，桌面端 text-3xl lg:text-4xl py-2…）；「管理」Link 的 `animationDelay` 引用从 `SECTIONS.length` 改为 `NAV_ITEMS.length`（两处）。
-
-- [ ] **Step 4: 类型检查**
+娉ㄦ剰涓ゅ鐨?`className`/`style` 鍚勮嚜淇濈暀鍘熷€硷紙绉诲姩绔?text-3xl py-2鈥︼紝妗岄潰绔?text-3xl lg:text-4xl py-2鈥︼級锛涖€岀鐞嗐€峀ink 鐨?`animationDelay` 寮曠敤浠?`SECTIONS.length` 鏀逛负 `NAV_ITEMS.length`锛堜袱澶勶級銆?
+- [ ] **Step 4: 绫诲瀷妫€鏌?*
 
 Run: `npx tsc --noEmit`
-Expected: 无输出
-
-- [ ] **Step 5: 构建验证**
+Expected: 鏃犺緭鍑?
+- [ ] **Step 5: 鏋勫缓楠岃瘉**
 
 Run: `npx next build 2>&1 | Select-String "Compiled|Failed|error" | Select-Object -First 10`
-Expected: 含 `Compiled successfully`
+Expected: 鍚?`Compiled successfully`
 
-- [ ] **Step 6: 提交**
+- [ ] **Step 6: 鎻愪氦**
 
 ```bash
 git add components/navbar.tsx
@@ -622,27 +595,22 @@ git commit -m "feat(navbar): mixed nav model (WORKS route, CONTACT anchor)"
 
 ---
 
-### Task 5: 端到端验收 + 最终审查 + 推送
-
+### Task 5: 绔埌绔獙鏀?+ 鏈€缁堝鏌?+ 鎺ㄩ€?
 **Files:**
-- 无（只读验证 + git push）
+- 鏃狅紙鍙楠岃瘉 + git push锛?
+- [ ] **Step 1: 鍚姩 dev 骞堕€愰」鏍稿鎵嬪姩娓呭崟**
 
-- [ ] **Step 1: 启动 dev 并逐项核对手动清单**
+Run: `npm run dev`锛屾祻瑙堝櫒鎵撳紑 `http://localhost:3000`锛?1. 棣栬娓?sessionStorage 鍚庡埛鏂帮細logo 娣″叆 鈫?鏁村眰娣″嚭闇插嚭椤甸潰锛涘啀鍒锋柊鐩存帴杩涘叆锛堟棤 logo 灞傦級
+2. Hero CTA 涓庡鑸?WORKS 鍧囪繘鍏?`/works`锛涢粦鍦鸿繃娓℃甯?3. `/works` 榛樿娌夋蹈绾靛悜娴侊紱鐐瑰彸涓婃寜閽垏缃戞牸+骞翠唤绛涢€夊彲鐢紱鍐嶅垏鍥炴甯革紱showreel 鎵撳紑姝ｅ父
+4. 娌夋蹈澶у崱鐐瑰嚮杩涜鎯咃細缂╃暐鍥惧厠闅嗛鍏ユ挱鏀惧櫒姝ｅ父
+5. 棣栭〉椤哄簭 Hero鈫抋bout鈫抧ews鈫抴orks 棰勮鈫抐ooter锛涘鑸?NEWS/ABOUT/CONTACT 鍦ㄩ椤靛唴骞虫粦婊氬姩瀹氫綅鍑嗙‘
+6. 鍦?`/works` 鎴栬鎯呴〉鐐?NEWS/ABOUT/CONTACT锛氬厛榛戝満鍥為椤靛啀婊氬姩鍒扮洰鏍?7. 棰勮鍖恒€屾煡鐪嬪叏閮ㄤ綔鍝併€嶈繘 `/works`
 
-Run: `npm run dev`，浏览器打开 `http://localhost:3000`：
-1. 首访清 sessionStorage 后刷新：logo 淡入 → 整层淡出露出页面；再刷新直接进入（无 logo 层）
-2. Hero CTA 与导航 WORKS 均进入 `/works`；黑场过渡正常
-3. `/works` 默认沉浸纵向流；点右上按钮切网格+年份筛选可用；再切回正常；showreel 打开正常
-4. 沉浸大卡点击进详情：缩略图克隆飞入播放器正常
-5. 首页顺序 Hero→about→news→works 预览→footer；导航 NEWS/ABOUT/CONTACT 在首页内平滑滚动定位准确
-6. 在 `/works` 或详情页点 NEWS/ABOUT/CONTACT：先黑场回首页再滚动到目标
-7. 预览区「查看全部作品」进 `/works`
-
-- [ ] **Step 2: 确认工作树干净后推送**
+- [ ] **Step 2: 纭宸ヤ綔鏍戝共鍑€鍚庢帹閫?*
 
 ```bash
 git status
 git push
 ```
 
-Expected: `master -> master` 成功
+Expected: `master -> master` 鎴愬姛

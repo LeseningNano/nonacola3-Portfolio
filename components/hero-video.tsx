@@ -1,21 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
+import { LoadingScreen } from "./loading-screen";
 import { SCROLL_CONTAINER_ID } from "./home-client";
 
 export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
-  const [showIntro, setShowIntro] = useState(true);
-  const [introFading, setIntroFading] = useState(false);
-  const [introIn, setIntroIn] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
+  const [loaderVisible, setLoaderVisible] = useState(false);
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const ctaRef = useRef<HTMLAnchorElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const loadTriggered = useRef(false);
   const rafId = useRef(0);
+  const introDoneRef = useRef(false);
+  const nudgeRaf = useRef(0);
 
   // Parallax + scroll-driven styles: write to DOM directly, no React re-render
   useLayoutEffect(() => {
@@ -46,10 +49,11 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
       if (contentRef.current) {
         contentRef.current.style.opacity = String(fade);
       }
-      if (ctaRef.current) {
-        ctaRef.current.style.opacity = String(fade);
-        ctaRef.current.style.pointerEvents =
-          progress <= 0.45 ? "auto" : "none";
+      if (buttonRef.current) {
+        const baseFade = Math.max(0, 1 - progress * 2.5);
+        buttonRef.current.style.opacity = introDoneRef.current ? String(baseFade) : "0";
+        buttonRef.current.style.pointerEvents =
+          introDoneRef.current && progress <= 0.45 ? "auto" : "none";
       }
     }
 
@@ -58,63 +62,131 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     }
 
     const container = document.getElementById(SCROLL_CONTAINER_ID);
+    // 移动端容器不滚动，监听 window；md+ 监听容器
     const isContainerScroll = container && container.clientHeight < container.scrollHeight;
     const target: HTMLElement | Window = isContainerScroll ? container! : window;
     target.addEventListener("scroll", onScroll, { passive: true });
+    // 移动端可能因 resize 切换滚动主体，兜底监听 window
     if (isContainerScroll) window.addEventListener("scroll", onScroll, { passive: true });
 
+    // 刷新/后续进入：跳过开场动画，按钮直接显示
+    if (sessionStorage.getItem("hero-loaded")) introDoneRef.current = true;
     apply();
 
     return () => {
       target.removeEventListener("scroll", onScroll);
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(rafId.current);
+      cancelAnimationFrame(nudgeRaf.current);
     };
   }, []);
 
-  // Logo 入场层显隐：pre-loader 黑底兜底期间由 React 接管。
-  // 回访（sessionStorage 有 hero-loaded）直接跳过。
+  // 加载层显隐：用 useLayoutEffect 在浏览器首帧绘制前决定，
+  // 避免内容在首访时于加载层淡入前闪现。
+  // - 刷新/返回（sessionStorage 有 hero-loaded）：无 pre-loader、加载层立即卸载，内容直显。
+  // - 首访：inline <head> 脚本已注入 #pre-loader 在 SSR 绘制期间盖住内容；
+  //   此处设 loaderVisible=true（瞬时，无 transition）让 React 接管覆盖，移除 pre-loader。
   useLayoutEffect(() => {
     if (sessionStorage.getItem("hero-loaded")) {
-      setShowIntro(false);
+      setShowLoader(false);
       return;
     }
-    requestAnimationFrame(() => setIntroIn(true));
+    // 首访：淡入加载层（200ms），pre-loader 在淡入完成后才移除，
+    // 期间两者同为黑色，pre-loader 兜底盖住内容直到 React 加载层完全显形。
+    requestAnimationFrame(() => setLoaderVisible(true));
     setTimeout(() => {
       const p = document.getElementById("pre-loader");
       if (p) p.remove();
     }, 260);
   }, []);
 
-  // 时间线：淡入 500ms → 停留 400ms → 淡出 450ms → 卸载并写入回访标记
-  useEffect(() => {
-    if (!showIntro || !introIn || introFading) return;
-    const t1 = setTimeout(() => setIntroFading(true), 900);
-    const t2 = setTimeout(() => {
-      sessionStorage.setItem("hero-loaded", "1");
-      setShowIntro(false);
-    }, 1350);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
+  // 开场轻推：复用滚轮的指数追逐动画通道，轻推一下示意可滑动，随后按钮淡入。
+  // 仅首次进入触发。与滚轮体感完全一致（同一段 rAF 动画代码、同一 easing）。
+  const playNudge = () => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobile = window.matchMedia("(max-width: 768px)").matches;
+    const container = document.getElementById(SCROLL_CONTAINER_ID);
+    if (reduce || mobile || !container) {
+      finishIntro();
+      return;
+    }
+    const peak = 320;
+    const pauseMs = 500;
+    const easing = 10; // 与滚轮一致
+
+    const dispatch = (target: number) => {
+      container.dispatchEvent(
+        new CustomEvent("smooth-scroll-to", { detail: { target, easing } })
+      );
     };
-  }, [showIntro, introIn, introFading]);
+    const getY = () => container.scrollTop;
+
+    let phase: "down" | "pause" | "up" = "down";
+    let pauseStart = 0;
+    // 容差：滚轮动画在差值 <0.5px 时判定结束
+    const EPS = 1;
+    dispatch(peak);
+
+    const frame = (now: number) => {
+      if (phase === "down") {
+        if (Math.abs(getY() - peak) < EPS) {
+          phase = "pause";
+          pauseStart = now;
+        }
+      } else if (phase === "pause") {
+        if (now - pauseStart >= pauseMs) {
+          phase = "up";
+          dispatch(0);
+        }
+      } else {
+        if (Math.abs(getY()) < EPS) {
+          finishIntro();
+          return;
+        }
+      }
+      nudgeRaf.current = requestAnimationFrame(frame);
+    };
+    nudgeRaf.current = requestAnimationFrame(frame);
+  };
+
+  const finishIntro = () => {
+    introDoneRef.current = true;
+    if (buttonRef.current) {
+      buttonRef.current.style.transition = "opacity 700ms ease";
+      buttonRef.current.style.opacity = "1";
+      buttonRef.current.style.pointerEvents = "auto";
+      setTimeout(() => {
+        if (buttonRef.current) buttonRef.current.style.transition = "";
+      }, 720);
+    }
+  };
+
+  // After loading screen finishes, fade out + 触发开场轻推
+  const handleLoadReady = () => {
+    if (!loadTriggered.current) {
+      loadTriggered.current = true;
+      sessionStorage.setItem("hero-loaded", "1");
+      setFadeOut(true);
+      setTimeout(() => {
+        setShowLoader(false);
+        playNudge();
+      }, 450);
+    }
+  };
 
   return (
     <>
-      {/* Logo 入场层 */}
-      {showIntro && (
+      {/* Full-screen loading overlay */}
+      {showLoader && (
         <div
-          className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex items-center justify-center"
+          className="fixed inset-0 z-[9999]"
           style={{
-            opacity: introFading ? 0 : introIn ? 1 : 0,
-            transition: introFading ? "opacity 450ms ease" : introIn ? "opacity 500ms ease" : "none",
-            pointerEvents: introFading ? "none" : "auto",
+            opacity: fadeOut ? 0 : loaderVisible ? 1 : 0,
+            transition: "opacity 200ms ease",
+            pointerEvents: loaderVisible && !fadeOut ? "auto" : "none",
           }}
         >
-          <span className="text-3xl md:text-5xl text-white tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
-            {siteConfig.name}
-          </span>
+          <LoadingScreen ready={isVideoReady || !videoUrl} onReady={handleLoadReady} />
         </div>
       )}
 
@@ -171,15 +243,27 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           </p>
         </div>
 
-        <Link
-          ref={ctaRef}
-          href="/works"
+        <button
+          ref={buttonRef}
+          onClick={() => {
+            const works = document.getElementById("works");
+            if (!works) return;
+            const container = document.getElementById(SCROLL_CONTAINER_ID);
+            const target = works.offsetTop * 0.9;
+            if (container) {
+              container.dispatchEvent(
+                new CustomEvent("smooth-scroll-to", { detail: { target } })
+              );
+            } else {
+              window.scrollTo({ top: target, behavior: "smooth" });
+            }
+          }}
           className="group absolute bottom-12 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
           跳转至 works.
           <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-        </Link>
+        </button>
       </section>
     </>
   );

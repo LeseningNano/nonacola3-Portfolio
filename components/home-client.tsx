@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { HeroVideo } from "@/components/hero-video";
-import { WorksPreview } from "@/components/works-preview";
+import { VideoGrid } from "@/components/video-grid";
 import { NewsSection } from "@/components/news-section";
 import { AboutSection } from "@/components/about-section";
 import { Footer } from "@/components/footer";
@@ -186,9 +186,9 @@ export function HomeClient({
       className="md:h-screen md:overflow-y-auto scrollbar-hide"
     >
       <HeroVideo videoUrl={heroVideoUrl} />
-      <AboutSection />
+      <VideoGrid videos={videos} />
       <NewsSection posts={posts} />
-      <WorksPreview videos={videos} />
+      <AboutSection />
       <Footer />
     </div>
   );

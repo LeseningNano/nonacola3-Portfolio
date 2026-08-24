@@ -54,3 +54,6 @@ next-env.d.ts
 dev-server.log
 
 handoff-mobile-layout.json
+
+.opencode/
+start-dsh.ps1
