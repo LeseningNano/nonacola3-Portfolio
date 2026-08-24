@@ -6,10 +6,13 @@ import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 
-const SECTIONS = [
-  { id: "works", label: "WORKS" },
-  { id: "news", label: "NEWS" },
-  { id: "about", label: "ABOUT" },
+type NavItem = { label: string; kind: "route" | "anchor"; target: string };
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "WORKS", kind: "route", target: "/works" },
+  { label: "NEWS", kind: "anchor", target: "news" },
+  { label: "ABOUT", kind: "anchor", target: "about" },
+  { label: "CONTACT", kind: "anchor", target: "contact" },
 ];
 
 const SCROLL_THRESHOLD = 80;
@@ -47,7 +50,7 @@ export function Navbar() {
     }, 320);
   }
 
-  function handleSectionClick(e: React.MouseEvent, id: string) {
+  function handleAnchorClick(e: React.MouseEvent, id: string) {
     e.preventDefault();
     closeMenu();
     const container = document.getElementById("main-scroll");
@@ -135,22 +138,34 @@ export function Navbar() {
           style={{ transitionTimingFunction: "var(--ease-menu)" }}
         >
           <div className="flex-1 flex flex-col items-start justify-center px-6 gap-1">
-            {SECTIONS.map((s, i) => (
-              <a
-                key={s.id}
-                href={`/#${s.id}`}
-                onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
-                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
-              >
-                {s.label}
-              </a>
-            ))}
+            {NAV_ITEMS.map((item, i) =>
+              item.kind === "route" ? (
+                <a
+                  key={item.label}
+                  href={item.target}
+                  onClick={closeMenu}
+                  className="text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
+                  style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <a
+                  key={item.label}
+                  href={`/#${item.target}`}
+                  onClick={(e) => handleAnchorClick(e, item.target)}
+                  className="text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
+                  style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
+                >
+                  {item.label}
+                </a>
+              )
+            )}
             <Link
               href="/dashboard"
               onClick={closeMenu}
               className="text-base py-3 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in opacity-0"
-              style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
+              style={{ animationDelay: `${NAV_ITEMS.length * 60}ms` }}
             >
               管理
             </Link>
@@ -178,22 +193,34 @@ export function Navbar() {
           style={{ transitionTimingFunction: "var(--ease-menu)" }}
         >
           <div className="flex flex-col justify-center h-full px-8 lg:px-10 gap-2">
-            {SECTIONS.map((s, i) => (
-              <a
-                key={s.id}
-                href={`/#${s.id}`}
-                onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
-                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
-              >
-                {s.label}
-              </a>
-            ))}
+            {NAV_ITEMS.map((item, i) =>
+              item.kind === "route" ? (
+                <a
+                  key={item.label}
+                  href={item.target}
+                  onClick={closeMenu}
+                  className="text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
+                  style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <a
+                  key={item.label}
+                  href={`/#${item.target}`}
+                  onClick={(e) => handleAnchorClick(e, item.target)}
+                  className="text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
+                  style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
+                >
+                  {item.label}
+                </a>
+              )
+            )}
             <Link
               href="/dashboard"
               onClick={closeMenu}
               className="text-sm lg:text-base py-3 mt-2 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in opacity-0 border-t border-white/5"
-              style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
+              style={{ animationDelay: `${NAV_ITEMS.length * 60}ms` }}
             >
               管理
             </Link>
