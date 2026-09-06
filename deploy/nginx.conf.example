@@ -1,0 +1,51 @@
+# Nginx 站点配置模板 — nonacola3 Portfolio（腾讯云香港轻量服务器）
+# 部署路径：/etc/nginx/sites-available/nonacola3
+# 使用前把 your-domain.com 替换为实际域名，certbot --nginx 会自动改写 TLS 部分。
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name your-domain.com;
+
+    # certbot 续期需要保留 80 端口可访问；签发完成后全量跳转 HTTPS
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name your-domain.com;
+
+    ssl_certificate     /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+    include             /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam         /etc/letsencrypt/ssl-dhparams.pem;
+
+    # 后台上传走 /api/upload，放宽请求体限制
+    client_max_body_size 50m;
+
+    gzip on;
+    gzip_comp_level 5;
+    gzip_types text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml image/svg+xml;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade           $http_upgrade;
+        proxy_set_header Connection        "upgrade";
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host  $host;
+        # next-auth 回调依赖以上转发头；App Router 流式响应需要关闭缓冲
+        proxy_buffering off;
+        proxy_read_timeout 60s;
+    }
+}
