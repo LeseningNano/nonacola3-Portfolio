@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>nonacola3 · 影像作品集 2026</title>
+<style>
+  @page { size: 210mm 297mm; margin: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --ink: #f5f5f5;
+    --muted: #8a8a8a;
+    --faint: #5a5a5a;
+    --line: #2e2e2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 210mm;
+    background: var(--bg);
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", "Yu Gothic UI", "Meiryo", sans-serif;
+    color: var(--ink);
+    line-break: strict;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* 弹性分布：剩余空间均匀摊在各区块之间，避免池化成大片空白 */
+  .page {
+    width: 210mm;
+    height: 297mm;
+    position: relative;
+    background: var(--bg);
+    padding: 13mm 14mm 12mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    break-after: page;
+  }
+  .page:last-child { break-after: auto; }
+
+  /* ── header ─────────────────────────────── */
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .brand {
+    font-size: 27px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .brand .dot { color: var(--faint); font-weight: 300; }
+  .head-meta {
+    text-align: right;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+  .head-meta strong { color: var(--ink); font-weight: 500; }
+
+  .rule { border: 0; border-top: 0.4pt solid var(--line); }
+
+  /* ── hero：全宽 16:9 大图 + 信息条 ───────── */
+  .hero { display: flex; flex-direction: column; }
+  .hero img.big {
+    width: 182mm;
+    height: 102mm;   /* 182 × 9/16 ≈ 102.4 → 基本无裁切 */
+    object-fit: cover;
+    display: block;
+    border: 0.5pt solid var(--line);
+  }
+  .hero-bar {
+    display: flex;
+    align-items: center;
+    gap: 8mm;
+    margin-top: 6mm;
+  }
+  .kicker {
+    font-size: 8.5px;
+    letter-spacing: 0.34em;
+    color: var(--muted);
+  }
+  .hero-title {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-top: 2.5mm;
+  }
+  .hero-desc {
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    margin-top: 2.5mm;
+    max-width: 70mm;
+    text-wrap: balance;
+  }
+  .hero-bar .qr-chip { flex-shrink: 0; }
+  .hero-bar .qr-chip img { width: 25mm; height: 25mm; }
+  .qr-note { font-size: 9px; color: var(--muted); line-height: 1.8; }
+  .qr-note strong { color: var(--ink); font-weight: 500; }
+
+  .qr-chip {
+    background: #ffffff;
+    padding: 2.2mm;
+    display: inline-block;
+  }
+
+  /* ── selected works ─────────────────────── */
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .section-title {
+    font-size: 10px;
+    letter-spacing: 0.34em;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .section-count { font-size: 8.5px; letter-spacing: 0.2em; color: var(--faint); }
+
+  .works {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5mm;
+  }
+  .card { display: flex; flex-direction: column; }
+  .card img.thumb {
+    width: 100%;
+    height: 45mm;
+    object-fit: cover;
+    display: block;
+    border: 0.5pt solid var(--line);
+  }
+  .card-body { display: flex; gap: 3mm; margin-top: 3.5mm; flex: 1; }
+  .card-text { flex: 1; min-width: 0; }
+  .tag-row {
+    display: flex;
+    gap: 2.5mm;
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+  }
+  .tag {
+    border: 0.4pt solid var(--line);
+    padding: 0.9mm 1.7mm;
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-top: 2.5mm;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+  .card-desc {
+    font-size: 9.5px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-top: 2mm;
+    text-wrap: balance;
+  }
+  .card-qr { flex-shrink: 0; text-align: center; }
+  .card-qr .qr-chip { padding: 1.7mm; }
+  .card-qr .qr-chip img { width: 15.5mm; height: 15.5mm; }
+  .card-qr .qr-cap { font-size: 7.5px; color: var(--muted); letter-spacing: 0.14em; margin-top: 1.4mm; }
+
+  /* ── profile（第 2 页）───────────────────── */
+  .profile { max-width: 168mm; }
+  .profile p {
+    font-size: 12px;
+    line-height: 1.95;
+    color: #cfcfcf;
+    margin-top: 3mm;
+    text-wrap: balance;
+  }
+  .profile p strong { color: var(--ink); font-weight: 700; }
+
+  /* ── contact 面板（第 2 页）──────────────── */
+  .contact {
+    border: 0.4pt solid var(--line);
+    padding: 7mm 8mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10mm;
+  }
+  .contact h3 {
+    font-size: 8.5px;
+    letter-spacing: 0.34em;
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .contact-item { display: flex; gap: 5.5mm; margin-top: 4mm; align-items: flex-start; }
+  .contact-item .qr-chip { padding: 2.2mm; }
+  .contact-item .qr-chip img { width: 27mm; height: 27mm; }
+  .contact-item .t { font-size: 13px; font-weight: 700; line-height: 1.5; }
+  .contact-item .s { font-size: 9.5px; color: var(--muted); line-height: 1.75; margin-top: 2mm; }
+
+  /* ── footer ─────────────────────────────── */
+  .foot {
+    border-top: 0.4pt solid var(--line);
+    padding-top: 3.5mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    color: var(--faint);
+  }
+
+  /* browser preview scaling */
+  @media screen {
+    html {
+      height: auto;
+      display: flex;
+      justify-content: center;
+      background: #0a0a0a;
+    }
+    body {
+      transform-origin: top center;
+      scale: min(1, calc(100vw / 794));
+      margin: 0 auto;
+      box-shadow: 0 0 60px rgba(0,0,0,0.4);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ PAGE 1 ═══════════ -->
+<div class="page">
+  <header class="head">
+    <div class="brand">NONACOLA3<span class="dot"> /</span> 影像作品集</div>
+    <div class="head-meta">
+      <strong>PV · 3DCG · BGA · 动态设计</strong><br>
+      lsnano@vip.qq.com<br>
+      2026
+    </div>
+  </header>
+  <hr class="rule">
+
+  <section class="hero">
+    <img class="big" src="assets/reel.jpg" alt="SHOWREEL 封面">
+    <div class="hero-bar">
+      <div>
+        <div class="kicker">SHOWREEL · 2026</div>
+        <h1 class="hero-title">REEL</h1>
+      </div>
+      <p class="hero-desc">近几个月完成作品的混剪，一次性看完所有类型的输出。</p>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 5mm;">
+        <div class="qr-chip"><img src="assets/qr-reel.png" alt="SHOWREEL 二维码"></div>
+        <div class="qr-note"><strong>手机扫码观看</strong><br>B 站直连 · 免登录</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-head">
+    <div class="section-title">SELECTED WORKS</div>
+    <div class="section-count">01 — 03</div>
+  </div>
+
+  <section class="works">
+    <article class="card">
+      <img class="thumb" src="assets/numb.jpg" alt="numb numb 封面">
+      <div class="card-body">
+        <div class="card-text">
+          <div class="tag-row"><span class="tag">一图流 PV</span><span>2026.08</span></div>
+          <div class="card-title">[numb numb] 注定无法成为你吗？</div>
+          <p class="card-desc">制作 PV + 人物动态</p>
+        </div>
+        <div class="card-qr">
+          <div class="qr-chip"><img src="assets/qr-numb.png" alt="二维码"></div>
+          <div class="qr-cap">扫码观看</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img class="thumb" src="assets/exit8.jpg" alt="8番出口 封面">
+      <div class="card-body">
+        <div class="card-text">
+          <div class="tag-row"><span class="tag">3DCG</span><span>2026.08</span></div>
+          <div class="card-title">【Miracool2026】8番出口</div>
+          <p class="card-desc">作品入选 Miracool 2026 线下放映</p>
+        </div>
+        <div class="card-qr">
+          <div class="qr-chip"><img src="assets/qr-exit8.png" alt="二维码"></div>
+          <div class="qr-cap">扫码观看</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img class="thumb" src="assets/yourhero.jpg" alt="Your Hero 封面">
+      <div class="card-body">
+        <div class="card-text">
+          <div class="tag-row"><span class="tag">多图流 PV</span><span>2026.07</span></div>
+          <div class="card-title">【出道曲】Your Hero✨ 与你相遇是世上最大的奇迹</div>
+          <p class="card-desc">负责 PV 制作 + 人物动态</p>
+        </div>
+        <div class="card-qr">
+          <div class="qr-chip"><img src="assets/qr-yourhero.png" alt="二维码"></div>
+          <div class="qr-cap">扫码观看</div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <footer class="foot">
+    <span>NONACOLA3 · PORTFOLIO</span>
+    <span>所有作品均可在 B 站观看</span>
+    <span>01 / 02</span>
+  </footer>
+</div>
+
+<!-- ═══════════ PAGE 2 ═══════════ -->
+<div class="page">
+  <header class="head">
+    <div class="brand" style="font-size: 15px;">NONACOLA3<span class="dot"> /</span> SELECTED WORKS</div>
+    <div class="head-meta"><strong>2025 — 2026</strong></div>
+  </header>
+  <hr class="rule">
+
+  <section class="profile">
+    <div class="kicker">PROFILE · 简介</div>
+    <p>影像创作者，专注 <strong>Vocaloid-PV、音游 BGA、3DCG 与 KV 动画</strong>。多次参与 PVSF、BOF 等线上创作活动，作品曾入选 Miracool 2026 线下放映，并为音游『闪音跃动』上线宣传制作 KV 木偶动画。</p>
+  </section>
+
+  <div class="section-head">
+    <div class="section-title">SELECTED WORKS</div>
+    <div class="section-count">04 — 06</div>
+  </div>
+
+  <section class="works">
+    <article class="card">
+      <img class="thumb" src="assets/ongaku.jpg" alt="闪音跃动 封面">
+      <div class="card-body">
+        <div class="card-text">
+          <div class="tag-row"><span class="tag">协助制作</span><span>2026.02</span></div>
+          <div class="card-title">新音游『闪音跃动』正式上线！</div>
+          <p class="card-desc">为音游上线宣传制作 KV 木偶动画</p>
+        </div>
+        <div class="card-qr">
+          <div class="qr-chip"><img src="assets/qr-ongaku.png" alt="二维码"></div>
+          <div class="qr-cap">扫码观看</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img class="thumb" src="assets/pvsf.jpg" alt="PVSF 封面" style="filter: brightness(1.35) contrast(1.02);">
+      <div class="card-body">
+        <div class="card-text">
+          <div class="tag-row"><span class="tag">文字 PV</span><span>2026.05</span></div>
+          <div class="card-title">あなたにはなれない【PVSF2026Sp】</div>
+          <p class="card-desc">PVSF2026Sp 参战作品 · 文字 PV</p>
+        </div>
+        <div class="card-qr">
+          <div class="qr-chip"><img src="assets/qr-pvsf.png" alt="二维码"></div>
+          <div class="qr-cap">扫码观看</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <img class="thumb" src="assets/bof.jpg" alt="BOF21 封面">
+      <div class="card-body">
+        <div class="card-text">
+          <div class="tag-row"><span class="tag">BGA</span><span>2025.10</span></div>
+          <div class="card-title">【BOF21】赤外分光計算端末 / NoKANY</div>
+          <p class="card-desc">BOF21 参战作品 · 背景视频动画</p>
+        </div>
+        <div class="card-qr">
+          <div class="qr-chip"><img src="assets/qr-bof.png" alt="二维码"></div>
+          <div class="qr-cap">扫码观看</div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="contact">
+    <div>
+      <h3>全部作品</h3>
+      <div class="contact-item">
+        <div class="qr-chip"><img src="assets/qr-space.png" alt="B站主页二维码"></div>
+        <div>
+          <div class="t">B 站主页</div>
+          <div class="s">space.bilibili.com/13361398<br>含全部投稿作品与最新动态，持续更新。</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>联系</h3>
+      <div class="contact-item">
+        <div>
+          <div class="t">lsnano@vip.qq.com</div>
+          <div class="s">如需完整工程文件、简历或合作信息，欢迎邮件联系。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>NONACOLA3 · PORTFOLIO</span>
+    <span>02 / 02</span>
+  </footer>
+</div>
+
+</body>
+</html>
