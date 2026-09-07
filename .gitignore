@@ -66,3 +66,4 @@ portfolio-pdf/page-*.png
 .portfolio-data.json
 .portfolio-assets/
 portfolio-pdf/node_modules/
+.zcode/
