@@ -146,14 +146,6 @@ export function Navbar() {
                 {s.label}
               </a>
             ))}
-            <Link
-              href="/dashboard"
-              onClick={closeMenu}
-              className="text-base py-3 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in opacity-0"
-              style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
-            >
-              管理
-            </Link>
           </div>
         </div>
       )}
@@ -189,14 +181,6 @@ export function Navbar() {
                 {s.label}
               </a>
             ))}
-            <Link
-              href="/dashboard"
-              onClick={closeMenu}
-              className="text-sm lg:text-base py-3 mt-2 text-neutral-500 hover:text-neutral-300 transition-colors animate-fade-in opacity-0 border-t border-white/5"
-              style={{ animationDelay: `${SECTIONS.length * 60}ms` }}
-            >
-              管理
-            </Link>
           </div>
         </div>
       )}
