@@ -16,7 +16,7 @@ const bitcount = Bitcount_Grid_Single({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nonacola3-portfolio.vercel.app"),
+  metadataBase: new URL("https://www.nonacola3.com"),
   title: {
     default: "nonacola3 — Video Portfolio",
     template: "%s — nonacola3",
