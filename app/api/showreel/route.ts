@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { ok, success, unauthorized, fail, revalidateTags } from "@/lib/api-utils";
+import { requireAdmin } from "@/lib/api-auth";
+import { ok, success, fail, revalidateTags } from "@/lib/api-utils";
 import { showreelMutateSchema } from "@/lib/schemas";
 
 export async function GET() {
@@ -17,8 +17,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const parsed = showreelMutateSchema.safeParse(await request.json());
   if (!parsed.success) {

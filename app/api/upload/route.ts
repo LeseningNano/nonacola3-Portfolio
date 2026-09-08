@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { auth } from "@/lib/auth";
+import { requireAdmin } from "@/lib/api-auth";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
-import { fail, unauthorized } from "@/lib/api-utils";
+import { fail } from "@/lib/api-utils";
 
 export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const formData = await req.formData();
   const file = formData.get("file") as File;

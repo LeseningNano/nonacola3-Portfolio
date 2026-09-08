@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { ok, success, unauthorized, notFound, fail, revalidateTags } from "@/lib/api-utils";
+import { requireAdmin } from "@/lib/api-auth";
+import { ok, success, notFound, fail, revalidateTags } from "@/lib/api-utils";
 import { videoUpdateSchema } from "@/lib/schemas";
 
 export async function GET(
@@ -18,8 +18,8 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const { id } = await params;
   const parsed = videoUpdateSchema.safeParse(await req.json());
@@ -51,8 +51,8 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const { id } = await params;
   await db.video.delete({ where: { id } });

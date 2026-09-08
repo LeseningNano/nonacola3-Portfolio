@@ -1,15 +1,15 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { ok, success, unauthorized, fail, notFound, revalidateTags } from "@/lib/api-utils";
+import { requireAdmin } from "@/lib/api-auth";
+import { ok, success, fail, notFound, revalidateTags } from "@/lib/api-utils";
 import { postMutateSchema } from "@/lib/schemas";
 
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const { id } = await params;
   const parsed = postMutateSchema.safeParse(await req.json());
@@ -38,8 +38,8 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const { id } = await params;
   try {

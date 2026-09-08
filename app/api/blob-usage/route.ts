@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { list } from "@vercel/blob";
-import { auth } from "@/lib/auth";
+import { requireAdmin } from "@/lib/api-auth";
 
 export async function GET() {
-  const session = await auth();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   try {
     const { blobs } = await list();

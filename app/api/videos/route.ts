@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { ok, created, unauthorized, fail, revalidateTags } from "@/lib/api-utils";
+import { requireAdmin } from "@/lib/api-auth";
+import { ok, created, fail, revalidateTags } from "@/lib/api-utils";
 import { videoCreateSchema } from "@/lib/schemas";
 
 export async function GET() {
@@ -12,8 +12,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const parsed = videoCreateSchema.safeParse(await req.json());
   if (!parsed.success) {

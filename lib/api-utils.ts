@@ -23,6 +23,10 @@ export function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 
+export function forbidden() {
+  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+}
+
 export function notFound(msg = "Not found") {
   return NextResponse.json({ error: msg }, { status: 404 });
 }

@@ -1,20 +1,20 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { ok, created, unauthorized, fail, revalidateTags } from "@/lib/api-utils";
+import { requireAdmin } from "@/lib/api-auth";
+import { ok, created, fail, revalidateTags } from "@/lib/api-utils";
 import { postMutateSchema } from "@/lib/schemas";
 
 export async function GET() {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const posts = await db.post.findMany({ orderBy: { createdAt: "desc" } });
   return ok(posts);
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session) return unauthorized();
+  const authorizationError = await requireAdmin();
+  if (authorizationError) return authorizationError;
 
   const parsed = postMutateSchema.safeParse(await req.json());
   if (!parsed.success) {
