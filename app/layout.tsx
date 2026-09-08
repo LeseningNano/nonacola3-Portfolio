@@ -41,7 +41,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){try{if(location.pathname==='/'&&!sessionStorage.getItem('hero-loaded')){var p=document.createElement('div');p.id='pre-loader';p.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a0a0a;';document.documentElement.appendChild(p);}}catch(e){}})();",
+              "(function(){try{if(!sessionStorage.getItem('hero-loaded')){var p=document.createElement('div');p.id='pre-loader';p.style.cssText='position:fixed;inset:0;z-index:9999;background:#0a0a0a;';document.documentElement.appendChild(p);}}catch(e){}})();",
           }}
         />
       </head>
