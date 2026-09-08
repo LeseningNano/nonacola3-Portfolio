@@ -2,16 +2,16 @@
   "buildCommand": "npx prisma generate && npx next build --webpack",
   "installCommand": "npm install",
   "outputDirectory": ".next",
-  "nodeVersion": "22.11.0",
+  "nodeVersion": "22.21.1",
   "cloudFunctions": {
-    "overseasRegions": ["ap-singapore"],
-    "nodejs": {
-      "externalNodeModules": [
-        "@prisma/client",
-        "@prisma/adapter-pg",
-        "pg"
-      ],
-      "maxDuration": 60
-    }
+    "regions": {
+      "overseas": ["ap-singapore"]
+    },
+    "externalNodeModules": [
+      "@prisma/client",
+      "@prisma/adapter-pg",
+      "pg"
+    ],
+    "maxDuration": 60
   }
 }
