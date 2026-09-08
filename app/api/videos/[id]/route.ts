@@ -34,12 +34,12 @@ export async function PUT(
       ...(b.title !== undefined && { title: b.title }),
       ...(b.category !== undefined && { category: b.category }),
       ...(b.embedUrl !== undefined && { embedUrl: b.embedUrl }),
-      description: b.description ?? null,
-      summary: b.summary ?? null,
-      thumbnail: b.thumbnail ?? null,
+      ...(b.description !== undefined && { description: b.description }),
+      ...(b.summary !== undefined && { summary: b.summary }),
+      ...(b.thumbnail !== undefined && { thumbnail: b.thumbnail }),
       ...(b.featured !== undefined && { featured: b.featured }),
       ...(b.order !== undefined && { order: b.order }),
-      date: b.date ? new Date(b.date) : null,
+      ...(b.date !== undefined && { date: b.date ? new Date(b.date) : null }),
     },
   });
 
