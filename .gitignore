@@ -61,9 +61,4 @@ start-dsh.ps1
 # opt-in: env 模板需要入库，真实 .env 仍被忽略
 !deploy/.env.production.example
 
-# portfolio pdf scratch
-portfolio-pdf/page-*.png
-.portfolio-data.json
-.portfolio-assets/
-portfolio-pdf/node_modules/
 .zcode/
