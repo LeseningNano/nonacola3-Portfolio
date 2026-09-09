@@ -6,32 +6,30 @@ import { siteConfig } from "@/lib/config";
 const MIN_DISPLAY_MS = 1200;
 
 export function LoadingScreen({
-  ready,
   onReady,
 }: {
-  ready: boolean;
   onReady: () => void;
 }) {
   const [fadeOut, setFadeOut] = useState(false);
   const [progress, setProgress] = useState(0);
-  const startTime = useRef(Date.now());
+  const startTime = useRef(0);
   const doneRef = useRef(false);
 
-  // Crawl toward 90% while waiting; snap to 100% when ready
+  useEffect(() => {
+    startTime.current = Date.now();
+  }, []);
+
+  // Complete on the existing minimum brand-display rhythm; it does not wait for media.
   useEffect(() => {
     const interval = setInterval(() => {
-      setProgress((p) => {
-        if (ready) return Math.min(100, p + 8);
-        // Asymptotic crawl: fast at first, stalls near 90
-        return p + (90 - p) * 0.04;
-      });
+      setProgress((p) => Math.min(100, p + 8));
     }, 50);
     return () => clearInterval(interval);
-  }, [ready]);
+  }, []);
 
   useEffect(() => {
     if (doneRef.current) return;
-    if (progress >= 100 && ready) {
+    if (progress >= 100) {
       const elapsed = Date.now() - startTime.current;
       const wait = Math.max(0, MIN_DISPLAY_MS - elapsed);
       doneRef.current = true;
@@ -41,19 +39,7 @@ export function LoadingScreen({
       }, wait + 200);
       return () => clearTimeout(timer);
     }
-  }, [progress, ready, onReady]);
-
-  // Hard fallback: never trap the user more than 8s
-  useEffect(() => {
-    const fallback = setTimeout(() => {
-      if (!doneRef.current) {
-        doneRef.current = true;
-        setFadeOut(true);
-        setTimeout(onReady, 500);
-      }
-    }, 8000);
-    return () => clearTimeout(fallback);
-  }, [onReady]);
+  }, [progress, onReady]);
 
   const flicker = (delay: string) => ({
     animation: `flicker-in 0.08s ${delay} both`,

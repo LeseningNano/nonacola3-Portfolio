@@ -8,11 +8,13 @@ import { SCROLL_CONTAINER_ID } from "./home-client";
 
 export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [loaderVisible, setLoaderVisible] = useState(false);
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const posterRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const loadTriggered = useRef(false);
@@ -44,6 +46,9 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
       }
       if (videoRef.current) {
         videoRef.current.style.filter = `blur(4px) brightness(${0.5 - progress * 0.3})`;
+      }
+      if (posterRef.current) {
+        posterRef.current.style.filter = `blur(4px) brightness(${0.5 - progress * 0.3})`;
       }
       const fade = Math.max(0, 1 - progress * 2.5);
       if (contentRef.current) {
@@ -81,6 +86,18 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (showLoader || !videoUrl) return;
+
+    type Connection = { saveData?: boolean; effectiveType?: string };
+    const connection = (navigator as Navigator & { connection?: Connection }).connection;
+    const shouldSaveData = connection?.saveData || connection?.effectiveType === "slow-2g" || connection?.effectiveType === "2g";
+    if (!shouldSaveData) {
+      const timer = setTimeout(() => setShouldLoadVideo(true), 0);
+      return () => clearTimeout(timer);
+    }
+  }, [showLoader, videoUrl]);
+
   // 加载层显隐：用 useLayoutEffect 在浏览器首帧绘制前决定，
   // 避免内容在首访时于加载层淡入前闪现。
   // - 刷新/返回（sessionStorage 有 hero-loaded）：无 pre-loader、加载层立即卸载，内容直显。
@@ -88,8 +105,8 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   //   此处设 loaderVisible=true（瞬时，无 transition）让 React 接管覆盖，移除 pre-loader。
   useLayoutEffect(() => {
     if (sessionStorage.getItem("hero-loaded")) {
-      setShowLoader(false);
-      return;
+      const frame = requestAnimationFrame(() => setShowLoader(false));
+      return () => cancelAnimationFrame(frame);
     }
     // 首访：淡入加载层（200ms），pre-loader 在淡入完成后才移除，
     // 期间两者同为黑色，pre-loader 兜底盖住内容直到 React 加载层完全显形。
@@ -186,7 +203,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
             pointerEvents: loaderVisible && !fadeOut ? "auto" : "none",
           }}
         >
-          <LoadingScreen ready={isVideoReady || !videoUrl} onReady={handleLoadReady} />
+          <LoadingScreen onReady={handleLoadReady} />
         </div>
       )}
 
@@ -204,23 +221,33 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           }}
         >
           {videoUrl ? (
+            <div
+              ref={posterRef}
+              className="absolute inset-0 w-full h-full bg-cover bg-center scale-110"
+              style={{
+                backgroundImage: "url('/hero-poster.webp')",
+                filter: "blur(4px) brightness(0.5)",
+              }}
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-b from-neutral-900 to-[#0a0a0a]" />
+          )}
+          {shouldLoadVideo && videoUrl ? (
             <video
               ref={videoRef}
               autoPlay
               loop
               muted
               playsInline
-              preload="auto"
+              preload="metadata"
               onCanPlay={() => setIsVideoReady(true)}
-              className={`w-full h-full object-cover scale-110 transition-opacity duration-1000 ${
+              className={`absolute inset-0 w-full h-full object-cover scale-110 transition-opacity duration-1000 ${
                 isVideoReady ? "opacity-100" : "opacity-0"
               }`}
               style={{ filter: "blur(4px) brightness(0.5)" }}
               src={videoUrl}
             />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-b from-neutral-900 to-[#0a0a0a]" />
-          )}
+          ) : null}
         </div>
 
         {/* Halftone Texture Layer */}
