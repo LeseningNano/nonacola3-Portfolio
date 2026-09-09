@@ -1,13 +1,12 @@
-import Link from "next/link";
 import Image from "next/image";
 import { Play } from "lucide-react";
 import type { VideoRow } from "@/lib/types";
+import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
 
 export function VideoCard({ video }: { video: VideoRow }) {
   return (
-    <Link
+    <IntentPrefetchLink
       href={`/works/${video.id}`}
-      prefetch={false}
       aria-label={video.title}
       className="block outline-none focus-visible:ring-1 focus-visible:ring-neutral-400"
     >
@@ -52,6 +51,6 @@ export function VideoCard({ video }: { video: VideoRow }) {
           )}
         </div>
       </div>
-    </Link>
+    </IntentPrefetchLink>
   );
 }

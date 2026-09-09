@@ -14,40 +14,19 @@ export function PageTransition() {
   const isTransitioning = useRef(false);
   const prevPathname = useRef(pathname);
   const cloneRef = useRef<HTMLImageElement | null>(null);
-  const prefetchedUrlsRef = useRef(new Set<string>());
 
-  const prefetchDetailPage = useCallback(
-    (target: EventTarget | null) => {
-      const element = target instanceof Element ? target : null;
-      const anchor = element?.closest("a");
-      const href = anchor?.getAttribute("href");
-      if (!href || (!href.startsWith("/works/") && !href.startsWith("/news/"))) return;
-      if (prefetchedUrlsRef.current.has(href)) return;
+  const navigateAfterTransitionStarts = useCallback(
+    (href: string) => {
+      // Touch devices need one paint cycle for the overlay/clone animation to become visible.
+      if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+        setTimeout(() => router.push(href), 200);
+        return;
+      }
 
-      prefetchedUrlsRef.current.add(href);
-      router.prefetch(href);
+      router.push(href);
     },
     [router]
   );
-
-  useEffect(() => {
-    const handlePointerOver = (event: PointerEvent) => prefetchDetailPage(event.target);
-    const handleFocusIn = (event: FocusEvent) => prefetchDetailPage(event.target);
-    const handlePointerDown = (event: PointerEvent) => {
-      if (event.pointerType === "touch" || event.pointerType === "pen") {
-        prefetchDetailPage(event.target);
-      }
-    };
-
-    document.addEventListener("pointerover", handlePointerOver, true);
-    document.addEventListener("focusin", handleFocusIn, true);
-    document.addEventListener("pointerdown", handlePointerDown, true);
-    return () => {
-      document.removeEventListener("pointerover", handlePointerOver, true);
-      document.removeEventListener("focusin", handleFocusIn, true);
-      document.removeEventListener("pointerdown", handlePointerDown, true);
-    };
-  }, [prefetchDetailPage]);
 
   // 路由变化完成 → 克隆图飞向播放器 / 黑场淡出
   // useLayoutEffect：在浏览器绘制新页面前就位，保证后退导航也能被黑场覆盖
@@ -131,9 +110,9 @@ export function PageTransition() {
         requestAnimationFrame(() => setOpacity(1));
       });
 
-      router.push(url);
+      navigateAfterTransitionStarts(url);
     },
-    [router]
+    [navigateAfterTransitionStarts]
   );
 
   // 作品卡片 → 详情页：缩略图克隆 + 黑场过渡
@@ -168,9 +147,9 @@ export function PageTransition() {
         requestAnimationFrame(() => setOpacity(1));
       });
 
-      router.push(href);
+      navigateAfterTransitionStarts(href);
     },
-    [router]
+    [navigateAfterTransitionStarts]
   );
 
   useEffect(() => {
