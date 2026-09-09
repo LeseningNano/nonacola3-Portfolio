@@ -5,7 +5,7 @@
   "nodeVersion": "22.21.1",
   "cloudFunctions": {
     "regions": {
-      "overseas": ["ap-singapore"]
+      "overseas": ["ap-hongkong"]
     },
     "externalNodeModules": [
       "@prisma/client",
