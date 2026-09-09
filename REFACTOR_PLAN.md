@@ -21,9 +21,9 @@
 
 ## 当前进度（2026-09-09）
 
-- Phase 0：已完成可重复的只读基线脚本与初始测量；真实国内网络、LCP 和多设备截图仍需后续补充。
+- Phase 0：已完成可重复的只读基线脚本、初始测量及国内 Chrome/HAR 补测；LCP 和多设备截图仍需后续补充。
 - Phase 1：1.1、1.2、1.4 已完成并已发布；1.3 登录与上传防护尚未开始。
-- Phase 2：2.1 已完成、部署并完成首轮 HTTP 复测；2.2 已完成现状评估，暂不改动已有缓存实现；2.3 仍需目标国内网络的浏览器指标后再做资源区域决策。
+- Phase 2：2.1 已完成、部署并由国内 Chrome/HAR 验证；2.2 已确认 EdgeOne 静态首页更新后采用手动重新部署；2.3 已决定现阶段保留 Neon；2.4 已完成媒体诊断，详情页预取和新封面 WebP 上传均已在本地完成。
 - Phase 3 及以后：未开始。
 
 ## 完成标准
@@ -179,7 +179,7 @@
 
 ### 2.1 解除 Hero 视频对首屏的阻塞
 
-状态：已完成、部署并完成首轮 HTTP 复测。首页中位 TTFB 从 402 ms 降至 246 ms，但 P95 基本持平；浏览器端 LCP 与视频请求起始时序仍需目标国内网络采样。
+状态：已完成、部署并完成 HTTP 与国内 Chrome/HAR 复测。首页中位 TTFB 从 402 ms 降至 246 ms；HAR 中 DOMContentLoaded 为 1.22–1.78 秒、load 约 2.93–2.97 秒，Hero 视频在约 3–4 秒后才开始请求，已不再阻塞主要内容。
 
 涉及文件：
 
@@ -203,7 +203,7 @@
 
 ### 2.2 降低访客页面对实时数据库的依赖
 
-状态：现状评估完成，暂不改代码。公开数据已由 `lib/data.ts` 使用带标签的 `unstable_cache` 缓存，内容写 API 已主动刷新对应标签，首页构建结果为静态页面。当前没有证据表明增加另一层缓存或固定刷新周期会改善可用性；“最后一次成功内容”仍是尚未解决的容灾项。
+状态：已确认平台行为并接受运维方案。公开数据已由 `lib/data.ts` 使用带标签的 `unstable_cache` 缓存，内容写 API 会调用 `revalidateTag`；生产验证显示 `/api/hero` 已返回新 URL 时，EdgeOne 上的静态首页仍包含旧 URL。当前阶段在修改 Hero 或其他首页内容后手动点击重新部署，不增加缓存架构复杂度。
 
 涉及文件：
 
@@ -215,6 +215,7 @@
 
 - 为访客内容设置明确的缓存策略和刷新周期。
 - 内容发布、编辑和删除后主动刷新对应缓存。
+- 将“首页内容更新后需要重新部署”作为当前 EdgeOne 运维步骤记录；若更新频率明显提高，再重新评估运行时路径失效或局部动态读取。
 - 评估保留“最后一次成功内容”，避免数据库短暂故障造成整站 500。
 - 详情页和首页采用一致的缓存失效规则。
 
@@ -223,10 +224,11 @@
 - 热缓存访问不需要等待 Neon 查询。
 - 数据库短暂不可达时，已有公开内容仍可访问，或至少快速显示友好错误。
 - 管理员更新内容后能在可接受时间内看到新版本。
+- 手动重新部署后，访客首页引用最新 Hero、作品、News 与 Showreel 数据。
 
 ### 2.3 再决定资源与数据库区域
 
-状态：暂不迁移。发布后 Hero 仍约 8.07 MiB，News 动态详情 TTFB 基本持平，数据库首次连接与复用连接差异明显；当前样本说明媒体和动态数据链路仍值得关注，但尚不足以支持立即迁移数据库或媒体。
+状态：现阶段保留 Neon，不迁移数据库。国内 HAR 显示首页 HTML 约 263–809 ms、DOMContentLoaded 约 1.0–1.8 秒；主要传输来自 Vercel Blob 媒体。详情 RSC 请求约 0.4–1.5 秒，值得减少无意预取，但不足以证明更换数据库的收益能覆盖迁移风险。
 
 任务：
 
@@ -238,6 +240,33 @@
 
 - 不在没有测量结果时同时迁移数据库和媒体。
 - 优先采用低成本、可撤销的缓存和资源策略。
+
+### 2.4 缩略图、详情预取与 Hero 资源
+
+状态：详情页预取和新封面 WebP 上传已在本地完成并通过目标 lint、typecheck 与生产构建，待发布后验证。Hero 压缩由管理员通过新文件名和 Fast Start 处理。
+
+测量结论：
+
+- 单次冷加载中，网站自身资源约 0.33 MiB，Vercel Blob 资源约 9.15 MiB。
+- Hero 视频原文件约 8.07 MiB；延后加载已保护首屏，但完整播放仍可能需要 30 秒以上下载。
+- 首页 Blob 缩略图合计约 1.10 MiB。现有 URL 尾部的 `imageMogr2/thumbnail/.../format/webp` 参数未被 Vercel Blob 执行，响应仍是 126–264 KiB 的 JPEG。
+- 首页会自动预取几乎所有作品和 News 详情，产生多轮动态 RSC 请求；部分请求耗时约 1.2–1.5 秒。
+- 新 Hero 已上传到数据库，但静态首页缓存未刷新；部署前的 HAR 仍请求旧文件，不能用于评价压缩版速度。
+
+任务：
+
+- 新上传的 JPEG、PNG 或 WebP 封面在浏览器端缩放到最长边不超过 960 px，并转换为质量约 80% 的 WebP；保留外部 URL 输入能力。
+- 限制原图不超过 20 MiB，转换或解码失败时向管理员显示明确错误。
+- 本批次不自动批量改写生产数据；现有封面可在后续编辑作品时逐个替换。
+- 作品卡片和 News 链接关闭视口自动预取；移除点击作品时紧接 `router.push` 前的冗余 `router.prefetch`。
+- 保持 Hero 延后加载策略；压缩视频必须使用新 Blob URL，并启用 MP4 Fast Start。
+
+验收：
+
+- 新上传封面响应为 WebP，最长边不超过 960 px，视觉无明显劣化。
+- 首页空闲停留时不再批量请求所有 `/works/:id` 与 `/news/:id` RSC。
+- 点击作品和 News 后导航及现有过渡动画正常。
+- 新 Hero URL、ETag 与文件大小在生产 Network 中可明确识别，不再因覆盖旧 URL 命中旧缓存。
 
 ### 回滚点
 
@@ -536,15 +565,16 @@
 3. `fix(upload): validate media type and size`
 4. `fix(api): preserve omitted video fields on update`
 5. `perf(hero): decouple page visibility from video loading`
-6. `perf(data): cache public portfolio content`
-7. `refactor(layout): separate public and admin shells`
-8. `fix(a11y): improve menu and modal keyboard behavior`
-9. `fix(a11y): support focus and reduced motion states`
-10. `refactor(home): reduce client component boundary`
-11. `refactor(upload): share repeated blob upload behavior`
-12. `chore(css): consolidate repeated design tokens`
-13. `test: cover auth content updates and uploads`
-14. `chore(build): separate migrations from application build`
+6. `fix(cache): refresh public pages after content updates`
+7. `perf(nav): stop eager detail-page prefetching`
+8. `refactor(layout): separate public and admin shells`
+9. `fix(a11y): improve menu and modal keyboard behavior`
+10. `fix(a11y): support focus and reduced motion states`
+11. `refactor(home): reduce client component boundary`
+12. `refactor(upload): share repeated blob upload behavior`
+13. `chore(css): consolidate repeated design tokens`
+14. `test: cover auth content updates and uploads`
+15. `chore(build): separate migrations from application build`
 
 ## 每次发布后的验证清单
 
@@ -581,3 +611,23 @@
 4. 建立性能测量基线，并确认 Hero 文件大小与数据库 TTFB。
 
 这批改动范围清晰、风险可控，可以先关闭最明显的产品与权限缺口，同时为下一批性能优化提供可靠依据。
+
+## 第二个实施批次（已批准执行）
+
+审查后保留两个独立代码任务，仍属于 Phase 2：
+
+1. **停止详情页批量自动预取**
+   - 为作品和 News 链接关闭自动预取，删除点击前无法及时完成的手动预取。
+   - 不修改页面过渡视觉或详情页结构。
+   - 风险：低；工作量：小。
+2. **为新上传封面生成 WebP**
+   - 在浏览器端将 JPEG、PNG 或 WebP 缩放到最长边 960 px，并转换为 WebP 80%。
+   - 保留手动 URL 输入，不批量修改现有生产记录。
+   - 风险：中；工作量：中。
+3. **发布后复测**
+   - 使用相同 HAR 方法复测首页传输量、动态 RSC 数量和新 Hero URL。
+   - 只有压缩后的 Hero 在国内仍明显缓慢，才评估迁移到国内友好的对象存储/CDN。
+   - 数据库迁移不在本批次范围内。
+   - 风险：低；工作量：小。
+
+审查决定：封面显示尺寸较小，适合在上传时积极缩放和转换；EdgeOne 重新部署成本可接受，暂不实现运行时首页失效。预取与封面改动分别独立提交并验证目标 lint、typecheck、生产构建；生产验证不删除或批量覆盖现有内容。
