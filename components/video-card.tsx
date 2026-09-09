@@ -5,7 +5,12 @@ import type { VideoRow } from "@/lib/types";
 
 export function VideoCard({ video }: { video: VideoRow }) {
   return (
-    <Link href={`/works/${video.id}`} aria-label={video.title} className="block outline-none focus-visible:ring-1 focus-visible:ring-neutral-400">
+    <Link
+      href={`/works/${video.id}`}
+      prefetch={false}
+      aria-label={video.title}
+      className="block outline-none focus-visible:ring-1 focus-visible:ring-neutral-400"
+    >
       <div
         data-vt-id={video.id}
         className="group relative aspect-video bg-neutral-900 overflow-hidden cursor-pointer transform-gpu"

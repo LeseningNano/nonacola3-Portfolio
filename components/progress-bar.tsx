@@ -110,8 +110,6 @@ export function PageTransition() {
       if (isTransitioning.current) return;
       isTransitioning.current = true;
 
-      router.prefetch(href);
-
       const card = anchor.querySelector("[data-vt-id]") as HTMLElement | null;
       const img = card?.querySelector("img") as HTMLImageElement | null;
       if (card && img) {

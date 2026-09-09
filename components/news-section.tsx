@@ -49,7 +49,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
             const rowClass =
               "group relative flex items-start md:items-center gap-3 md:gap-4 px-3 md:px-4 py-3.5 border-b border-neutral-900 hover:bg-white/5 transition-colors duration-200 before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-white before:scale-y-0 hover:before:scale-y-100 before:transition-transform before:duration-200 before:origin-center";
             return post.title ? (
-              <Link key={post.id} href={`/news/${post.id}`} className={rowClass}>
+              <Link key={post.id} href={`/news/${post.id}`} prefetch={false} className={rowClass}>
                 {inner}
               </Link>
             ) : (
