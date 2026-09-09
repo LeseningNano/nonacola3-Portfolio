@@ -4,6 +4,9 @@ import { ArrowLeft } from "lucide-react";
 import { getPost } from "@/lib/data";
 import { MarkdownBody } from "@/components/markdown-body";
 
+export const dynamic = "force-static";
+export const revalidate = 300;
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const post = await getPost(id);

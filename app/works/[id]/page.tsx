@@ -8,6 +8,9 @@ import { VideoCard } from "@/components/video-card";
 import { pickRelatedVideos } from "@/lib/utils";
 import type { VideoRow } from "@/lib/types";
 
+export const dynamic = "force-static";
+export const revalidate = 300;
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const video = await getVideo(id);
