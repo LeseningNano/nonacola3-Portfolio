@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/toast";
 import { MarkdownEditor } from "@/components/markdown-editor";
+import { optimizeThumbnail } from "@/lib/optimize-thumbnail";
 
 interface VideoData {
   id?: string;
@@ -55,11 +56,12 @@ export function VideoForm({
     setUploadProgress(0);
 
     try {
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
+      const optimizedFile = await optimizeThumbnail(file);
+      const safeName = optimizedFile.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
       const pathname = `uploads/thumb-${Date.now()}-${safeName}`;
 
       const { upload } = await import("@vercel/blob/client");
-      const blob = await upload(pathname, file, {
+      const blob = await upload(pathname, optimizedFile, {
         access: "public",
         handleUploadUrl: "/api/blob-token",
         onUploadProgress: (p) => setUploadProgress(p.percentage),
@@ -67,8 +69,8 @@ export function VideoForm({
 
       setForm((prev) => ({ ...prev, thumbnail: blob.url }));
       setUploadProgress(100);
-    } catch (err: any) {
-      toastError("封面上传失败");
+    } catch (err: unknown) {
+      toastError(err instanceof Error ? err.message : "封面上传失败");
     } finally {
       setTimeout(() => { setUploading(false); setUploadProgress(0); }, 300);
     }
@@ -175,7 +177,7 @@ export function VideoForm({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   onChange={handleFileUpload}
                   className="hidden"
                 />
