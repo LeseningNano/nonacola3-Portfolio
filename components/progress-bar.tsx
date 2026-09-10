@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react
 import { useRouter, usePathname } from "next/navigation";
 
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+const MIN_TRANSITION_INTRO_MS = 200;
 
 export function PageTransition() {
   const router = useRouter();
@@ -12,21 +13,9 @@ export function PageTransition() {
   const [visible, setVisible] = useState(false);
   const [instant, setInstant] = useState(false);
   const isTransitioning = useRef(false);
+  const transitionStartedAt = useRef(0);
   const prevPathname = useRef(pathname);
   const cloneRef = useRef<HTMLImageElement | null>(null);
-
-  const navigateAfterTransitionStarts = useCallback(
-    (href: string) => {
-      // Touch devices need one paint cycle for the overlay/clone animation to become visible.
-      if (window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
-        setTimeout(() => router.push(href), 200);
-        return;
-      }
-
-      router.push(href);
-    },
-    [router]
-  );
 
   // 路由变化完成 → 克隆图飞向播放器 / 黑场淡出
   // useLayoutEffect：在浏览器绘制新页面前就位，保证后退导航也能被黑场覆盖
@@ -51,6 +40,10 @@ export function PageTransition() {
     }
 
     const clone = cloneRef.current;
+    const remainingIntro = Math.max(
+      0,
+      MIN_TRANSITION_INTRO_MS - (performance.now() - transitionStartedAt.current)
+    );
 
     const finish = () => {
       if (cloneRef.current) {
@@ -59,13 +52,14 @@ export function PageTransition() {
       }
       setVisible(false);
       isTransitioning.current = false;
+      transitionStartedAt.current = 0;
     };
 
     if (!clone) {
       setTimeout(() => {
         setOpacity(0);
         setTimeout(finish, 200);
-      }, 50);
+      }, remainingIntro);
       return;
     }
 
@@ -96,7 +90,7 @@ export function PageTransition() {
         setTimeout(finish, 260);
       }
     };
-    setTimeout(() => tryPlace(90), 60);
+    setTimeout(() => tryPlace(90), Math.max(60, remainingIntro));
   }, [pathname]);
 
   // 通用黑场过渡
@@ -104,15 +98,16 @@ export function PageTransition() {
     (url: string) => {
       if (isTransitioning.current) return;
       isTransitioning.current = true;
+      transitionStartedAt.current = performance.now();
 
       setVisible(true);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setOpacity(1));
       });
 
-      navigateAfterTransitionStarts(url);
+      router.push(url);
     },
-    [navigateAfterTransitionStarts]
+    [router]
   );
 
   // 作品卡片 → 详情页：缩略图克隆 + 黑场过渡
@@ -120,6 +115,7 @@ export function PageTransition() {
     (href: string, anchor: HTMLAnchorElement) => {
       if (isTransitioning.current) return;
       isTransitioning.current = true;
+      transitionStartedAt.current = performance.now();
 
       const card = anchor.querySelector("[data-vt-id]") as HTMLElement | null;
       const img = card?.querySelector("img") as HTMLImageElement | null;
@@ -147,9 +143,9 @@ export function PageTransition() {
         requestAnimationFrame(() => setOpacity(1));
       });
 
-      navigateAfterTransitionStarts(href);
+      router.push(href);
     },
-    [navigateAfterTransitionStarts]
+    [router]
   );
 
   useEffect(() => {
