@@ -4,7 +4,6 @@ import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react
 import { useRouter, usePathname } from "next/navigation";
 
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
-const MIN_TRANSITION_INTRO_MS = 200;
 
 export function PageTransition() {
   const router = useRouter();
@@ -13,7 +12,7 @@ export function PageTransition() {
   const [visible, setVisible] = useState(false);
   const [instant, setInstant] = useState(false);
   const isTransitioning = useRef(false);
-  const transitionStartedAt = useRef(0);
+  const pendingNavigationRef = useRef<string | null>(null);
   const prevPathname = useRef(pathname);
   const cloneRef = useRef<HTMLImageElement | null>(null);
 
@@ -40,10 +39,6 @@ export function PageTransition() {
     }
 
     const clone = cloneRef.current;
-    const remainingIntro = Math.max(
-      0,
-      MIN_TRANSITION_INTRO_MS - (performance.now() - transitionStartedAt.current)
-    );
 
     const finish = () => {
       if (cloneRef.current) {
@@ -52,14 +47,13 @@ export function PageTransition() {
       }
       setVisible(false);
       isTransitioning.current = false;
-      transitionStartedAt.current = 0;
     };
 
     if (!clone) {
       setTimeout(() => {
         setOpacity(0);
         setTimeout(finish, 200);
-      }, remainingIntro);
+      }, 50);
       return;
     }
 
@@ -90,24 +84,38 @@ export function PageTransition() {
         setTimeout(finish, 260);
       }
     };
-    setTimeout(() => tryPlace(90), Math.max(60, remainingIntro));
+    setTimeout(() => tryPlace(90), 60);
   }, [pathname]);
+
+  const navigateAfterCover = useCallback(
+    (url: string) => {
+      pendingNavigationRef.current = url;
+      router.prefetch(url);
+      setVisible(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setOpacity(1));
+      });
+    },
+    [router]
+  );
+
+  const handleOverlayTransitionEnd = useCallback(() => {
+    const url = pendingNavigationRef.current;
+    if (!url || opacity !== 1) return;
+
+    pendingNavigationRef.current = null;
+    router.push(url);
+  }, [opacity, router]);
 
   // 通用黑场过渡
   const startTransition = useCallback(
     (url: string) => {
       if (isTransitioning.current) return;
       isTransitioning.current = true;
-      transitionStartedAt.current = performance.now();
 
-      setVisible(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setOpacity(1));
-      });
-
-      router.push(url);
+      navigateAfterCover(url);
     },
-    [router]
+    [navigateAfterCover]
   );
 
   // 作品卡片 → 详情页：缩略图克隆 + 黑场过渡
@@ -115,7 +123,6 @@ export function PageTransition() {
     (href: string, anchor: HTMLAnchorElement) => {
       if (isTransitioning.current) return;
       isTransitioning.current = true;
-      transitionStartedAt.current = performance.now();
 
       const card = anchor.querySelector("[data-vt-id]") as HTMLElement | null;
       const img = card?.querySelector("img") as HTMLImageElement | null;
@@ -138,14 +145,9 @@ export function PageTransition() {
         cloneRef.current = clone;
       }
 
-      setVisible(true);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setOpacity(1));
-      });
-
-      router.push(href);
+      navigateAfterCover(href);
     },
-    [router]
+    [navigateAfterCover]
   );
 
   useEffect(() => {
@@ -197,6 +199,7 @@ export function PageTransition() {
     <div
       className="fixed inset-0 z-[9999] bg-[#0a0a0a] pointer-events-none"
       style={{ opacity, transition: instant ? "none" : "opacity 200ms ease-in-out" }}
+      onTransitionEnd={handleOverlayTransitionEnd}
     />
   );
 }
