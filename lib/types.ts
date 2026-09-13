@@ -5,6 +5,8 @@ export interface Video {
   title: string;
   description: string | null;
   summary: string | null;
+  role: string | null;
+  tools: string | null;
   category: string;
   embedUrl: string;
   thumbnail: string | null;
@@ -21,6 +23,8 @@ export interface VideoRow {
   title: string;
   description: string | null;
   summary: string | null;
+  role: string | null;
+  tools: string | null;
   category: string;
   embedUrl: string;
   thumbnail: string | null;

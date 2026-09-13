@@ -15,6 +15,8 @@ interface VideoData {
   title: string;
   description: string;
   summary: string;
+  role: string;
+  tools: string;
   category: string;
   embedUrl: string;
   thumbnail: string;
@@ -41,6 +43,8 @@ export function VideoForm({
     title: initialData?.title ?? "",
     description: initialData?.description ?? "",
     summary: initialData?.summary ?? "",
+    role: initialData?.role ?? "",
+    tools: initialData?.tools ?? "",
     category: initialData?.category ?? "",
     embedUrl: initialData?.embedUrl ?? "",
     thumbnail: initialData?.thumbnail ?? "",
@@ -130,6 +134,28 @@ export function VideoForm({
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
               placeholder="如：商业广告、短片、纪录片"
+              className="bg-neutral-800 border-neutral-700"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="role">职责（选填）</Label>
+            <Input
+              id="role"
+              maxLength={200}
+              value={form.role}
+              onChange={(event) => setForm({ ...form, role: event.target.value })}
+              placeholder="如：Motion Design / Compositing"
+              className="bg-neutral-800 border-neutral-700"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="tools">工具（选填）</Label>
+            <Input
+              id="tools"
+              maxLength={200}
+              value={form.tools}
+              onChange={(event) => setForm({ ...form, tools: event.target.value })}
+              placeholder="如：After Effects · Blender"
               className="bg-neutral-800 border-neutral-700"
             />
           </div>

@@ -36,6 +36,8 @@ export async function PUT(
       ...(b.embedUrl !== undefined && { embedUrl: b.embedUrl }),
       ...(b.description !== undefined && { description: b.description }),
       ...(b.summary !== undefined && { summary: b.summary }),
+      ...(b.role !== undefined && { role: b.role }),
+      ...(b.tools !== undefined && { tools: b.tools }),
       ...(b.thumbnail !== undefined && { thumbnail: b.thumbnail }),
       ...(b.featured !== undefined && { featured: b.featured }),
       ...(b.order !== undefined && { order: b.order }),

@@ -28,6 +28,8 @@ export async function POST(req: NextRequest) {
       embedUrl: b.embedUrl,
       description: b.description ?? null,
       summary: b.summary ?? null,
+      role: b.role ?? null,
+      tools: b.tools ?? null,
       thumbnail: b.thumbnail ?? null,
       featured: b.featured ?? false,
       order: b.order ?? 0,
