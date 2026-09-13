@@ -35,7 +35,7 @@ export function SelectedWorkCard({ work, dominant = false }: SelectedWorkCardPro
                 src={work.thumbnail}
                 alt={work.title}
                 fill
-                sizes={dominant ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
+                sizes={dominant ? "(max-width: 639px) calc(100vw - 40px), (max-width: 767px) calc(100vw - 64px), (max-width: 1199px) calc(100vw - 96px), 1104px" : "(max-width: 639px) calc(100vw - 40px), (max-width: 767px) calc(100vw - 64px), (max-width: 1199px) calc(50vw - 58px), 542px"}
                 className="object-cover transition-transform duration-500 motion-reduce:transition-none md:group-hover:scale-[1.03]"
               />
               <span className="absolute inset-0 bg-black/10 transition-colors duration-300 md:group-hover:bg-black/0" />
