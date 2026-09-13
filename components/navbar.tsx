@@ -135,17 +135,33 @@ export function Navbar() {
           style={{ transitionTimingFunction: "var(--ease-menu)" }}
         >
           <div className="flex-1 flex flex-col items-start justify-center px-6 gap-1">
-            {SECTIONS.map((s, i) => (
-              <a
-                key={s.id}
-                href={`/#${s.id}`}
-                onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
-                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
-              >
-                {s.label}
-              </a>
-            ))}
+            {SECTIONS.map((s, i) => {
+              const className = "text-3xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0";
+              const style = {
+                fontFamily: "var(--font-bitcount)",
+                animationDelay: `${i * 60}ms`,
+              };
+
+              if (s.id === "works" && pathname !== "/") {
+                return (
+                  <Link key={s.id} href="/works" onClick={closeMenu} className={className} style={style}>
+                    {s.label}
+                  </Link>
+                );
+              }
+
+              return (
+                <a
+                  key={s.id}
+                  href={`/#${s.id}`}
+                  onClick={(event) => handleSectionClick(event, s.id)}
+                  className={className}
+                  style={style}
+                >
+                  {s.label}
+                </a>
+              );
+            })}
           </div>
         </div>
       )}
@@ -170,17 +186,33 @@ export function Navbar() {
           style={{ transitionTimingFunction: "var(--ease-menu)" }}
         >
           <div className="flex flex-col justify-center h-full px-8 lg:px-10 gap-2">
-            {SECTIONS.map((s, i) => (
-              <a
-                key={s.id}
-                href={`/#${s.id}`}
-                onClick={(e) => handleSectionClick(e, s.id)}
-                className="text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0"
-                style={{ fontFamily: "var(--font-bitcount)", animationDelay: `${i * 60}ms` }}
-              >
-                {s.label}
-              </a>
-            ))}
+            {SECTIONS.map((s, i) => {
+              const className = "text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0";
+              const style = {
+                fontFamily: "var(--font-bitcount)",
+                animationDelay: `${i * 60}ms`,
+              };
+
+              if (s.id === "works" && pathname !== "/") {
+                return (
+                  <Link key={s.id} href="/works" onClick={closeMenu} className={className} style={style}>
+                    {s.label}
+                  </Link>
+                );
+              }
+
+              return (
+                <a
+                  key={s.id}
+                  href={`/#${s.id}`}
+                  onClick={(event) => handleSectionClick(event, s.id)}
+                  className={className}
+                  style={style}
+                >
+                  {s.label}
+                </a>
+              );
+            })}
           </div>
         </div>
       )}
