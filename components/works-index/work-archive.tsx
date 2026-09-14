@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
+import { createThumbnailProxyPath } from "@/lib/works-index";
 import type { WorkYearGroup } from "@/lib/works-index";
 
 interface WorkArchiveProps {
@@ -16,8 +17,12 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
             {group.label}
           </h3>
           <div className="grid grid-cols-1 gap-x-4 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
-            {group.works.map((work) => (
-              <IntentPrefetchLink
+            {group.works.map((work) => {
+              const thumbnail = work.thumbnail
+                ? createThumbnailProxyPath(work.thumbnail) ?? work.thumbnail
+                : null;
+
+              return <IntentPrefetchLink
                 key={work.id}
                 href={`/works/${work.id}`}
                 aria-label={`View case study: ${work.title}`}
@@ -25,11 +30,12 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
               >
                 <article>
                   <div data-vt-id={work.id} className="relative aspect-video overflow-hidden bg-neutral-900">
-                    {work.thumbnail ? (
+                    {thumbnail ? (
                       <Image
-                        src={work.thumbnail}
+                        src={thumbnail}
                         alt={work.title}
                         fill
+                        unoptimized={thumbnail.startsWith("/media/thumbnail")}
                         sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 767px) calc(50vw - 40px), (max-width: 1023px) calc(50vw - 56px), (max-width: 1199px) calc(33.333vw - 42.667px), 357.33px"
                         className="object-cover transition-transform duration-500 motion-reduce:transition-none md:group-hover:scale-[1.025]"
                       />
@@ -44,8 +50,8 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
                   </h4>
                   <p className="mt-1 text-xs text-neutral-400">{work.category}</p>
                 </article>
-              </IntentPrefetchLink>
-            ))}
+              </IntentPrefetchLink>;
+            })}
           </div>
         </section>
       ))}

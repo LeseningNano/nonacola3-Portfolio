@@ -22,9 +22,9 @@ export function SelectedWorkCard({ work, dominant = false }: SelectedWorkCardPro
   const role = work.role?.trim();
   const tools = work.tools?.trim();
   const summary = work.summary?.trim();
-  const thumbnail = dominant && work.thumbnail
+  const thumbnail = work.thumbnail
     ? createThumbnailProxyPath(work.thumbnail) ?? work.thumbnail
-    : work.thumbnail;
+    : null;
 
   return (
     <IntentPrefetchLink
