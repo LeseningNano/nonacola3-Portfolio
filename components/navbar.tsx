@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
+import { getPortfolioMenuPrimary } from "@/lib/portfolio-navigation";
 
 const SECTIONS = [
   { id: "works", label: "WORKS" },
@@ -22,6 +23,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openRafRef = useRef(0);
+  const primaryItem = getPortfolioMenuPrimary(pathname);
 
   function openMenu() {
     if (closeTimerRef.current) {
@@ -63,6 +65,16 @@ export function Navbar() {
       router.push("/");
     }
   }
+
+  useEffect(() => {
+    cancelAnimationFrame(openRafRef.current);
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setOpen(false);
+    setMounted(false);
+  }, [pathname]);
 
   useEffect(() => {
     function check() {
@@ -144,8 +156,10 @@ export function Navbar() {
 
               if (s.id === "works") {
                 return (
-                  <Link key={s.id} href="/works" onClick={closeMenu} className={className} style={style}>
-                    {s.label}
+                  <Link key={s.id} href={primaryItem.href} onClick={closeMenu} className={`${className} inline-flex items-center gap-3`} style={style}>
+                    {primaryItem.direction === "back" && <ArrowLeft aria-hidden="true" className="h-6 w-6" />}
+                    <span>{primaryItem.label}</span>
+                    {primaryItem.direction === "forward" && <ArrowRight aria-hidden="true" className="h-6 w-6" />}
                   </Link>
                 );
               }
@@ -195,8 +209,10 @@ export function Navbar() {
 
               if (s.id === "works") {
                 return (
-                  <Link key={s.id} href="/works" onClick={closeMenu} className={className} style={style}>
-                    {s.label}
+                  <Link key={s.id} href={primaryItem.href} onClick={closeMenu} className={`${className} inline-flex items-center gap-3`} style={style}>
+                    {primaryItem.direction === "back" && <ArrowLeft aria-hidden="true" className="h-7 w-7" />}
+                    <span>{primaryItem.label}</span>
+                    {primaryItem.direction === "forward" && <ArrowRight aria-hidden="true" className="h-7 w-7" />}
                   </Link>
                 );
               }
