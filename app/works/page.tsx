@@ -60,13 +60,10 @@ export default async function WorksPage() {
             <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-400 md:text-base">
               A selection of projects that represent my motion design workflow.
             </p>
-            <div className="mt-10">
-              <SelectedWorkCard work={selected[0]} dominant />
-              {selected.length > 1 && (
-                <div className="mt-14 grid grid-cols-1 gap-x-5 gap-y-14 md:grid-cols-2">
-                  {selected.slice(1).map((work) => <SelectedWorkCard key={work.id} work={work} />)}
-                </div>
-              )}
+            <div className="mt-10 space-y-20 md:mt-14 md:space-y-28">
+              {selected.map((work, index) => (
+                <SelectedWorkCard key={work.id} work={work} index={index} />
+              ))}
             </div>
           </section>
         )}
