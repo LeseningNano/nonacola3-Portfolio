@@ -11,6 +11,8 @@ model Video {
   title       String
   description String?
   summary     String?
+  role        String?
+  tools       String?
   category    String
   embedUrl    String
   thumbnail   String?

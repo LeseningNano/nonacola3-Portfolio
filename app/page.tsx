@@ -10,6 +10,8 @@ export default async function Home() {
     title: v.title,
     description: v.description,
     summary: v.summary,
+    role: v.role,
+    tools: v.tools,
     category: v.category,
     embedUrl: v.embedUrl,
     thumbnail: v.thumbnail,

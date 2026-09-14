@@ -1,0 +1,3 @@
+ALTER TABLE "Video"
+ADD COLUMN "role" TEXT,
+ADD COLUMN "tools" TEXT;
