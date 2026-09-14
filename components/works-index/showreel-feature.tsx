@@ -17,19 +17,6 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
 
   return (
     <section aria-labelledby="showreel-heading" className="border-t border-white/10 pt-6 md:pt-8">
-      <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-xs tracking-[0.28em] text-neutral-500">SHOWREEL 2026</p>
-          <h2 id="showreel-heading" className="mt-2 text-xl text-white md:text-2xl">
-            Motion Design / PV / Compositing / 3D
-          </h2>
-          <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-400">
-            A collection of motion design, PV and visual experiments.
-          </p>
-        </div>
-        <p className="text-sm tabular-nums text-neutral-500">01:03</p>
-      </div>
-
       <div className="relative aspect-video overflow-hidden bg-black">
         {active ? (
           videoType === "upload" ? (
@@ -55,7 +42,7 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
               alt=""
               fill
               preload
-              sizes="(max-width: 1248px) 100vw, 1200px"
+              sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 767px) calc(100vw - 64px), (max-width: 1199px) calc(100vw - 96px), 1104px"
               className="object-cover transition-transform duration-500 motion-reduce:transition-none md:group-hover:scale-[1.015]"
             />
             <span className="absolute inset-0 bg-black/25 transition-colors group-hover:bg-black/15" />
@@ -66,6 +53,19 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
             </span>
           </button>
         )}
+      </div>
+
+      <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p className="text-xs tracking-[0.28em] text-neutral-400">SHOWREEL 2026</p>
+          <h2 id="showreel-heading" className="mt-2 text-xl text-white md:text-2xl">
+            Motion Design / PV / Compositing / 3D
+          </h2>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-400">
+            A collection of motion design, PV and visual experiments.
+          </p>
+        </div>
+        <p className="text-sm tabular-nums text-neutral-400">01:03</p>
       </div>
     </section>
   );

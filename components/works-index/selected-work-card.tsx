@@ -11,7 +11,7 @@ interface SelectedWorkCardProps {
 function Metadata({ label, value }: { label: string; value: string }) {
   return (
     <div className="grid grid-cols-[4rem_1fr] gap-4 text-sm">
-      <dt className="text-neutral-500">{label}</dt>
+      <dt className="text-neutral-400">{label}</dt>
       <dd className="text-neutral-300">{value}</dd>
     </div>
   );
@@ -20,6 +20,7 @@ function Metadata({ label, value }: { label: string; value: string }) {
 export function SelectedWorkCard({ work, dominant = false }: SelectedWorkCardProps) {
   const role = work.role?.trim();
   const tools = work.tools?.trim();
+  const summary = work.summary?.trim();
 
   return (
     <IntentPrefetchLink
@@ -49,7 +50,10 @@ export function SelectedWorkCard({ work, dominant = false }: SelectedWorkCardPro
         <div className={dominant ? "pt-5 md:grid md:grid-cols-2 md:gap-10" : "pt-4"}>
           <div>
             <h3 className={dominant ? "text-2xl md:text-3xl" : "text-xl md:text-2xl"}>{work.title}</h3>
-            <p className="mt-1 text-sm text-neutral-500">{work.category}</p>
+            <p className="mt-1 text-sm text-neutral-400">{work.category}</p>
+            {summary && (
+              <p className="mt-4 max-w-xl text-sm leading-6 text-neutral-400">{summary}</p>
+            )}
           </div>
           <div className={dominant ? "mt-5 md:mt-0" : "mt-5"}>
             {(role || tools) && (

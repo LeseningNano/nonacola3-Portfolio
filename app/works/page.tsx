@@ -43,7 +43,7 @@ export default async function WorksPage() {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <main className="mx-auto max-w-[1200px] px-5 pb-20 pt-28 sm:px-8 md:px-12 md:pt-36">
         <header>
-          <p className="text-xs tracking-[0.28em] text-neutral-500">MOTION DESIGNER</p>
+          <p className="text-xs tracking-[0.28em] text-neutral-400">MOTION DESIGNER</p>
           <h1 className="mt-5 max-w-5xl text-4xl font-normal leading-[1.05] tracking-[-0.035em] sm:text-5xl md:text-7xl">
             Motion Designer creating PV, game promotional visuals and cinematic motion graphics.
           </h1>
@@ -52,11 +52,11 @@ export default async function WorksPage() {
           </p>
           <dl className="mt-10 grid gap-5 border-y border-white/10 py-5 text-sm sm:grid-cols-2">
             <div className="grid grid-cols-[5rem_1fr] gap-3">
-              <dt className="text-neutral-600">Location</dt>
+              <dt className="text-neutral-400">Location</dt>
               <dd className="text-neutral-300">China</dd>
             </div>
             <div className="grid grid-cols-[5rem_1fr] gap-3">
-              <dt className="text-neutral-600">Focus</dt>
+              <dt className="text-neutral-400">Focus</dt>
               <dd className="text-neutral-300">PV Production · Motion Graphics · Compositing · Blender</dd>
             </div>
           </dl>
@@ -91,12 +91,12 @@ export default async function WorksPage() {
         <section aria-labelledby="all-works-heading" className="mt-24 border-t border-white/10 pt-7 md:mt-32">
           <h2 id="all-works-heading" className="text-3xl tracking-tight md:text-5xl">All Works</h2>
           <div className="mt-10">
-            {groups.length > 0 ? <WorkArchive groups={groups} /> : <p className="text-neutral-500">Work is currently being updated.</p>}
+            {groups.length > 0 ? <WorkArchive groups={groups} /> : <p className="text-neutral-400">Work is currently being updated.</p>}
           </div>
         </section>
 
         <section aria-labelledby="contact-heading" className="mt-24 border-t border-white/10 pt-8 md:mt-32">
-          <p className="text-xs tracking-[0.24em] text-neutral-500">AVAILABLE FOR OPPORTUNITIES</p>
+          <p className="text-xs tracking-[0.24em] text-neutral-400">AVAILABLE FOR OPPORTUNITIES</p>
           <h2 id="contact-heading" className="mt-4 text-4xl tracking-tight md:text-6xl">Let's work together.</h2>
           <a href={`mailto:${siteConfig.email}`} className="mt-7 inline-block text-neutral-300 underline decoration-neutral-700 underline-offset-4 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
             {siteConfig.email}

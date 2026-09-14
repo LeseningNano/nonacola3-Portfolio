@@ -12,7 +12,7 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
     <div className="space-y-16">
       {groups.map((group) => (
         <section key={group.label} aria-labelledby={`works-year-${group.label}`}>
-          <h3 id={`works-year-${group.label}`} className="mb-5 text-sm tracking-[0.2em] text-neutral-500">
+          <h3 id={`works-year-${group.label}`} className="mb-5 text-sm tracking-[0.2em] text-neutral-400">
             {group.label}
           </h3>
           <div className="grid grid-cols-1 gap-x-4 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
@@ -30,7 +30,7 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
                         src={work.thumbnail}
                         alt={work.title}
                         fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        sizes="(max-width: 639px) calc(100vw - 40px), (max-width: 767px) calc(50vw - 40px), (max-width: 1023px) calc(50vw - 56px), (max-width: 1199px) calc(33.333vw - 42.667px), 357.33px"
                         className="object-cover transition-transform duration-500 motion-reduce:transition-none md:group-hover:scale-[1.025]"
                       />
                     ) : (
@@ -42,7 +42,7 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
                   <h4 className="mt-3 text-base text-neutral-100 transition-colors group-hover:text-white">
                     {work.title}
                   </h4>
-                  <p className="mt-1 text-xs text-neutral-500">{work.category}</p>
+                  <p className="mt-1 text-xs text-neutral-400">{work.category}</p>
                 </article>
               </IntentPrefetchLink>
             ))}
