@@ -70,7 +70,7 @@ export default async function WorksPage() {
 
         <section aria-labelledby="all-works-heading" className="mt-24 border-t border-white/10 pt-7 md:mt-32">
           <h2 id="all-works-heading" className="text-3xl tracking-tight md:text-5xl">All Works</h2>
-          <div className="mt-10">
+          <div className="mt-8 md:mt-10">
             {groups.length > 0 ? <WorkArchive groups={groups} /> : <p className="text-neutral-400">Work is currently being updated.</p>}
           </div>
         </section>
