@@ -5,6 +5,59 @@ export interface WorkYearGroup {
   works: VideoRow[];
 }
 
+export const WORKS_HEADLINE =
+  "Motion Designer creating PV, game promotional visuals and cinematic motion graphics.";
+
+const HIGHLIGHTED_WORDS = new Set([
+  "Motion",
+  "Designer",
+  "PV,",
+  "game",
+  "promotional",
+  "visuals",
+  "cinematic",
+  "motion",
+  "graphics.",
+]);
+
+export interface WorksHeadlineToken {
+  text: string;
+  highlighted: boolean;
+}
+
+export function getWorksHeadlineTokens(): WorksHeadlineToken[] {
+  return WORKS_HEADLINE.split(" ").map((text) => ({
+    text,
+    highlighted: HIGHLIGHTED_WORDS.has(text),
+  }));
+}
+
+export function getSelectedWorkOrientation(
+  index: number
+): "media-left" | "media-right" {
+  return index % 2 === 0 ? "media-left" : "media-right";
+}
+
+export interface FilmographyEntry {
+  work: VideoRow;
+  sequence: number;
+}
+
+export interface WorkFilmographyGroup {
+  label: string;
+  entries: FilmographyEntry[];
+}
+
+export function createFilmography(
+  groups: WorkYearGroup[]
+): WorkFilmographyGroup[] {
+  let sequence = 0;
+  return groups.map((group) => ({
+    label: group.label,
+    entries: group.works.map((work) => ({ work, sequence: ++sequence })),
+  }));
+}
+
 export function selectFeaturedWorks(videos: VideoRow[]): VideoRow[] {
   return videos.filter((video) => video.featured);
 }

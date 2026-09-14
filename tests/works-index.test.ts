@@ -2,13 +2,43 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { VideoRow } from "../lib/types";
 import {
+  WORKS_HEADLINE,
+  createFilmography,
   createThumbnailProxyPath,
   createThumbnailProxyResponse,
   groupWorksByYear,
+  getSelectedWorkOrientation,
+  getWorksHeadlineTokens,
   isAllowedThumbnailSource,
   normalizeShowreelType,
   selectFeaturedWorks,
 } from "../lib/works-index";
+
+test("keeps the approved works headline and highlights only recruiter keywords", () => {
+  const tokens = getWorksHeadlineTokens();
+  assert.equal(tokens.map((token) => token.text).join(" "), WORKS_HEADLINE);
+  assert.equal(
+    tokens.filter((token) => token.highlighted).map((token) => token.text).join("|"),
+    "Motion|Designer|PV,|game|promotional|visuals|cinematic|motion|graphics."
+  );
+});
+
+test("alternates selected work media from left to right", () => {
+  assert.equal(getSelectedWorkOrientation(0), "media-left");
+  assert.equal(getSelectedWorkOrientation(1), "media-right");
+  assert.equal(getSelectedWorkOrientation(2), "media-left");
+});
+
+test("numbers filmography entries continuously across year groups", () => {
+  const groups = [
+    { label: "2026", works: [work("one", null), work("two", null)] },
+    { label: "2025", works: [work("three", null)] },
+  ];
+  assert.deepEqual(
+    createFilmography(groups).map((group) => group.entries.map((entry) => entry.sequence)),
+    [[1, 2], [3]]
+  );
+});
 
 function work(id: string, date: string | null, featured = false): VideoRow {
   return {
