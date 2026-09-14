@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { SelectedWorkCard } from "../components/works-index/selected-work-card";
+import { WorkArchive } from "../components/works-index/work-archive";
 import type { VideoRow } from "../lib/types";
 import {
   WORKS_HEADLINE,
@@ -29,6 +33,43 @@ test("alternates selected work media from left to right", () => {
   assert.equal(getSelectedWorkOrientation(2), "media-left");
 });
 
+test("renders selected work media in the large desktop track on either side", () => {
+  const selectedWork = {
+    ...work("selected", null, true),
+    title: "Selected Project",
+    thumbnail: "https://kq4mwotlyfyzycmp.public.blob.vercel-storage.com/selected.jpg",
+  };
+  const mediaLeft = renderToStaticMarkup(
+    createElement(SelectedWorkCard, { work: selectedWork, index: 0 })
+  );
+  const mediaRight = renderToStaticMarkup(
+    createElement(SelectedWorkCard, { work: selectedWork, index: 1 })
+  );
+
+  assert.match(
+    mediaLeft,
+    /md:grid-cols-\[minmax\(0,1\.55fr\)_minmax\(16rem,0\.85fr\)\]/
+  );
+  assert.match(
+    mediaRight,
+    /md:grid-cols-\[minmax\(16rem,0\.85fr\)_minmax\(0,1\.55fr\)\]/
+  );
+});
+
+test("keeps selected work media before details in mobile DOM order", () => {
+  const selectedWork = {
+    ...work("mobile-order", null, true),
+    title: "Mobile Order Project",
+  };
+
+  for (const index of [0, 1]) {
+    const markup = renderToStaticMarkup(
+      createElement(SelectedWorkCard, { work: selectedWork, index })
+    );
+    assert.ok(markup.indexOf('data-vt-id="mobile-order"') < markup.indexOf("<h3"));
+  }
+});
+
 test("numbers filmography entries continuously across year groups", () => {
   const groups = [
     { label: "2026", works: [work("one", null), work("two", null)] },
@@ -38,6 +79,18 @@ test("numbers filmography entries continuously across year groups", () => {
     createFilmography(groups).map((group) => group.entries.map((entry) => entry.sequence)),
     [[1, 2], [3]]
   );
+});
+
+test("renders continuous ordered-list semantics without archive images", () => {
+  const groups = [
+    { label: "2026", works: [work("one", null), work("two", null)] },
+    { label: "2025", works: [work("three", null)] },
+  ];
+  const markup = renderToStaticMarkup(createElement(WorkArchive, { groups }));
+
+  assert.match(markup, /<ol start="1">/);
+  assert.match(markup, /<ol start="3">/);
+  assert.doesNotMatch(markup, /<img\b/);
 });
 
 function work(id: string, date: string | null, featured = false): VideoRow {

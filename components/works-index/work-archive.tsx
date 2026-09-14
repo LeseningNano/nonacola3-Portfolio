@@ -15,7 +15,7 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
           <h3 id={`works-year-${group.label}`} className="mb-5 text-sm tracking-[0.2em] text-neutral-400">
             {group.label}
           </h3>
-          <ol>
+          <ol start={group.entries[0]?.sequence}>
             {group.entries.map(({ work, sequence }) => (
               <li key={work.id}>
                 <IntentPrefetchLink

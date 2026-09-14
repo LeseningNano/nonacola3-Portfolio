@@ -23,6 +23,10 @@ function Metadata({ label, value }: { label: string; value: string }) {
 
 export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
   const orientation = getSelectedWorkOrientation(index);
+  const desktopColumns =
+    orientation === "media-right"
+      ? "md:grid-cols-[minmax(16rem,0.85fr)_minmax(0,1.55fr)]"
+      : "md:grid-cols-[minmax(0,1.55fr)_minmax(16rem,0.85fr)]";
   const role = work.role?.trim();
   const tools = work.tools?.trim();
   const summary = work.summary?.trim();
@@ -36,7 +40,7 @@ export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
       aria-label={`View case study: ${work.title}`}
       className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
-      <article className="grid gap-5 md:grid-cols-[minmax(0,1.55fr)_minmax(16rem,0.85fr)] md:items-center md:gap-10 lg:gap-16">
+      <article className={`grid gap-5 ${desktopColumns} md:items-center md:gap-10 lg:gap-16`}>
         <div className={orientation === "media-right" ? "md:order-2" : undefined}>
           <div data-vt-id={work.id} className="relative aspect-video overflow-hidden bg-neutral-900">
             {thumbnail ? (
