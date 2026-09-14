@@ -1,0 +1,24 @@
+.word {
+  opacity: 0;
+  transition: opacity 360ms ease;
+  transition-delay: calc(var(--word-index) * 90ms);
+}
+
+.supporting {
+  opacity: 0;
+  transition: opacity 600ms ease;
+  transition-delay: 1260ms;
+}
+
+.entered .word,
+.entered .supporting {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .word,
+  .supporting {
+    opacity: 1;
+    transition: none;
+  }
+}

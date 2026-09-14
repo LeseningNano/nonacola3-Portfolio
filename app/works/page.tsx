@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/footer";
+import { WorksIntro } from "@/components/works-index/works-intro";
 import { ShowreelFeature } from "@/components/works-index/showreel-feature";
 import { SelectedWorkCard } from "@/components/works-index/selected-work-card";
 import { WorkArchive } from "@/components/works-index/work-archive";
@@ -42,34 +43,16 @@ export default async function WorksPage() {
   return (
     <div lang="en" className="min-h-screen bg-[#0a0a0a] text-white">
       <main className="mx-auto max-w-[1200px] px-5 pb-20 pt-28 sm:px-8 md:px-12 md:pt-36">
-        <header>
-          <p className="text-xs tracking-[0.28em] text-neutral-400">MOTION DESIGNER</p>
-          <h1 className="mt-5 max-w-5xl text-4xl font-normal leading-[1.05] tracking-[-0.035em] sm:text-5xl md:text-7xl">
-            Motion Designer creating PV, game promotional visuals and cinematic motion graphics.
-          </h1>
-          <p className="mt-7 max-w-2xl text-base leading-7 text-neutral-400 md:text-lg">
-            Focused on rhythm-driven editing, compositing and 3D visual storytelling with After Effects and Blender.
-          </p>
-          <dl className="mt-10 grid gap-5 border-y border-white/10 py-5 text-sm sm:grid-cols-2">
-            <div className="grid grid-cols-[5rem_1fr] gap-3">
-              <dt className="text-neutral-400">Location</dt>
-              <dd className="text-neutral-300">China</dd>
+        <WorksIntro>
+          {showreel?.showreelUrl.trim() && (
+            <div className="mt-12 md:mt-16">
+              <ShowreelFeature
+                showreelUrl={showreel.showreelUrl}
+                videoType={normalizeShowreelType(showreel.videoType)}
+              />
             </div>
-            <div className="grid grid-cols-[5rem_1fr] gap-3">
-              <dt className="text-neutral-400">Focus</dt>
-              <dd className="text-neutral-300">PV Production · Motion Graphics · Compositing · Blender</dd>
-            </div>
-          </dl>
-        </header>
-
-        {showreel?.showreelUrl.trim() && (
-          <div className="mt-20 md:mt-28">
-            <ShowreelFeature
-              showreelUrl={showreel.showreelUrl}
-              videoType={normalizeShowreelType(showreel.videoType)}
-            />
-          </div>
-        )}
+          )}
+        </WorksIntro>
 
         {selected.length > 0 && (
           <section aria-labelledby="selected-works-heading" className="mt-24 border-t border-white/10 pt-7 md:mt-32">
