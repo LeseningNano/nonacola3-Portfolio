@@ -4,6 +4,7 @@ import { WorksIntro } from "@/components/works-index/works-intro";
 import { ShowreelFeature } from "@/components/works-index/showreel-feature";
 import { SelectedWorkCard } from "@/components/works-index/selected-work-card";
 import { WorkArchive } from "@/components/works-index/work-archive";
+import { SmoothScrollContainer } from "@/components/smooth-scroll-container";
 import { siteConfig } from "@/lib/config";
 import { getShowreel, getVideos } from "@/lib/data";
 import type { VideoRow } from "@/lib/types";
@@ -41,7 +42,7 @@ export default async function WorksPage() {
   const groups = groupWorksByYear(works);
 
   return (
-    <div lang="en" className="min-h-screen bg-[#0a0a0a] text-white">
+    <SmoothScrollContainer lang="en" className="min-h-screen bg-[#0a0a0a] text-white">
       <main className="mx-auto max-w-[1200px] px-5 pb-20 pt-28 sm:px-8 md:px-12 md:pt-36">
         <WorksIntro>
           {showreel?.showreelUrl.trim() && (
@@ -84,6 +85,6 @@ export default async function WorksPage() {
         </section>
       </main>
       <Footer />
-    </div>
+    </SmoothScrollContainer>
   );
 }

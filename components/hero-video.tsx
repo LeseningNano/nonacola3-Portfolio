@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { LoadingScreen } from "./loading-screen";
-import { SCROLL_CONTAINER_ID } from "./home-client";
+import { SCROLL_CONTAINER_ID } from "./smooth-scroll-container";
 
 export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
@@ -16,7 +17,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const posterRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLAnchorElement>(null);
   const loadTriggered = useRef(false);
   const rafId = useRef(0);
   const introDoneRef = useRef(false);
@@ -270,27 +271,15 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           </p>
         </div>
 
-        <button
+        <Link
           ref={buttonRef}
-          onClick={() => {
-            const works = document.getElementById("works");
-            if (!works) return;
-            const container = document.getElementById(SCROLL_CONTAINER_ID);
-            const target = works.offsetTop * 0.9;
-            if (container) {
-              container.dispatchEvent(
-                new CustomEvent("smooth-scroll-to", { detail: { target } })
-              );
-            } else {
-              window.scrollTo({ top: target, behavior: "smooth" });
-            }
-          }}
+          href="/works"
           className="group absolute bottom-12 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
           跳转至 works.
           <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-        </button>
+        </Link>
       </section>
     </>
   );
