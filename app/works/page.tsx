@@ -40,7 +40,7 @@ export default async function WorksPage() {
   const groups = groupWorksByYear(works);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div lang="en" className="min-h-screen bg-[#0a0a0a] text-white">
       <main className="mx-auto max-w-[1200px] px-5 pb-20 pt-28 sm:px-8 md:px-12 md:pt-36">
         <header>
           <p className="text-xs tracking-[0.28em] text-neutral-400">MOTION DESIGNER</p>
