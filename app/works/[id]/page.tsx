@@ -80,11 +80,11 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
             <ExternalLink className="w-4 h-4" />
           </a>
           <Link
-            href="/"
+            href="/works"
             className="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-4 py-2 transition-all duration-300"
           >
             <ArrowLeft className="w-4 h-4" />
-            返回主页
+            返回作品列表
           </Link>
         </div>
 

@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { VideoRow } from "../lib/types";
 import {
+  createThumbnailProxyPath,
+  createThumbnailProxyResponse,
   groupWorksByYear,
+  isAllowedThumbnailSource,
   normalizeShowreelType,
   selectFeaturedWorks,
 } from "../lib/works-index";
@@ -45,4 +48,49 @@ test("showreel type accepts upload and falls back to url", () => {
   assert.equal(normalizeShowreelType("url"), "url");
   assert.equal(normalizeShowreelType("unexpected"), "url");
   assert.equal(normalizeShowreelType(undefined), "url");
+});
+
+test("thumbnail proxy only accepts HTTPS Vercel Blob sources", () => {
+  const source = "https://kq4mwotlyfyzycmp.public.blob.vercel-storage.com/uploads/work.jpg";
+
+  assert.equal(isAllowedThumbnailSource(source), true);
+  assert.equal(isAllowedThumbnailSource("http://kq4mwotlyfyzycmp.public.blob.vercel-storage.com/work.jpg"), false);
+  assert.equal(isAllowedThumbnailSource("https://another.public.blob.vercel-storage.com/work.jpg"), false);
+  assert.equal(isAllowedThumbnailSource("https://public.blob.vercel-storage.com.evil.test/work.jpg"), false);
+  assert.equal(isAllowedThumbnailSource("https://user:pass@kq4mwotlyfyzycmp.public.blob.vercel-storage.com/work.jpg"), false);
+  assert.equal(isAllowedThumbnailSource("https://127.0.0.1/work.jpg"), false);
+  assert.equal(createThumbnailProxyPath(source), `/media/thumbnail?url=${encodeURIComponent(source)}`);
+  assert.equal(createThumbnailProxyPath("https://example.com/work.jpg"), null);
+});
+
+test("thumbnail proxy returns cacheable same-origin image responses", async () => {
+  const source = "https://kq4mwotlyfyzycmp.public.blob.vercel-storage.com/uploads/work.jpg";
+  const fetcher: typeof fetch = async () =>
+    new Response(new Uint8Array([1, 2, 3]), {
+      headers: {
+        "content-type": "image/jpeg",
+        etag: '"work-v1"',
+      },
+    });
+
+  const response = await createThumbnailProxyResponse(source, fetcher);
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("content-type"), "image/jpeg");
+  assert.equal(response.headers.get("etag"), '"work-v1"');
+  assert.equal(response.headers.get("cache-control"), "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=86400");
+  assert.equal(response.headers.get("pages-cache-control"), "public, s-maxage=2592000");
+});
+
+test("thumbnail proxy rejects untrusted sources before fetching", async () => {
+  let called = false;
+  const fetcher: typeof fetch = async () => {
+    called = true;
+    return new Response();
+  };
+
+  const response = await createThumbnailProxyResponse("https://127.0.0.1/private", fetcher);
+
+  assert.equal(response.status, 400);
+  assert.equal(called, false);
 });

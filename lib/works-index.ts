@@ -37,3 +37,60 @@ export function normalizeShowreelType(
 ): "url" | "upload" {
   return value === "upload" ? "upload" : "url";
 }
+
+const THUMBNAIL_BLOB_HOST = "kq4mwotlyfyzycmp.public.blob.vercel-storage.com";
+
+export function isAllowedThumbnailSource(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      url.hostname === THUMBNAIL_BLOB_HOST &&
+      url.username === "" &&
+      url.password === "" &&
+      url.port === ""
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function createThumbnailProxyPath(source: string): string | null {
+  if (!isAllowedThumbnailSource(source)) return null;
+  return `/media/thumbnail?url=${encodeURIComponent(source)}`;
+}
+
+export async function createThumbnailProxyResponse(
+  source: string,
+  fetcher: typeof fetch = fetch
+): Promise<Response> {
+  if (!isAllowedThumbnailSource(source)) {
+    return new Response("Invalid thumbnail source", { status: 400 });
+  }
+
+  let upstream: Response;
+  try {
+    upstream = await fetcher(source, {
+      redirect: "error",
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    return new Response("Thumbnail origin unavailable", { status: 502 });
+  }
+
+  const contentType = upstream.headers.get("content-type") ?? "";
+  if (!upstream.ok || !contentType.toLowerCase().startsWith("image/")) {
+    return new Response("Invalid thumbnail response", { status: 502 });
+  }
+
+  const headers = new Headers({
+    "Cache-Control": "public, max-age=86400, s-maxage=2592000, stale-while-revalidate=86400",
+    "Content-Type": contentType,
+    "Pages-Cache-Control": "public, s-maxage=2592000",
+    "X-Content-Type-Options": "nosniff",
+  });
+  const etag = upstream.headers.get("etag");
+  if (etag) headers.set("ETag", etag);
+
+  return new Response(upstream.body, { status: 200, headers });
+}

@@ -142,7 +142,7 @@ export function Navbar() {
                 animationDelay: `${i * 60}ms`,
               };
 
-              if (s.id === "works" && pathname !== "/") {
+              if (s.id === "works") {
                 return (
                   <Link key={s.id} href="/works" onClick={closeMenu} className={className} style={style}>
                     {s.label}
@@ -193,7 +193,7 @@ export function Navbar() {
                 animationDelay: `${i * 60}ms`,
               };
 
-              if (s.id === "works" && pathname !== "/") {
+              if (s.id === "works") {
                 return (
                   <Link key={s.id} href="/works" onClick={closeMenu} className={className} style={style}>
                     {s.label}

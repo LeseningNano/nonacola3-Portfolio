@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
+import { createThumbnailProxyPath } from "@/lib/works-index";
 import type { VideoRow } from "@/lib/types";
 
 interface SelectedWorkCardProps {
@@ -21,6 +22,9 @@ export function SelectedWorkCard({ work, dominant = false }: SelectedWorkCardPro
   const role = work.role?.trim();
   const tools = work.tools?.trim();
   const summary = work.summary?.trim();
+  const thumbnail = dominant && work.thumbnail
+    ? createThumbnailProxyPath(work.thumbnail) ?? work.thumbnail
+    : work.thumbnail;
 
   return (
     <IntentPrefetchLink
@@ -30,12 +34,13 @@ export function SelectedWorkCard({ work, dominant = false }: SelectedWorkCardPro
     >
       <article>
         <div data-vt-id={work.id} className="relative aspect-video overflow-hidden bg-neutral-900">
-          {work.thumbnail ? (
+          {thumbnail ? (
             <>
               <Image
-                src={work.thumbnail}
+                src={thumbnail}
                 alt={work.title}
                 fill
+                unoptimized={thumbnail.startsWith("/media/thumbnail")}
                 sizes={dominant ? "(max-width: 639px) calc(100vw - 40px), (max-width: 767px) calc(100vw - 64px), (max-width: 1199px) calc(100vw - 96px), 1104px" : "(max-width: 639px) calc(100vw - 40px), (max-width: 767px) calc(100vw - 64px), (max-width: 1199px) calc(50vw - 58px), 542px"}
                 className="object-cover transition-transform duration-500 motion-reduce:transition-none md:group-hover:scale-[1.03]"
               />
