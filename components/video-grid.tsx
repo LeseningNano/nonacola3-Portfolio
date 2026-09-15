@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
 import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
@@ -30,8 +31,20 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
     <section id="works" className="w-full bg-[#0a0a0a]">
       <div className="pt-16">
         <div className="mb-8 px-6 md:px-12 lg:px-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>works.</h2>
-          <p className="text-base md:text-lg text-neutral-400 font-light mt-1">精选视频作品与创作项目</p>
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>works.</h2>
+              <p className="text-base md:text-lg text-neutral-400 font-light mt-1">精选视频作品与创作项目</p>
+            </div>
+            <Link
+              href="/works"
+              className="group inline-flex items-center gap-2 self-start md:self-auto text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
+              style={{ fontFamily: "var(--font-bitcount)" }}
+            >
+              ALL WORKS
+              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
         </div>
 
         {/* Showreel strip */}
