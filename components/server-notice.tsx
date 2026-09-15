@@ -1,42 +1,79 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AlertTriangle, X } from "lucide-react";
 import Link from "next/link";
+import { shouldShowServerNotice } from "@/lib/portfolio-navigation";
+
+// 横幅完全展开后的停留时长
+const AUTO_CLOSE_MS = 3000;
 
 export function ServerNotice() {
+  const pathname = usePathname();
+  const active = shouldShowServerNotice(pathname);
   const [mounted, setMounted] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [closing, setClosing] = useState(false);
   const rafRef = useRef(0);
 
-  useEffect(() => {
+  // 仅首页显示；等首页开场动画结束（导航栏弹出的同一时刻）再展开，
+  // 避免横幅悬在尚未出现的导航栏下方。
+  // 用 useLayoutEffect 订阅：首页回访时 HeroVideo 在 useLayoutEffect 里同步派发
+  // portfolio-intro-done，useEffect 订阅会晚于该派发导致事件丢失。
+  useLayoutEffect(() => {
+    if (!active) return;
     const dismissed = sessionStorage.getItem("server-notice-dismissed");
     if (dismissed) return;
 
-    const timer = setTimeout(() => {
+    function handleIntroDone() {
       setMounted(true);
       // 双 rAF 确保浏览器先把 0fr 起始帧提交，再切到 1fr 触发过渡
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = requestAnimationFrame(() => setExpanded(true));
       });
-    }, 3500);
+    }
 
+    window.addEventListener("portfolio-intro-done", handleIntroDone);
     return () => {
-      clearTimeout(timer);
+      window.removeEventListener("portfolio-intro-done", handleIntroDone);
       cancelAnimationFrame(rafRef.current);
     };
-  }, []);
+  }, [active]);
 
-  const dismiss = () => {
+  // 切换页面时立即关闭（导航栏恢复自身透明逻辑）
+  useEffect(() => {
+    if (active) return;
+    setMounted(false);
+    setExpanded(false);
+    setClosing(false);
+  }, [active]);
+
+  // 展开：通知导航栏进入不透明态；3s 后自动关闭（本会话不再显示）。
+  // 收起统一走 cleanup 派发 open:false，覆盖自动关闭 / 手动关闭 / 切页三种路径。
+  useEffect(() => {
+    if (!expanded) return;
+    window.dispatchEvent(
+      new CustomEvent("server-notice-open", { detail: { open: true } })
+    );
+    const timer = setTimeout(dismiss, AUTO_CLOSE_MS);
+    return () => {
+      clearTimeout(timer);
+      window.dispatchEvent(
+        new CustomEvent("server-notice-open", { detail: { open: false } })
+      );
+    };
+  }, [expanded]);
+
+  function dismiss() {
     setClosing(true);
     setExpanded(false);
     sessionStorage.setItem("server-notice-dismissed", "1");
     // 350ms 收成一条线 → 150ms 淡出 → 卸载
     setTimeout(() => setMounted(false), 500);
-  };
+  }
 
-  if (!mounted) return null;
+  if (!mounted || !active) return null;
 
   return (
     <div
@@ -57,7 +94,7 @@ export function ServerNotice() {
           >
             <AlertTriangle className="w-4 h-4 text-white flex-shrink-0" />
             <p className="text-xs md:text-sm text-neutral-300 leading-relaxed">
-              服务器位于海外，缩略图与视频资源加载可能较慢。点击了解详情与后续优化计划。
+              网页访问较慢，敬请谅解。了解详情→
             </p>
           </Link>
           <button

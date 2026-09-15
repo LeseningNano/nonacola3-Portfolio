@@ -53,6 +53,17 @@ export function Navbar() {
     return () => window.removeEventListener("portfolio-intro-done", handleIntroDone);
   }, []);
 
+  // 首页公告横幅在场时，导航栏切换为不透明背景（server-notice 派发）
+  const [noticeOpen, setNoticeOpen] = useState(false);
+  useEffect(() => {
+    function handleNotice(event: Event) {
+      const detail = (event as CustomEvent<{ open?: boolean }>).detail;
+      setNoticeOpen(Boolean(detail?.open));
+    }
+    window.addEventListener("server-notice-open", handleNotice);
+    return () => window.removeEventListener("server-notice-open", handleNotice);
+  }, []);
+
   function openMenu() {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
@@ -155,7 +166,11 @@ export function Navbar() {
     >
       <div
         className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
-          scrolled || mounted ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""
+          noticeOpen
+            ? "bg-black border-b border-white/5"
+            : scrolled || mounted
+              ? "bg-black/80 backdrop-blur-md border-b border-white/5"
+              : ""
         }`}
       >
         <Link href="/" className="font-normal text-base md:text-lg" style={{ fontFamily: "var(--font-bitcount)" }}>

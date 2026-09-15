@@ -18,3 +18,8 @@ export function getPortfolioMenuPrimary(pathname: string): PortfolioMenuPrimary 
 export function shouldGateNavbarOnIntro(pathname: string): boolean {
   return pathname === "/" || pathname === "/works";
 }
+
+// 访问提示横幅只在首页（主屏）出现，切换页面即关闭。
+export function shouldShowServerNotice(pathname: string): boolean {
+  return pathname === "/";
+}

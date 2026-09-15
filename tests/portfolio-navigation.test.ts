@@ -7,6 +7,7 @@ import { VideoGrid } from "../components/video-grid";
 import {
   getPortfolioMenuPrimary,
   shouldGateNavbarOnIntro,
+  shouldShowServerNotice,
 } from "../lib/portfolio-navigation";
 import type { VideoRow } from "../lib/types";
 
@@ -77,4 +78,11 @@ test("navbar intro gating applies only to the homepage and works index", () => {
   assert.equal(shouldGateNavbarOnIntro("/news/example"), false);
   assert.equal(shouldGateNavbarOnIntro("/login"), false);
   assert.equal(shouldGateNavbarOnIntro("/dashboard"), false);
+});
+
+test("server notice shows only on the homepage", () => {
+  assert.equal(shouldShowServerNotice("/"), true);
+  assert.equal(shouldShowServerNotice("/works"), false);
+  assert.equal(shouldShowServerNotice("/works/example"), false);
+  assert.equal(shouldShowServerNotice("/news/example"), false);
 });
