@@ -41,10 +41,13 @@ test("homepage hero shows a scroll hint beside the call to action", () => {
   assert.match(markup, /motion-reduce:animate-none/);
 });
 
-test("homepage hero centers the title block on mobile and keeps the desktop anchor", () => {
+test("homepage hero groups identity and Works action over a mobile bottom gradient", () => {
   const markup = renderToStaticMarkup(createElement(HeroVideo, { videoUrl: null }));
 
-  assert.match(markup, /top-\[40%\]/);
+  assert.match(markup, /data-mobile-hero-primary="true"/);
+  assert.match(markup, /bg-gradient-to-t/);
+  assert.match(markup, /from-black\/85/);
+  assert.doesNotMatch(markup, /top-\[40%\]/);
   assert.match(markup, /md:bottom-28/);
 });
 

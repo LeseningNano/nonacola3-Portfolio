@@ -279,10 +279,14 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           }}
         />
 
+        {/* Mobile readability layer: keep the video full-bleed while grounding the primary actions. */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[4] h-[68%] bg-gradient-to-t from-black/85 via-black/35 to-transparent md:hidden" />
+
         {/* Content Layer */}
         <div
           ref={contentRef}
-          className="absolute top-[40%] -translate-y-1/2 md:top-auto md:translate-y-0 md:bottom-28 left-4 md:left-20 z-10 text-left"
+          data-mobile-hero-primary="true"
+          className="absolute bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] left-4 right-4 z-10 text-left md:bottom-28 md:left-20 md:right-auto"
         >
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.name}
@@ -290,12 +294,20 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-neutral-400 font-light" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.title}
           </p>
+          <Link
+            href="/works"
+            className="group mt-6 inline-flex min-h-11 items-center gap-2 border border-neutral-400 px-4 py-2.5 text-[13px] text-neutral-200 transition-colors duration-300 hover:border-white hover:text-white md:hidden"
+            style={{ fontFamily: "var(--font-bitcount)" }}
+          >
+            跳转至 works.
+            <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+          </Link>
         </div>
 
         <Link
           ref={buttonRef}
           href="/works"
-          className="group absolute bottom-12 md:bottom-28 right-1/2 translate-x-1/2 md:right-24 md:translate-x-0 z-10 text-[13px] md:text-sm lg:text-base xl:text-lg pt-3 md:pt-3.5 pb-2 md:pb-2.5 pl-4 md:pl-5 pr-3 md:pr-4 hover:pr-5 md:hover:pr-6 text-neutral-300 hover:text-white transition-all duration-300 cursor-pointer border border-neutral-400 hover:border-white flex items-center gap-2"
+          className="group absolute bottom-28 right-24 z-10 hidden items-center gap-2 border border-neutral-400 pb-2.5 pl-5 pr-4 pt-3.5 text-sm text-neutral-300 transition-all duration-300 hover:border-white hover:pr-6 hover:text-white md:flex lg:text-base xl:text-lg"
           style={{ fontFamily: "var(--font-bitcount)" }}
         >
           跳转至 works.
@@ -306,7 +318,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         <div
           ref={hintRef}
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-2 md:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 text-neutral-500"
+          className="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 text-neutral-500 md:bottom-8"
         >
           <span className="text-[10px] tracking-[0.3em]" style={{ fontFamily: "var(--font-bitcount)" }}>
             SCROLL
