@@ -12,6 +12,21 @@ test("homepage hero call to action links to the Works index", () => {
   assert.match(markup, /跳转至 works\./);
 });
 
+test("homepage hero shows a scroll hint beside the call to action", () => {
+  const markup = renderToStaticMarkup(createElement(HeroVideo, { videoUrl: null }));
+
+  assert.match(markup, /SCROLL/);
+  assert.match(markup, /animate-bounce/);
+  assert.match(markup, /motion-reduce:animate-none/);
+});
+
+test("homepage hero centers the title block on mobile and keeps the desktop anchor", () => {
+  const markup = renderToStaticMarkup(createElement(HeroVideo, { videoUrl: null }));
+
+  assert.match(markup, /top-\[40%\]/);
+  assert.match(markup, /md:bottom-28/);
+});
+
 test("portfolio menu enters Works from the homepage and other non-Works routes", () => {
   const expected = { id: "works", label: "WORKS", href: "/works", direction: "forward" };
 

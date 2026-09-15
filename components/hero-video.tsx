@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { LoadingScreen } from "./loading-screen";
 import { SCROLL_CONTAINER_ID } from "./smooth-scroll-container";
@@ -18,6 +18,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const posterRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLAnchorElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
   const loadTriggered = useRef(false);
   const rafId = useRef(0);
   const introDoneRef = useRef(false);
@@ -60,6 +61,10 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         buttonRef.current.style.opacity = introDoneRef.current ? String(baseFade) : "0";
         buttonRef.current.style.pointerEvents =
           introDoneRef.current && progress <= 0.45 ? "auto" : "none";
+      }
+      if (hintRef.current) {
+        const baseFade = Math.max(0, 1 - progress * 2.5);
+        hintRef.current.style.opacity = introDoneRef.current ? String(baseFade) : "0";
       }
     }
 
@@ -177,6 +182,13 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         if (buttonRef.current) buttonRef.current.style.transition = "";
       }, 720);
     }
+    if (hintRef.current) {
+      hintRef.current.style.transition = "opacity 700ms ease";
+      hintRef.current.style.opacity = "1";
+      setTimeout(() => {
+        if (hintRef.current) hintRef.current.style.transition = "";
+      }, 720);
+    }
   };
 
   // After loading screen finishes, fade out + 触发开场轻推
@@ -262,7 +274,10 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
         />
 
         {/* Content Layer */}
-        <div ref={contentRef} className="absolute bottom-28 md:bottom-28 left-4 md:left-20 z-10 text-left">
+        <div
+          ref={contentRef}
+          className="absolute top-[40%] -translate-y-1/2 md:top-auto md:translate-y-0 md:bottom-28 left-4 md:left-20 z-10 text-left"
+        >
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
             {siteConfig.name}
           </h1>
@@ -280,6 +295,18 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
           跳转至 works.
           <ArrowRight className="w-3 h-3 md:w-3.5 md:h-3.5 lg:w-4 lg:h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
         </Link>
+
+        {/* Scroll hint：CTA 改为跳转 /works 后，提醒用户首页仍可向下滚动 */}
+        <div
+          ref={hintRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-2 md:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 text-neutral-500"
+        >
+          <span className="text-[10px] tracking-[0.3em]" style={{ fontFamily: "var(--font-bitcount)" }}>
+            SCROLL
+          </span>
+          <ChevronDown className="w-3.5 h-3.5 animate-bounce motion-reduce:animate-none" />
+        </div>
       </section>
     </>
   );
