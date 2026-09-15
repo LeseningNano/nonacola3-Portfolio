@@ -4,6 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
 
 import { ServerNotice } from "@/components/server-notice";
+import { ChunkRecovery } from "@/components/chunk-recovery";
 import { ToastProvider } from "@/components/toast";
 import "./globals.css";
 
@@ -47,6 +48,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} ${montserrat.variable} ${bitcount.variable} bg-[#0a0a0a] text-white antialiased`}>
         <ToastProvider>
+          <ChunkRecovery />
           <PageTransition />
           <ServerNotice />
           <Navbar />
