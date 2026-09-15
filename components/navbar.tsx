@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
-import { getPortfolioMenuPrimary } from "@/lib/portfolio-navigation";
+import {
+  getPortfolioMenuPrimary,
+  shouldGateNavbarOnIntro,
+} from "@/lib/portfolio-navigation";
 
 const SECTIONS = [
   { id: "works", label: "WORKS" },
@@ -24,6 +27,31 @@ export function Navbar() {
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openRafRef = useRef(0);
   const primaryItem = getPortfolioMenuPrimary(pathname);
+  // 首页 / works 索引页有开场动画：导航栏等 portfolio-intro-done 再弹出，
+  // 其他路由直接显示。reduced-motion 下不做隐藏。
+  const [revealed, setRevealed] = useState(() => !shouldGateNavbarOnIntro(pathname));
+
+  useLayoutEffect(() => {
+    if (!shouldGateNavbarOnIntro(pathname)) {
+      setRevealed(true);
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setRevealed(true);
+      return;
+    }
+    setRevealed(false);
+  }, [pathname]);
+
+  // 用 useLayoutEffect 订阅：首页回访时 HeroVideo 在 useLayoutEffect 里同步派发
+  // portfolio-intro-done，useEffect 订阅会晚于该派发导致事件丢失。
+  useLayoutEffect(() => {
+    function handleIntroDone() {
+      setRevealed(true);
+    }
+    window.addEventListener("portfolio-intro-done", handleIntroDone);
+    return () => window.removeEventListener("portfolio-intro-done", handleIntroDone);
+  }, []);
 
   function openMenu() {
     if (closeTimerRef.current) {
@@ -119,7 +147,12 @@ export function Navbar() {
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 motion-reduce:transition-none ${
+        revealed ? "" : "-translate-y-full invisible"
+      }`}
+      style={{ transitionTimingFunction: "var(--ease-menu)" }}
+    >
       <div
         className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
           scrolled || mounted ? "bg-black/80 backdrop-blur-md border-b border-white/5" : ""

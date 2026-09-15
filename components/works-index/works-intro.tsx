@@ -5,6 +5,10 @@ import type { CSSProperties, ReactNode } from "react";
 import { getWorksHeadlineTokens } from "@/lib/works-index";
 import styles from "./works-intro.module.css";
 
+// works-intro.module.css 中最后一个过渡：supporting 块 1260ms 延迟 + 600ms 过渡。
+// 改 CSS 动画时长时需同步此常量。
+const INTRO_TOTAL_MS = 1900;
+
 export function WorksIntro({ children }: { children: ReactNode }) {
   const tokens = getWorksHeadlineTokens();
   const [entered, setEntered] = useState(false);
@@ -13,6 +17,20 @@ export function WorksIntro({ children }: { children: ReactNode }) {
     const frame = requestAnimationFrame(() => setEntered(true));
     return () => cancelAnimationFrame(frame);
   }, []);
+
+  // 开场动画结束后通知导航栏弹出；reduced-motion 下 CSS 直接显示，立即通知。
+  useEffect(() => {
+    if (!entered) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
+      return;
+    }
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
+    }, INTRO_TOTAL_MS);
+    return () => clearTimeout(timer);
+  }, [entered]);
 
   return (
     <div className={entered ? styles.entered : undefined}>

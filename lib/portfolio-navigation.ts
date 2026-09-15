@@ -12,3 +12,9 @@ export function getPortfolioMenuPrimary(pathname: string): PortfolioMenuPrimary 
 
   return { id: "works", label: "WORKS", href: "/works", direction: "forward" };
 }
+
+// 首页与 works 索引页有开场动画：导航栏在动画结束（portfolio-intro-done）前隐藏。
+// 其他路由没有开场动画，导航栏保持常驻。
+export function shouldGateNavbarOnIntro(pathname: string): boolean {
+  return pathname === "/" || pathname === "/works";
+}

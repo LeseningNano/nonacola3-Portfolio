@@ -4,7 +4,10 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { HeroVideo } from "../components/hero-video";
 import { VideoGrid } from "../components/video-grid";
-import { getPortfolioMenuPrimary } from "../lib/portfolio-navigation";
+import {
+  getPortfolioMenuPrimary,
+  shouldGateNavbarOnIntro,
+} from "../lib/portfolio-navigation";
 import type { VideoRow } from "../lib/types";
 
 const sampleVideo: VideoRow = {
@@ -65,4 +68,13 @@ test("portfolio menu returns Home throughout the Works route tree", () => {
 
   assert.deepEqual(getPortfolioMenuPrimary("/works"), expected);
   assert.deepEqual(getPortfolioMenuPrimary("/works/example"), expected);
+});
+
+test("navbar intro gating applies only to the homepage and works index", () => {
+  assert.equal(shouldGateNavbarOnIntro("/"), true);
+  assert.equal(shouldGateNavbarOnIntro("/works"), true);
+  assert.equal(shouldGateNavbarOnIntro("/works/example"), false);
+  assert.equal(shouldGateNavbarOnIntro("/news/example"), false);
+  assert.equal(shouldGateNavbarOnIntro("/login"), false);
+  assert.equal(shouldGateNavbarOnIntro("/dashboard"), false);
 });

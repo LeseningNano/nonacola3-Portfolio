@@ -81,7 +81,11 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
     if (isContainerScroll) window.addEventListener("scroll", onScroll, { passive: true });
 
     // 刷新/后续进入：跳过开场动画，按钮直接显示
-    if (sessionStorage.getItem("hero-loaded")) introDoneRef.current = true;
+    if (sessionStorage.getItem("hero-loaded")) {
+      introDoneRef.current = true;
+      // 回访没有开场动画，导航栏立即弹出
+      window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
+    }
     apply();
 
     return () => {
@@ -174,6 +178,8 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
 
   const finishIntro = () => {
     introDoneRef.current = true;
+    // 首页开场动画结束：通知导航栏弹出（任务：导航栏动画后显示）
+    window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
     if (buttonRef.current) {
       buttonRef.current.style.transition = "opacity 700ms ease";
       buttonRef.current.style.opacity = "1";
