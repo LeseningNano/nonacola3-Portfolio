@@ -40,8 +40,15 @@ export function useWorksLanguage(): WorksLanguageContextValue {
   return useContext(WorksLanguageContext);
 }
 
-export function WorksLanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<WorksLocale>(DEFAULT_WORKS_LOCALE);
+export function WorksLanguageProvider({
+  children,
+  initialLocale = DEFAULT_WORKS_LOCALE,
+}: {
+  children?: ReactNode;
+  /** 测试与隔离渲染用的初始语言；线上始终走默认英文，再由存储恢复。 */
+  initialLocale?: WorksLocale;
+}) {
+  const [locale, setLocaleState] = useState<WorksLocale>(initialLocale);
   const [ready, setReady] = useState(false);
 
   // hydration 后恢复本地存储里的语言；存储不可用时也要置 ready。

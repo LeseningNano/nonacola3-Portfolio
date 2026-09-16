@@ -5,6 +5,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SelectedWorkCard } from "../components/works-index/selected-work-card";
 import { WorkArchive } from "../components/works-index/work-archive";
+import { ShowreelFeature } from "../components/works-index/showreel-feature";
+import { WorksLanguageProvider } from "../components/works-index/works-language-provider";
+import { WorksPageCopy } from "../components/works-index/works-page-copy";
 import type { VideoRow } from "../lib/types";
 import {
   DEFAULT_WORKS_LOCALE,
@@ -70,6 +73,104 @@ test("works language provider persists only the scoped locale", () => {
   assert.match(source, /isWorksLocale/);
   assert.match(source, /localStorage\.setItem\(WORKS_LOCALE_STORAGE_KEY/);
   assert.doesNotMatch(source, /document\.documentElement\.lang/);
+});
+
+test("selected work keeps authored project data while fixed labels default to English", () => {
+  const authored = {
+    ...work("localized-boundary", null, true),
+    title: "原文标题",
+    category: "自主制作",
+    role: "Motion Design",
+    tools: "After Effects · Blender",
+    summary: "作者填写的摘要",
+  };
+  const markup = renderToStaticMarkup(
+    createElement(SelectedWorkCard, { work: authored, index: 0 })
+  );
+  assert.match(markup, /原文标题/);
+  assert.match(markup, /自主制作/);
+  assert.match(markup, /作者填写的摘要/);
+  assert.match(markup, /View Case Study/);
+});
+
+test("provider-scoped Chinese localizes fixed labels without touching authored content", () => {
+  const authored = {
+    ...work("zh-boundary", null, true),
+    title: "原文标题",
+    category: "自主制作",
+    role: "Motion Design",
+  };
+  const markup = renderToStaticMarkup(
+    createElement(
+      WorksLanguageProvider,
+      { initialLocale: "zh-CN" },
+      createElement(SelectedWorkCard, { work: authored, index: 0 })
+    )
+  );
+  assert.match(markup, /查看项目详情：原文标题/);
+  assert.match(markup, /职责/);
+  assert.match(markup, /Motion Design/);
+  assert.match(markup, /lang="zh-CN"/);
+});
+
+test("works page copy localizes sections while archive data stays authored", () => {
+  const groups = [{ label: "2026", works: [work("g1", "2026-01-01T00:00:00.000Z")] }];
+  const props = { selected: [work("s1", null, true)], groups, email: "hi@example.com" };
+
+  const en = renderToStaticMarkup(createElement(WorksPageCopy, props));
+  assert.match(en, /Selected Works/);
+  assert.match(en, /All Works/);
+  assert.match(en, /work together/);
+  assert.match(en, /s1/);
+
+  const zh = renderToStaticMarkup(
+    createElement(
+      WorksLanguageProvider,
+      { initialLocale: "zh-CN" },
+      createElement(WorksPageCopy, props)
+    )
+  );
+  assert.match(zh, /精选作品/);
+  assert.match(zh, /全部作品/);
+  assert.match(zh, /期待与你合作。/);
+  assert.match(zh, /s1/);
+
+  const emptyZh = renderToStaticMarkup(
+    createElement(
+      WorksLanguageProvider,
+      { initialLocale: "zh-CN" },
+      createElement(WorksPageCopy, { selected: [], groups: [], email: "hi@example.com" })
+    )
+  );
+  assert.match(emptyZh, /作品正在更新中。/);
+});
+
+test("showreel localizes fixed strings while media behavior stays intact", () => {
+  const props = { showreelUrl: "https://example.com/watch?v=abc", videoType: "url" as const };
+  const en = renderToStaticMarkup(createElement(ShowreelFeature, props));
+  assert.match(en, /SHOWREEL 2026/);
+  assert.match(en, /Play Showreel 2026/);
+
+  const zh = renderToStaticMarkup(
+    createElement(
+      WorksLanguageProvider,
+      { initialLocale: "zh-CN" },
+      createElement(ShowreelFeature, props)
+    )
+  );
+  assert.match(zh, /作品集锦 2026/);
+  assert.match(zh, /播放 2026 作品集锦/);
+});
+
+test("works intro consumes the shared copy dictionary with locale-aware spacing", () => {
+  const source = readFileSync(
+    new URL("../components/works-index/works-intro.tsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(source, /copy\.intro\.headlineTokens/);
+  assert.match(source, /copy\.intro\.eyebrow/);
+  assert.doesNotMatch(source, /getWorksHeadlineTokens/);
+  assert.match(source, /INTRO_TOTAL_MS/);
 });
 
 test("alternates selected work media from left to right", () => {

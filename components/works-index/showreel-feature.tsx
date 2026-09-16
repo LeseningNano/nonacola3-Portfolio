@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Play } from "lucide-react";
 import { useState } from "react";
 import { getEmbedUrl } from "@/lib/utils";
+import { useWorksLanguage } from "./works-language-provider";
 
 interface ShowreelFeatureProps {
   showreelUrl: string;
@@ -12,6 +13,7 @@ interface ShowreelFeatureProps {
 
 export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps) {
   const [active, setActive] = useState(false);
+  const { copy } = useWorksLanguage();
   const embedSrc = getEmbedUrl(showreelUrl);
   const separator = embedSrc.includes("?") ? "&" : "?";
 
@@ -24,7 +26,7 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
           ) : (
             <iframe
               src={`${embedSrc}${separator}autoplay=1&mute=1&muted=1`}
-              title="Showreel 2026"
+              title={copy.showreel.frameTitle}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="h-full w-full"
@@ -33,7 +35,7 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
         ) : (
           <button
             type="button"
-            aria-label="Play Showreel 2026"
+            aria-label={copy.showreel.playLabel}
             onClick={() => setActive(true)}
             className="group absolute inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
           >
@@ -57,12 +59,12 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
 
       <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-xs tracking-[0.28em] text-neutral-400">SHOWREEL 2026</p>
+          <p className="text-xs tracking-[0.28em] text-neutral-400">{copy.showreel.label}</p>
           <h2 id="showreel-heading" className="mt-2 text-xl text-white md:text-2xl">
-            Motion Design / PV / Compositing / 3D
+            {copy.showreel.title}
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-400">
-            A collection of motion design, PV and visual experiments.
+            {copy.showreel.description}
           </p>
         </div>
         <p className="text-sm tabular-nums text-neutral-400">01:03</p>

@@ -5,6 +5,7 @@ import {
   createThumbnailProxyPath,
   getSelectedWorkOrientation,
 } from "@/lib/works-index";
+import { useWorksLanguage } from "./works-language-provider";
 import type { VideoRow } from "@/lib/types";
 
 interface SelectedWorkCardProps {
@@ -23,6 +24,7 @@ function Metadata({ label, value }: { label: string; value: string }) {
 
 export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
   const orientation = getSelectedWorkOrientation(index);
+  const { copy } = useWorksLanguage();
   const desktopColumns =
     orientation === "media-right"
       ? "md:grid-cols-[minmax(16rem,0.85fr)_minmax(0,1.55fr)]"
@@ -37,7 +39,7 @@ export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
   return (
     <IntentPrefetchLink
       href={`/works/${work.id}`}
-      aria-label={`View case study: ${work.title}`}
+      aria-label={copy.selected.linkLabel(work.title)}
       className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
       <article className={`grid gap-5 ${desktopColumns} md:items-center md:gap-10 lg:gap-16`}>
@@ -67,15 +69,15 @@ export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
           <p className="mt-1 text-sm text-neutral-400">{work.category}</p>
           {(role || tools) && (
             <dl className="mt-5 space-y-2">
-              {role && <Metadata label="Role" value={role} />}
-              {tools && <Metadata label="Tools" value={tools} />}
+              {role && <Metadata label={copy.selected.roleLabel} value={role} />}
+              {tools && <Metadata label={copy.selected.toolsLabel} value={tools} />}
             </dl>
           )}
           {summary && (
             <p className="mt-5 max-w-xl text-sm leading-6 text-neutral-400">{summary}</p>
           )}
           <p className="mt-5 text-sm text-neutral-300">
-            View Case Study{" "}
+            {copy.selected.viewCaseStudy}{" "}
             <span className="inline-block transition-transform duration-300 motion-reduce:transition-none md:group-hover:translate-x-1 md:group-focus-visible:translate-x-1">
               →
             </span>
