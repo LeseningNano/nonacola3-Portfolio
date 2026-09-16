@@ -6,6 +6,12 @@ import { SelectedWorkCard } from "../components/works-index/selected-work-card";
 import { WorkArchive } from "../components/works-index/work-archive";
 import type { VideoRow } from "../lib/types";
 import {
+  DEFAULT_WORKS_LOCALE,
+  WORKS_COPY,
+  getWorksCopy,
+  isWorksLocale,
+} from "../lib/works-copy";
+import {
   WORKS_HEADLINE,
   createFilmography,
   createThumbnailProxyPath,
@@ -24,6 +30,33 @@ test("keeps the approved works headline and highlights only recruiter keywords",
   assert.equal(
     tokens.filter((token) => token.highlighted).map((token) => token.text).join("|"),
     "Motion|Designer|PV,|game|promotional|visuals|cinematic|motion|graphics."
+  );
+});
+
+test("works locale defaults to English and rejects untrusted stored values", () => {
+  assert.equal(DEFAULT_WORKS_LOCALE, "en");
+  assert.equal(isWorksLocale("en"), true);
+  assert.equal(isWorksLocale("zh-CN"), true);
+  assert.equal(isWorksLocale("zh"), false);
+  assert.equal(isWorksLocale("<script>"), false);
+  assert.equal(isWorksLocale(null), false);
+});
+
+test("works dictionaries expose the same complete fixed-copy contract", () => {
+  assert.deepEqual(Object.keys(WORKS_COPY.en), Object.keys(WORKS_COPY["zh-CN"]));
+  assert.equal(getWorksCopy("en").selected.heading, "Selected Works");
+  assert.equal(getWorksCopy("zh-CN").selected.heading, "精选作品");
+  assert.equal(getWorksCopy("zh-CN").contact.heading, "期待与你合作。");
+});
+
+test("works localized headlines reconstruct the approved sentences", () => {
+  assert.equal(
+    WORKS_COPY.en.intro.headlineTokens.map(({ text }) => text).join(" "),
+    "Motion Designer creating PV, game promotional visuals and cinematic motion graphics."
+  );
+  assert.equal(
+    WORKS_COPY["zh-CN"].intro.headlineTokens.map(({ text }) => text).join(""),
+    "动效设计师，专注于 PV、游戏宣传视觉与电影感动态图形。"
   );
 });
 
