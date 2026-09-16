@@ -3,6 +3,23 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Reveal, shouldSkipRevealMotion } from "../components/viewport-reveal";
+import { VideoGrid } from "../components/video-grid";
+import type { VideoRow } from "../lib/types";
+
+const sampleVideo: VideoRow = {
+  id: "v1",
+  title: "Sample work",
+  description: null,
+  summary: null,
+  role: null,
+  tools: null,
+  category: "",
+  embedUrl: "",
+  thumbnail: null,
+  featured: false,
+  order: 0,
+  date: null,
+};
 
 test("SSR markup keeps reveal content visible without JavaScript", () => {
   const heading = renderToStaticMarkup(
@@ -43,4 +60,21 @@ test("content variant carries the variant marker for CSS transitions", () => {
 test("reduced motion skips the reveal animation entirely", () => {
   assert.equal(shouldSkipRevealMotion(true), true);
   assert.equal(shouldSkipRevealMotion(false), false);
+});
+
+test("works section stages the title reveal before staggered content", () => {
+  const markup = renderToStaticMarkup(
+    createElement(VideoGrid, { videos: [sampleVideo] })
+  );
+
+  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-reveal="content"/);
+  // 错峰：内容相对标题的延迟存在
+  assert.match(markup, /--reveal-delay:(1[5-9]\d|[2-9]\d\d)ms/);
+  // 无 JS 安全：SSR 不带隐藏态
+  assert.ok(!markup.includes("data-reveal-pending"));
+  // 现有结构与文案不受影响
+  assert.match(markup, /ALL WORKS/);
+  assert.match(markup, /href="\/works"/);
+  assert.match(markup, /works\./);
 });

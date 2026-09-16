@@ -7,6 +7,7 @@ import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
 import { CategoryFilter } from "./category-filter";
+import { Reveal } from "./viewport-reveal";
 import type { VideoRow } from "@/lib/types";
 
 export function VideoGrid({ videos }: { videos: VideoRow[] }) {
@@ -33,75 +34,88 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
         <div className="mb-8 px-6 md:px-12 lg:px-16">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>works.</h2>
-              <p className="text-base md:text-lg text-neutral-400 font-light mt-1">精选视频作品与创作项目</p>
+              <Reveal
+                as="h2"
+                variant="heading"
+                className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight"
+                style={{ fontFamily: "var(--font-bitcount)" }}
+              >
+                works.
+              </Reveal>
+              <Reveal as="p" variant="content" delay={180} className="text-base md:text-lg text-neutral-400 font-light mt-1">
+                精选视频作品与创作项目
+              </Reveal>
             </div>
-            <Link
-              href="/works"
-              className="group inline-flex items-center gap-2 self-start md:self-auto text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
-              style={{ fontFamily: "var(--font-bitcount)" }}
-            >
-              ALL WORKS
-              <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-            </Link>
+            <Reveal variant="content" delay={320} className="self-start md:self-auto">
+              <Link
+                href="/works"
+                className="group inline-flex items-center gap-2 text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
+                style={{ fontFamily: "var(--font-bitcount)" }}
+              >
+                ALL WORKS
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </Link>
+            </Reveal>
           </div>
         </div>
 
-        {/* Showreel strip */}
-        <div className="mb-10">
-          <button
-            onClick={() => setShowShowreel(true)}
-            className="w-full h-12 bg-neutral-900 hover:bg-neutral-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-neutral-500 text-sm md:text-base tracking-wider translate-y-px" style={{ fontFamily: "var(--font-bitcount)" }}>REEL</span>
-              <span className="text-sm md:text-base text-neutral-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
-            </div>
-            <span className="text-neutral-600 group-hover:text-neutral-400 text-xs transition-colors duration-300">▶</span>
-          </button>
-        </div>
-
-        <div key={showAll ? "grid" : "marquee"} className={showAll ? "animate-works-expand" : "animate-works-collapse"}>
-          {showAll ? (
-            <>
-              <div className="px-6 md:px-12 lg:px-16 mb-8">
-                <CategoryFilter
-                  categories={years}
-                  selected={selectedYear}
-                  onSelect={setSelectedYear}
-                />
+        <Reveal variant="content" delay={450}>
+          {/* Showreel strip */}
+          <div className="mb-10">
+            <button
+              onClick={() => setShowShowreel(true)}
+              className="w-full h-12 bg-neutral-900 hover:bg-neutral-800 transition-colors duration-300 cursor-pointer group flex items-center justify-between px-6 md:px-12 lg:px-16"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-neutral-500 text-sm md:text-base tracking-wider translate-y-px" style={{ fontFamily: "var(--font-bitcount)" }}>REEL</span>
+                <span className="text-sm md:text-base text-neutral-400 group-hover:text-white transition-colors duration-300">视觉创作总结</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
-                {filteredVideos.map((video) => (
-                  <VideoCard key={video.id} video={video} />
-                ))}
-              </div>
-            </>
-          ) : (
-            <WorksMarquee videos={videos} />
-          )}
-        </div>
+              <span className="text-neutral-600 group-hover:text-neutral-400 text-xs transition-colors duration-300">▶</span>
+            </button>
+          </div>
 
-        {/* 展开/收起开关 */}
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={() => setShowAll((v) => !v)}
-            className="inline-flex items-center gap-2 text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
-          >
+          <div key={showAll ? "grid" : "marquee"} className={showAll ? "animate-works-expand" : "animate-works-collapse"}>
             {showAll ? (
               <>
-                收起
-                <ChevronUp className="w-4 h-4" />
+                <div className="px-6 md:px-12 lg:px-16 mb-8">
+                  <CategoryFilter
+                    categories={years}
+                    selected={selectedYear}
+                    onSelect={setSelectedYear}
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
+                  {filteredVideos.map((video) => (
+                    <VideoCard key={video.id} video={video} />
+                  ))}
+                </div>
               </>
             ) : (
-              <>
-                显示全部作品
-                <span className="text-neutral-500">{videos.length}</span>
-                <ChevronDown className="w-4 h-4" />
-              </>
+              <WorksMarquee videos={videos} />
             )}
-          </button>
-        </div>
+          </div>
+
+          {/* 展开/收起开关 */}
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={() => setShowAll((v) => !v)}
+              className="inline-flex items-center gap-2 text-xs md:text-sm tracking-widest text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-5 py-2.5 transition-all duration-300"
+            >
+              {showAll ? (
+                <>
+                  收起
+                  <ChevronUp className="w-4 h-4" />
+                </>
+              ) : (
+                <>
+                  显示全部作品
+                  <span className="text-neutral-500">{videos.length}</span>
+                  <ChevronDown className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </div>
+        </Reveal>
 
         {showShowreel && (
           <ShowreelModal onClose={() => setShowShowreel(false)} />

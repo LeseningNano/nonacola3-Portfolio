@@ -21,12 +21,14 @@ export function Reveal({
   variant,
   delay,
   className,
+  style,
   children,
 }: {
   as?: RevealTag;
   variant: RevealVariant;
   delay?: number;
   className?: string;
+  style?: CSSProperties;
   children?: ReactNode;
 }) {
   const ref = useRef<HTMLElement | null>(null);
@@ -70,10 +72,10 @@ export function Reveal({
   }, []);
 
   const Tag = as as ElementType;
-  const style =
+  const revealStyle: CSSProperties =
     delay === undefined
-      ? undefined
-      : ({ "--reveal-delay": `${delay}ms` } as CSSProperties);
+      ? { ...style }
+      : ({ ...style, "--reveal-delay": `${delay}ms` } as CSSProperties);
 
   if (variant === "heading") {
     return (
@@ -81,7 +83,7 @@ export function Reveal({
         ref={ref}
         data-reveal="heading"
         className={className}
-        style={style}
+        style={revealStyle}
       >
         <span className="reveal-inner">{children}</span>
       </Tag>
@@ -89,7 +91,7 @@ export function Reveal({
   }
 
   return (
-    <Tag ref={ref} data-reveal={variant} className={className} style={style}>
+    <Tag ref={ref} data-reveal={variant} className={className} style={revealStyle}>
       {children}
     </Tag>
   );
