@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SelectedWorkCard } from "../components/works-index/selected-work-card";
@@ -58,6 +59,17 @@ test("works localized headlines reconstruct the approved sentences", () => {
     WORKS_COPY["zh-CN"].intro.headlineTokens.map(({ text }) => text).join(""),
     "动效设计师，专注于 PV、游戏宣传视觉与电影感动态图形。"
   );
+});
+
+test("works language provider persists only the scoped locale", () => {
+  const source = readFileSync(
+    new URL("../components/works-index/works-language-provider.tsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(source, /localStorage\.getItem\(WORKS_LOCALE_STORAGE_KEY\)/);
+  assert.match(source, /isWorksLocale/);
+  assert.match(source, /localStorage\.setItem\(WORKS_LOCALE_STORAGE_KEY/);
+  assert.doesNotMatch(source, /document\.documentElement\.lang/);
 });
 
 test("alternates selected work media from left to right", () => {
