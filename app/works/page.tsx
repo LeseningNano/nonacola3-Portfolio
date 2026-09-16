@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/footer";
 import { WorksIntro } from "@/components/works-index/works-intro";
 import { ShowreelFeature } from "@/components/works-index/showreel-feature";
-import { SelectedWorkCard } from "@/components/works-index/selected-work-card";
-import { WorkArchive } from "@/components/works-index/work-archive";
 import { SmoothScrollContainer } from "@/components/smooth-scroll-container";
+import { WorksLanguageProvider } from "@/components/works-index/works-language-provider";
+import { WorksLanguageToggle } from "@/components/works-index/works-language-toggle";
+import { WorksPageCopy } from "@/components/works-index/works-page-copy";
 import { siteConfig } from "@/lib/config";
 import { getShowreel, getVideos } from "@/lib/data";
 import type { VideoRow } from "@/lib/types";
@@ -42,49 +43,27 @@ export default async function WorksPage() {
   const groups = groupWorksByYear(works);
 
   return (
-    <SmoothScrollContainer lang="en" className="min-h-screen bg-[#0a0a0a] text-white">
-      <main className="mx-auto max-w-[1200px] px-5 pb-20 pt-28 sm:px-8 md:px-12 md:pt-36">
-        <WorksIntro>
-          {showreel?.showreelUrl.trim() && (
-            <div className="mt-12 md:mt-16">
-              <ShowreelFeature
-                showreelUrl={showreel.showreelUrl}
-                videoType={normalizeShowreelType(showreel.videoType)}
-              />
-            </div>
-          )}
-        </WorksIntro>
-
-        {selected.length > 0 && (
-          <section aria-labelledby="selected-works-heading" className="mt-24 border-t border-white/10 pt-7 md:mt-32">
-            <h2 id="selected-works-heading" className="text-3xl tracking-tight md:text-5xl">Selected Works</h2>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-neutral-400 md:text-base">
-              A selection of projects that represent my motion design workflow.
-            </p>
-            <div className="mt-10 space-y-20 md:mt-14 md:space-y-28">
-              {selected.map((work, index) => (
-                <SelectedWorkCard key={work.id} work={work} index={index} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <section aria-labelledby="all-works-heading" className="mt-24 border-t border-white/10 pt-7 md:mt-32">
-          <h2 id="all-works-heading" className="text-3xl tracking-tight md:text-5xl">All Works</h2>
-          <div className="mt-8 md:mt-10">
-            {groups.length > 0 ? <WorkArchive groups={groups} /> : <p className="text-neutral-400">Work is currently being updated.</p>}
+    <SmoothScrollContainer className="min-h-screen bg-[#0a0a0a] text-white">
+      <WorksLanguageProvider>
+        <main className="mx-auto max-w-[1200px] px-5 pb-20 pt-28 sm:px-8 md:px-12 md:pt-36">
+          <div className="flex justify-end" data-works-language-toggle="">
+            <WorksLanguageToggle />
           </div>
-        </section>
+          <WorksIntro>
+            {showreel?.showreelUrl.trim() && (
+              <div className="mt-12 md:mt-16">
+                <ShowreelFeature
+                  showreelUrl={showreel.showreelUrl}
+                  videoType={normalizeShowreelType(showreel.videoType)}
+                />
+              </div>
+            )}
+          </WorksIntro>
 
-        <section aria-labelledby="contact-heading" className="mt-24 border-t border-white/10 pt-8 md:mt-32">
-          <p className="text-xs tracking-[0.24em] text-neutral-400">AVAILABLE FOR OPPORTUNITIES</p>
-          <h2 id="contact-heading" className="mt-4 text-4xl tracking-tight md:text-6xl">Let's work together.</h2>
-          <a href={`mailto:${siteConfig.email}`} className="mt-7 inline-block text-neutral-300 underline decoration-neutral-700 underline-offset-4 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
-            {siteConfig.email}
-          </a>
-        </section>
-      </main>
-      <Footer />
+          <WorksPageCopy selected={selected} groups={groups} email={siteConfig.email} />
+        </main>
+        <Footer />
+      </WorksLanguageProvider>
     </SmoothScrollContainer>
   );
 }

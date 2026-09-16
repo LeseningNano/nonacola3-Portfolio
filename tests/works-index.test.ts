@@ -173,6 +173,16 @@ test("works intro consumes the shared copy dictionary with locale-aware spacing"
   assert.match(source, /INTRO_TOTAL_MS/);
 });
 
+test("works page keeps static data loading and scopes the language provider", () => {
+  const source = readFileSync(new URL("../app/works/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /dynamic = "force-static"/);
+  assert.match(source, /revalidate = 300/);
+  assert.match(source, /<WorksLanguageProvider>/);
+  assert.match(source, /<WorksLanguageToggle/);
+  assert.doesNotMatch(source, /cookies\(/);
+  assert.doesNotMatch(source, /searchParams/);
+});
+
 test("alternates selected work media from left to right", () => {
   assert.equal(getSelectedWorkOrientation(0), "media-left");
   assert.equal(getSelectedWorkOrientation(1), "media-right");
