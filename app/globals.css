@@ -311,3 +311,64 @@ body::after {
 .marquee-container:hover .animate-marquee {
   animation-play-state: paused;
 }
+
+/* ============================================================
+   Cinematic Scroll 一次性视口入场（works./news./about. 及区块内容）
+   隐藏态 data-reveal-pending 只由 viewport-reveal.tsx 在浏览器中添加，
+   SSR 与禁用 JS 时内容始终可见；运动全部由这里的 CSS 负责。
+   ============================================================ */
+[data-reveal] {
+  transition:
+    opacity 700ms var(--ease-menu) var(--reveal-delay, 0ms),
+    transform 700ms var(--ease-menu) var(--reveal-delay, 0ms);
+}
+
+/* 标题遮罩揭示：外层裁切，内层从遮罩下向上揭示 */
+[data-reveal="heading"] {
+  overflow: hidden;
+}
+[data-reveal="heading"] .reveal-inner {
+  display: inline-block;
+  transition: transform 700ms var(--ease-menu) var(--reveal-delay, 0ms);
+}
+[data-reveal-pending][data-reveal="heading"] .reveal-inner {
+  transform: translateY(110%);
+}
+
+/* 内容错峰淡入：桌面 20px，移动端缩小到 12px */
+[data-reveal-pending][data-reveal="content"] {
+  opacity: 0;
+  transform: translateY(20px);
+}
+@media (max-width: 768px) {
+  [data-reveal-pending][data-reveal="content"] {
+    transform: translateY(12px);
+  }
+}
+
+/* 区块遮光层：进入视口前压暗，进入后淡出，模拟镜头换段；JS 关闭时默认透明 */
+[data-reveal="dim"] {
+  opacity: 0;
+  transition: opacity 900ms var(--ease-menu);
+}
+[data-reveal-pending][data-reveal="dim"] {
+  opacity: 1;
+}
+[data-reveal-visible][data-reveal="dim"] {
+  opacity: 0;
+}
+
+/* reduced-motion：不播放动画，内容立即可见（JS 早退之外的双保险） */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal] .reveal-inner {
+    transition: none !important;
+  }
+  [data-reveal-pending] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [data-reveal-pending][data-reveal="heading"] .reveal-inner {
+    transform: none !important;
+  }
+}
