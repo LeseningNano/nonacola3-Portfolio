@@ -1,9 +1,10 @@
 import { siteConfig, socialLinks } from "@/lib/config";
-import { Reveal } from "@/components/viewport-reveal";
+import { Reveal, SectionDim } from "@/components/viewport-reveal";
 
 export function AboutSection() {
   return (
-    <section id="about" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
+    <section id="about" className="relative w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
+      <SectionDim />
       <Reveal
         as="h2"
         variant="heading"

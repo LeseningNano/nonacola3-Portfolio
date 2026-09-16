@@ -22,6 +22,7 @@ export function Reveal({
   delay,
   className,
   style,
+  ariaHidden,
   children,
 }: {
   as?: RevealTag;
@@ -29,6 +30,7 @@ export function Reveal({
   delay?: number;
   className?: string;
   style?: CSSProperties;
+  ariaHidden?: boolean;
   children?: ReactNode;
 }) {
   const ref = useRef<HTMLElement | null>(null);
@@ -84,6 +86,7 @@ export function Reveal({
         data-reveal="heading"
         className={className}
         style={revealStyle}
+        aria-hidden={ariaHidden ? "true" : undefined}
       >
         <span className="reveal-inner">{children}</span>
       </Tag>
@@ -91,8 +94,26 @@ export function Reveal({
   }
 
   return (
-    <Tag ref={ref} data-reveal={variant} className={className} style={revealStyle}>
+    <Tag
+      ref={ref}
+      data-reveal={variant}
+      className={className}
+      style={revealStyle}
+      aria-hidden={ariaHidden ? "true" : undefined}
+    >
       {children}
     </Tag>
+  );
+}
+
+// 区块遮光层：进入视口前压暗、进入后淡出，模拟镜头换段。
+// 仅桌面显示（移动端只保留标题揭示与内容淡入），永远不拦截交互。
+export function SectionDim() {
+  return (
+    <Reveal
+      variant="dim"
+      ariaHidden
+      className="pointer-events-none absolute inset-0 z-10 hidden bg-black/60 md:block"
+    />
   );
 }

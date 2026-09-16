@@ -1,6 +1,6 @@
 import type { PostItem } from "@/lib/types";
 import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
-import { Reveal } from "@/components/viewport-reveal";
+import { Reveal, SectionDim } from "@/components/viewport-reveal";
 
 export type { PostItem };
 
@@ -12,7 +12,8 @@ function formatDate(iso: string) {
 export function NewsSection({ posts }: { posts: PostItem[] }) {
   const recent = posts.slice(0, 5);
   return (
-    <section id="news" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
+    <section id="news" className="relative w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
+      <SectionDim />
       <Reveal
         as="h2"
         variant="heading"

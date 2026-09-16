@@ -7,7 +7,7 @@ import { VideoCard } from "./video-card";
 import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
 import { CategoryFilter } from "./category-filter";
-import { Reveal } from "./viewport-reveal";
+import { Reveal, SectionDim } from "./viewport-reveal";
 import { WorksDrift } from "./works-drift";
 import type { VideoRow } from "@/lib/types";
 
@@ -30,7 +30,8 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
       : videos.filter((v) => v.date && new Date(v.date).getFullYear().toString() === selectedYear);
 
   return (
-    <section id="works" className="w-full bg-[#0a0a0a]">
+    <section id="works" className="relative w-full bg-[#0a0a0a]">
+      <SectionDim />
       <div className="pt-16">
         <div className="mb-8 px-6 md:px-12 lg:px-16">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

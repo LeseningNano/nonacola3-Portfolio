@@ -110,3 +110,22 @@ test("about section stages title and content the same way", () => {
   assert.ok(!markup.includes("data-reveal-pending"));
   assert.match(markup, /about\./);
 });
+
+test("homepage sections get a non-blocking dim transition layer", () => {
+  const works = renderToStaticMarkup(createElement(VideoGrid, { videos: [sampleVideo] }));
+  const news = renderToStaticMarkup(createElement(NewsSection, { posts: [samplePost] }));
+  const about = renderToStaticMarkup(createElement(AboutSection));
+
+  for (const [name, markup] of [["works", works], ["news", news], ["about", about]] as const) {
+    assert.ok(markup.includes('data-reveal="dim"'), `${name} has the dim layer`);
+    assert.ok(markup.includes("pointer-events-none"), `${name} dim layer never blocks input`);
+    assert.ok(markup.includes("hidden"), `${name} dim layer hidden by default`);
+    assert.ok(markup.includes("md:block"), `${name} dim layer is desktop only`);
+    assert.ok(markup.includes("aria-hidden"), `${name} dim layer is decorative`);
+  }
+
+  // 遮光层需要区块作为定位上下文
+  assert.match(works, /section id="works" class="relative/);
+  assert.match(news, /section id="news" class="relative/);
+  assert.match(about, /section id="about" class="relative/);
+});
