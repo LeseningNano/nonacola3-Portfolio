@@ -39,11 +39,8 @@ export function WorksIntro({ children }: { children: ReactNode }) {
   // 英文按词空格连接；中文不插入空格，拉丁字符间的空格已含在 token 内
   const separator = locale === "en" ? " " : "";
   const fullHeadline = tokens.map((token) => token.text).join(separator);
-  // 英文沿用原负字距紧行高；中文按 CJK 排版习惯使用自然字距与放宽行高
-  const headlineMetrics =
-    locale === "en"
-      ? "leading-[1.05] tracking-[-0.035em]"
-      : "leading-[1.18] tracking-[0.01em]";
+  // 字距沿用原有设计不随语言变化；仅行高按语言区分（中文放宽）
+  const headlineLeading = locale === "en" ? "leading-[1.05]" : "leading-[1.18]";
 
   return (
     <div className={entered ? styles.entered : undefined}>
@@ -58,7 +55,7 @@ export function WorksIntro({ children }: { children: ReactNode }) {
           <h1
             ref={fade}
             aria-label={fullHeadline}
-            className={`text-4xl font-normal sm:text-5xl md:text-6xl ${headlineMetrics}`}
+            className={`text-4xl font-normal tracking-[-0.035em] sm:text-5xl md:text-6xl ${headlineLeading}`}
           >
             {tokens.map((token, index) => (
               <span

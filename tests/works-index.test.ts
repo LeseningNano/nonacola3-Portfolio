@@ -212,15 +212,15 @@ test("switching locale fades localized copy without remounting DOM", () => {
   }
 });
 
-test("localized headline uses locale-appropriate CJK metrics", () => {
+test("localized headline uses locale-appropriate leading and the original tracking", () => {
   const source = readFileSync(
     new URL("../components/works-index/works-intro.tsx", import.meta.url),
     "utf8"
   );
-  // 英文保留原有负字距与紧行高；中文使用自然字距与放宽的行高
+  // 字距沿用原有设计不随语言变化；仅行高按语言区分（中文放宽）
   assert.match(source, /tracking-\[-0\.035em\]/);
+  assert.doesNotMatch(source, /tracking-\[0\.01em\]/);
   assert.match(source, /leading-\[1\.05\]/);
-  assert.match(source, /tracking-\[0\.01em\]/);
   assert.match(source, /leading-\[1\.18\]/);
   assert.match(source, /locale === "en"/);
 });
