@@ -183,6 +183,48 @@ test("works page keeps static data loading and scopes the language provider", ()
   assert.doesNotMatch(source, /searchParams/);
 });
 
+test("language toggle stays hidden until the works intro completes", () => {
+  const source = readFileSync(
+    new URL("../components/works-index/works-language-toggle.tsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(source, /portfolio-intro-done/);
+  assert.match(source, /opacity-0/);
+  assert.match(source, /transition-opacity/);
+});
+
+test("switching locale fades localized copy without remounting DOM", () => {
+  const fadeHook = readFileSync(
+    new URL("../components/works-index/use-locale-fade.ts", import.meta.url),
+    "utf8"
+  );
+  // WAAPI 原位动画，不做 DOM 重挂载（重挂载会在部分元素上残留旧节点）
+  assert.match(fadeHook, /\.animate\(/);
+  assert.match(fadeHook, /prefers-reduced-motion: reduce/);
+
+  for (const file of ["works-intro.tsx", "works-page-copy.tsx", "showreel-feature.tsx"]) {
+    const source = readFileSync(
+      new URL(`../components/works-index/${file}`, import.meta.url),
+      "utf8"
+    );
+    assert.match(source, /useLocaleFade\(\)/, `${file} drives the switch fade`);
+    assert.doesNotMatch(source, /key=\{locale\}/, `${file} must not remount on toggle`);
+  }
+});
+
+test("localized headline uses locale-appropriate CJK metrics", () => {
+  const source = readFileSync(
+    new URL("../components/works-index/works-intro.tsx", import.meta.url),
+    "utf8"
+  );
+  // 英文保留原有负字距与紧行高；中文使用自然字距与放宽的行高
+  assert.match(source, /tracking-\[-0\.035em\]/);
+  assert.match(source, /leading-\[1\.05\]/);
+  assert.match(source, /tracking-\[0\.01em\]/);
+  assert.match(source, /leading-\[1\.18\]/);
+  assert.match(source, /locale === "en"/);
+});
+
 test("alternates selected work media from left to right", () => {
   assert.equal(getSelectedWorkOrientation(0), "media-left");
   assert.equal(getSelectedWorkOrientation(1), "media-right");

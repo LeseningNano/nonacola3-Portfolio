@@ -90,7 +90,9 @@ export function WorksLanguageProvider({
   // lang 只作用在 /works 内容区的这个元素上，不改全站根节点语言
   return (
     <WorksLanguageContext.Provider value={value}>
-      <div lang={locale}>{children}</div>
+      <div lang={locale}>
+        {children}
+      </div>
     </WorksLanguageContext.Provider>
   );
 }

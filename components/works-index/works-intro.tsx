@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useWorksLanguage } from "./works-language-provider";
+import { useLocaleFade } from "./use-locale-fade";
 import styles from "./works-intro.module.css";
 
 // works-intro.module.css 中最后一个过渡：supporting 块 1260ms 延迟 + 600ms 过渡。
@@ -12,6 +13,7 @@ const INTRO_TOTAL_MS = 1900;
 export function WorksIntro({ children }: { children: ReactNode }) {
   const { locale, copy } = useWorksLanguage();
   const tokens = copy.intro.headlineTokens;
+  const fade = useLocaleFade();
   const [entered, setEntered] = useState(false);
 
   useEffect(() => {
@@ -37,15 +39,27 @@ export function WorksIntro({ children }: { children: ReactNode }) {
   // 英文按词空格连接；中文不插入空格，拉丁字符间的空格已含在 token 内
   const separator = locale === "en" ? " " : "";
   const fullHeadline = tokens.map((token) => token.text).join(separator);
+  // 英文沿用原负字距紧行高；中文按 CJK 排版习惯使用自然字距与放宽行高
+  const headlineMetrics =
+    locale === "en"
+      ? "leading-[1.05] tracking-[-0.035em]"
+      : "leading-[1.18] tracking-[0.01em]";
 
   return (
     <div className={entered ? styles.entered : undefined}>
       <header>
-        <p className={`${styles.supporting} text-xs tracking-[0.28em] text-neutral-400`}>
+        <p
+          ref={fade}
+          className={`${styles.supporting} text-xs tracking-[0.28em] text-neutral-400`}
+        >
           {copy.intro.eyebrow}
         </p>
         <div className="mt-5 grid gap-7 md:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)] md:items-end md:gap-12">
-          <h1 aria-label={fullHeadline} className="text-4xl font-normal leading-[1.05] tracking-[-0.035em] sm:text-5xl md:text-6xl">
+          <h1
+            ref={fade}
+            aria-label={fullHeadline}
+            className={`text-4xl font-normal sm:text-5xl md:text-6xl ${headlineMetrics}`}
+          >
             {tokens.map((token, index) => (
               <span
                 key={`${token.text}-${index}`}
@@ -58,7 +72,7 @@ export function WorksIntro({ children }: { children: ReactNode }) {
               </span>
             ))}
           </h1>
-          <div className={styles.supporting}>
+          <div ref={fade} className={styles.supporting}>
             <p className="text-sm leading-6 text-neutral-400 md:text-base">{copy.intro.availability}</p>
             <dl className="mt-5 space-y-2 border-y border-white/10 py-4 text-sm">
               <div className="grid grid-cols-[4rem_1fr] gap-3">

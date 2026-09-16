@@ -6,6 +6,7 @@ import {
   getSelectedWorkOrientation,
 } from "@/lib/works-index";
 import { useWorksLanguage } from "./works-language-provider";
+import { useLocaleFade } from "./use-locale-fade";
 import type { VideoRow } from "@/lib/types";
 
 interface SelectedWorkCardProps {
@@ -25,6 +26,7 @@ function Metadata({ label, value }: { label: string; value: string }) {
 export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
   const orientation = getSelectedWorkOrientation(index);
   const { copy } = useWorksLanguage();
+  const fade = useLocaleFade();
   const desktopColumns =
     orientation === "media-right"
       ? "md:grid-cols-[minmax(16rem,0.85fr)_minmax(0,1.55fr)]"
@@ -68,7 +70,7 @@ export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
           <h3 className="text-2xl md:text-3xl">{work.title}</h3>
           <p className="mt-1 text-sm text-neutral-400">{work.category}</p>
           {(role || tools) && (
-            <dl className="mt-5 space-y-2">
+            <dl ref={fade} className="mt-5 space-y-2">
               {role && <Metadata label={copy.selected.roleLabel} value={role} />}
               {tools && <Metadata label={copy.selected.toolsLabel} value={tools} />}
             </dl>
@@ -76,7 +78,7 @@ export function SelectedWorkCard({ work, index }: SelectedWorkCardProps) {
           {summary && (
             <p className="mt-5 max-w-xl text-sm leading-6 text-neutral-400">{summary}</p>
           )}
-          <p className="mt-5 text-sm text-neutral-300">
+          <p ref={fade} className="mt-5 text-sm text-neutral-300">
             {copy.selected.viewCaseStudy}{" "}
             <span className="inline-block transition-transform duration-300 motion-reduce:transition-none md:group-hover:translate-x-1 md:group-focus-visible:translate-x-1">
               →

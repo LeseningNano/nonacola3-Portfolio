@@ -5,6 +5,7 @@ import { Play } from "lucide-react";
 import { useState } from "react";
 import { getEmbedUrl } from "@/lib/utils";
 import { useWorksLanguage } from "./works-language-provider";
+import { useLocaleFade } from "./use-locale-fade";
 
 interface ShowreelFeatureProps {
   showreelUrl: string;
@@ -14,6 +15,7 @@ interface ShowreelFeatureProps {
 export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps) {
   const [active, setActive] = useState(false);
   const { copy } = useWorksLanguage();
+  const fade = useLocaleFade();
   const embedSrc = getEmbedUrl(showreelUrl);
   const separator = embedSrc.includes("?") ? "&" : "?";
 
@@ -57,7 +59,7 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
         )}
       </div>
 
-      <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div ref={fade} className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-xs tracking-[0.28em] text-neutral-400">{copy.showreel.label}</p>
           <h2 id="showreel-heading" className="mt-2 text-xl text-white md:text-2xl">
