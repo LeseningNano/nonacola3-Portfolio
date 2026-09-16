@@ -1,5 +1,6 @@
 import type { PostItem } from "@/lib/types";
 import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
+import { Reveal } from "@/components/viewport-reveal";
 
 export type { PostItem };
 
@@ -12,15 +13,22 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
   const recent = posts.slice(0, 5);
   return (
     <section id="news" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
+      <Reveal
+        as="h2"
+        variant="heading"
+        className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight"
+        style={{ fontFamily: "var(--font-bitcount)" }}
+      >
         news.
-      </h2>
-      <p className="text-base md:text-lg text-neutral-400 font-light mt-1">最新动态</p>
+      </Reveal>
+      <Reveal as="p" variant="content" delay={180} className="text-base md:text-lg text-neutral-400 font-light mt-1">
+        最新动态
+      </Reveal>
 
       {recent.length === 0 ? (
         <p className="text-neutral-600 text-sm mt-8">暂无动态。</p>
       ) : (
-        <div className="mt-8 border-t border-neutral-800">
+        <Reveal variant="content" delay={320} className="mt-8 border-t border-neutral-800">
           {recent.map((post) => {
             const isArticle = Boolean(post.title);
             const inner = (
@@ -58,7 +66,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
               </div>
             );
           })}
-        </div>
+        </Reveal>
       )}
     </section>
   );

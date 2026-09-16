@@ -4,7 +4,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Reveal, shouldSkipRevealMotion } from "../components/viewport-reveal";
 import { VideoGrid } from "../components/video-grid";
-import type { VideoRow } from "../lib/types";
+import { NewsSection } from "../components/news-section";
+import { AboutSection } from "../components/about-section";
+import type { VideoRow, PostItem } from "../lib/types";
 
 const sampleVideo: VideoRow = {
   id: "v1",
@@ -19,6 +21,15 @@ const sampleVideo: VideoRow = {
   featured: false,
   order: 0,
   date: null,
+};
+
+const samplePost: PostItem = {
+  id: "p1",
+  title: "A post",
+  body: "Body",
+  tag: null,
+  published: true,
+  createdAt: new Date("2026-01-01").toISOString(),
 };
 
 test("SSR markup keeps reveal content visible without JavaScript", () => {
@@ -77,4 +88,25 @@ test("works section stages the title reveal before staggered content", () => {
   assert.match(markup, /ALL WORKS/);
   assert.match(markup, /href="\/works"/);
   assert.match(markup, /works\./);
+});
+
+test("news section stages title and content the same way", () => {
+  const markup = renderToStaticMarkup(
+    createElement(NewsSection, { posts: [samplePost] })
+  );
+
+  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-reveal="content"/);
+  assert.ok(!markup.includes("data-reveal-pending"));
+  assert.match(markup, /news\./);
+  assert.match(markup, /最新动态/);
+});
+
+test("about section stages title and content the same way", () => {
+  const markup = renderToStaticMarkup(createElement(AboutSection));
+
+  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-reveal="content"/);
+  assert.ok(!markup.includes("data-reveal-pending"));
+  assert.match(markup, /about\./);
 });

@@ -1,14 +1,22 @@
 import { siteConfig, socialLinks } from "@/lib/config";
+import { Reveal } from "@/components/viewport-reveal";
 
 export function AboutSection() {
   return (
     <section id="about" className="w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
-      <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
+      <Reveal
+        as="h2"
+        variant="heading"
+        className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight"
+        style={{ fontFamily: "var(--font-bitcount)" }}
+      >
         about.
-      </h2>
-      <p className="text-base md:text-lg text-neutral-400 font-light mt-1">了解更多 & 合作洽谈</p>
+      </Reveal>
+      <Reveal as="p" variant="content" delay={180} className="text-base md:text-lg text-neutral-400 font-light mt-1">
+        了解更多 & 合作洽谈
+      </Reveal>
 
-      <div className="mt-10 flex flex-col md:flex-row gap-12 md:gap-16">
+      <Reveal variant="content" delay={320} className="mt-10 flex flex-col md:flex-row gap-12 md:gap-16">
         <p className="text-base md:text-lg text-neutral-300 leading-relaxed max-w-2xl flex-1">
           我是nonacola3，是一名业余PV师，正在努力进步中。热爱影像创作（也爱打游戏），喜欢用视觉语言讲述故事。期待通过每一个作品不断打磨技术，也希望能与更多志同道合的朋友交流合作。
         </p>
@@ -34,7 +42,7 @@ export function AboutSection() {
             ))}
           </div>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
