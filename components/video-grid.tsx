@@ -8,6 +8,7 @@ import { WorksMarquee } from "./works-marquee";
 import { ShowreelModal } from "./showreel-modal";
 import { CategoryFilter } from "./category-filter";
 import { Reveal } from "./viewport-reveal";
+import { WorksDrift } from "./works-drift";
 import type { VideoRow } from "@/lib/types";
 
 export function VideoGrid({ videos }: { videos: VideoRow[] }) {
@@ -91,7 +92,9 @@ export function VideoGrid({ videos }: { videos: VideoRow[] }) {
                 </div>
               </>
             ) : (
-              <WorksMarquee videos={videos} />
+              <WorksDrift>
+                <WorksMarquee videos={videos} />
+              </WorksDrift>
             )}
           </div>
 
