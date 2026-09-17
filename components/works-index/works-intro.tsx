@@ -53,7 +53,6 @@ export function WorksIntro({ children }: { children: ReactNode }) {
         </p>
         <div className="mt-5 grid gap-7 md:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)] md:items-end md:gap-12">
           <h1
-            ref={fade}
             aria-label={fullHeadline}
             className={`text-4xl font-normal tracking-[-0.035em] sm:text-5xl md:text-6xl ${headlineLeading}`}
           >

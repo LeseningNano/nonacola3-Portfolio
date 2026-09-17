@@ -55,7 +55,7 @@ export const WORKS_COPY = {
       eyebrow: "动效设计师 · 中国",
       headlineTokens: [
         { text: "动效设计师，", highlighted: true },
-        { text: "专注于", highlighted: false },
+        { text: "聚焦", highlighted: false },
         { text: " PV、", highlighted: true },
         { text: "游戏宣传视觉", highlighted: true },
         { text: "与", highlighted: false },

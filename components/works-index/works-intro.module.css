@@ -1,7 +1,14 @@
 .word {
   opacity: 0;
-  transition: opacity 360ms ease;
-  transition-delay: calc(var(--word-index) * 90ms);
+  /* 插入即播 + forwards：词条每次重挂载（含切换语言）都会重播逐词揭示 */
+  animation: word-in 360ms ease forwards;
+  animation-delay: calc(var(--word-index) * 90ms);
+}
+
+@keyframes word-in {
+  to {
+    opacity: 1;
+  }
 }
 
 .supporting {
@@ -10,7 +17,6 @@
   transition-delay: 1260ms;
 }
 
-.entered .word,
 .entered .supporting {
   opacity: 1;
 }
@@ -19,6 +25,7 @@
   .word,
   .supporting {
     opacity: 1;
+    animation: none;
     transition: none;
   }
 }

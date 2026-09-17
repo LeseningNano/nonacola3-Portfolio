@@ -60,7 +60,7 @@ test("works localized headlines reconstruct the approved sentences", () => {
   );
   assert.equal(
     WORKS_COPY["zh-CN"].intro.headlineTokens.map(({ text }) => text).join(""),
-    "动效设计师，专注于 PV、游戏宣传视觉与电影感动态图形。"
+    "动效设计师，聚焦 PV、游戏宣传视觉与电影感动态图形。"
   );
 });
 
@@ -171,6 +171,20 @@ test("works intro consumes the shared copy dictionary with locale-aware spacing"
   assert.match(source, /copy\.intro\.eyebrow/);
   assert.doesNotMatch(source, /getWorksHeadlineTokens/);
   assert.match(source, /INTRO_TOTAL_MS/);
+});
+
+test("headline words replay the staggered reveal on every mount", () => {
+  const css = readFileSync(
+    new URL("../components/works-index/works-intro.module.css", import.meta.url),
+    "utf8"
+  );
+  // 词条用插入即播的 animation（含按词延迟）：切换语言重挂载词条时会重播逐词揭示，
+  // 不依赖 .entered 门控，避免中文词条以终态整句出现
+  assert.match(css, /animation: word-in 360ms ease forwards/);
+  assert.match(css, /@keyframes word-in/);
+  assert.match(css, /animation-delay: calc\(var\(--word-index\) \* 90ms\)/);
+  assert.doesNotMatch(css, /\.entered \.word/);
+  assert.match(css, /prefers-reduced-motion: reduce/);
 });
 
 test("works page keeps static data loading and scopes the language provider", () => {
