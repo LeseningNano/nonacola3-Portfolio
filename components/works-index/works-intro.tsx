@@ -1,30 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { useWorksLanguage } from "./works-language-provider";
-import { useLocaleFade } from "./use-locale-fade";
 import styles from "./works-intro.module.css";
 
-// works-intro.module.css 中最后一个过渡：supporting 块 1260ms 延迟 + 600ms 过渡。
+// works-intro.module.css 中最后一个动画：supporting 块 1260ms 延迟 + 600ms 淡入。
 // 改 CSS 动画时长时需同步此常量。
 const INTRO_TOTAL_MS = 1900;
 
 export function WorksIntro({ children }: { children: ReactNode }) {
   const { locale, copy } = useWorksLanguage();
   const tokens = copy.intro.headlineTokens;
-  const fade = useLocaleFade();
-  const [entered, setEntered] = useState(false);
-
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
 
   // 开场动画结束后通知导航栏弹出；reduced-motion 下 CSS 直接显示，立即通知。
-  // 语言切换只改文字，不重置 entered、不重发该事件。
+  // 语言切换只改文字并重播各自动画，不重发该事件。
   useEffect(() => {
-    if (!entered) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
@@ -34,7 +25,7 @@ export function WorksIntro({ children }: { children: ReactNode }) {
       window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
     }, INTRO_TOTAL_MS);
     return () => clearTimeout(timer);
-  }, [entered]);
+  }, []);
 
   // 英文按词空格连接；中文不插入空格，拉丁字符间的空格已含在 token 内
   const separator = locale === "en" ? " " : "";
@@ -43,10 +34,10 @@ export function WorksIntro({ children }: { children: ReactNode }) {
   const headlineLeading = locale === "en" ? "leading-[1.05]" : "leading-[1.18]";
 
   return (
-    <div className={entered ? styles.entered : undefined}>
+    <div>
       <header>
         <p
-          ref={fade}
+          key={locale}
           className={`${styles.supporting} text-xs tracking-[0.28em] text-neutral-400`}
         >
           {copy.intro.eyebrow}
@@ -68,7 +59,8 @@ export function WorksIntro({ children }: { children: ReactNode }) {
               </span>
             ))}
           </h1>
-          <div ref={fade} className={styles.supporting}>
+          {/* 眉标与简介栏切语言时重播：标题逐词动画期间保持隐藏，1260ms 后一起淡入 */}
+          <div key={locale} className={styles.supporting}>
             <p className="text-sm leading-6 text-neutral-400 md:text-base">{copy.intro.availability}</p>
             <dl className="mt-5 space-y-2 border-y border-white/10 py-4 text-sm">
               <div className="grid grid-cols-[4rem_1fr] gap-3">
@@ -83,6 +75,7 @@ export function WorksIntro({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
+      {/* Showreel 槽位不随语言重挂载，避免重置播放器状态；淡入节奏与简介栏一致 */}
       <div className={styles.supporting}>{children}</div>
     </div>
   );

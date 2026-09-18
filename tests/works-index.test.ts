@@ -216,7 +216,7 @@ test("switching locale fades localized copy without remounting DOM", () => {
   assert.match(fadeHook, /\.animate\(/);
   assert.match(fadeHook, /prefers-reduced-motion: reduce/);
 
-  for (const file of ["works-intro.tsx", "works-page-copy.tsx", "showreel-feature.tsx"]) {
+  for (const file of ["works-page-copy.tsx", "showreel-feature.tsx"]) {
     const source = readFileSync(
       new URL(`../components/works-index/${file}`, import.meta.url),
       "utf8"
@@ -224,6 +224,30 @@ test("switching locale fades localized copy without remounting DOM", () => {
     assert.match(source, /useLocaleFade\(\)/, `${file} drives the switch fade`);
     assert.doesNotMatch(source, /key=\{locale\}/, `${file} must not remount on toggle`);
   }
+});
+
+test("intro side copy replays after the headline during locale switches", () => {
+  const source = readFileSync(
+    new URL("../components/works-index/works-intro.tsx", import.meta.url),
+    "utf8"
+  );
+  // 眉标与简介栏在切语言时重挂载重播（标题动画期间保持隐藏），
+  // 但 h1 本身绝不重挂载（会残留旧节点），WAAPI 淡入与 entered 门控一并退场
+  assert.match(source, /key=\{locale\}/);
+  assert.doesNotMatch(source, /<h1\s+key=/);
+  assert.doesNotMatch(source, /useLocaleFade/);
+  assert.doesNotMatch(source, /styles\.entered/);
+});
+
+test("supporting copy reveals on a delayed mount animation", () => {
+  const css = readFileSync(
+    new URL("../components/works-index/works-intro.module.css", import.meta.url),
+    "utf8"
+  );
+  assert.match(css, /animation: supporting-in 600ms ease forwards/);
+  assert.match(css, /animation-delay: 1260ms/);
+  assert.match(css, /@keyframes supporting-in/);
+  assert.doesNotMatch(css, /\.entered/);
 });
 
 test("localized headline uses locale-appropriate leading and the original tracking", () => {

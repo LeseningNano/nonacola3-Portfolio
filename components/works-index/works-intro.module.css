@@ -11,14 +11,18 @@
   }
 }
 
+/* 眉标 / 简介栏 / Showreel 槽位：标题逐词动画期间保持隐藏，
+   1260ms 后一起淡入；重挂载（切语言）时按同样节奏重播 */
 .supporting {
   opacity: 0;
-  transition: opacity 600ms ease;
-  transition-delay: 1260ms;
+  animation: supporting-in 600ms ease forwards;
+  animation-delay: 1260ms;
 }
 
-.entered .supporting {
-  opacity: 1;
+@keyframes supporting-in {
+  to {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
