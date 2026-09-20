@@ -5,7 +5,13 @@ import {
   getActiveAdminItem,
   isAdminPath,
 } from "../lib/admin-navigation";
-import { filterAdminWorks, serializeAdminWork } from "../lib/admin-works";
+import {
+  createWorkFormState,
+  createWorkPayload,
+  filterAdminWorks,
+  reduceWorkEditorState,
+  serializeAdminWork,
+} from "../lib/admin-works";
 import type { Video } from "../lib/types";
 
 function adminWork(
@@ -83,4 +89,73 @@ test("admin work filtering searches title and category and can limit featured wo
   assert.deepEqual(filterAdminWorks(works, "numb", false).map(({ id }) => id), ["a"]);
   assert.deepEqual(filterAdminWorks(works, "motion", false).map(({ id }) => id), ["b"]);
   assert.deepEqual(filterAdminWorks(works, "", true).map(({ id }) => id), ["a"]);
+});
+
+test("work payload preserves explicit clears while omitting nothing from the controlled form", () => {
+  const state = createWorkFormState(adminWork("a", "Work", "PV", false));
+  const payload = createWorkPayload({ ...state, summary: "", role: "", date: "" });
+
+  assert.equal(payload.summary, null);
+  assert.equal(payload.role, null);
+  assert.equal(payload.date, null);
+  assert.equal(payload.title, "Work");
+  assert.deepEqual(Object.keys(payload).sort(), [
+    "category",
+    "date",
+    "description",
+    "embedUrl",
+    "featured",
+    "order",
+    "role",
+    "summary",
+    "thumbnail",
+    "title",
+    "tools",
+  ]);
+});
+
+test("upload success followed by save failure retains fields and uploaded URL", () => {
+  const initial = {
+    form: createWorkFormState(),
+    baseline: createWorkFormState(),
+    status: "clean" as const,
+    error: null,
+  };
+  const typed = reduceWorkEditorState(initial, {
+    type: "field",
+    field: "title",
+    value: "New work",
+  });
+  const uploaded = reduceWorkEditorState(typed, {
+    type: "field",
+    field: "thumbnail",
+    value: "https://store.public.blob.vercel-storage.com/thumb.webp",
+  });
+  const failed = reduceWorkEditorState(uploaded, {
+    type: "save-error",
+    message: "保存失败",
+  });
+
+  assert.equal(failed.form.title, "New work");
+  assert.match(failed.form.thumbnail, /thumb\.webp$/);
+  assert.equal(failed.status, "error");
+});
+
+test("edit baseline is clean, a field change is dirty, and save success adopts the saved form", () => {
+  const baseline = createWorkFormState(adminWork("a", "Work", "PV", false));
+  const initial = { form: baseline, baseline, status: "clean" as const, error: null };
+  assert.equal(initial.status, "clean");
+
+  const dirty = reduceWorkEditorState(initial, {
+    type: "field",
+    field: "title",
+    value: "Updated work",
+  });
+  assert.equal(dirty.status, "dirty");
+
+  const savedForm = { ...dirty.form, title: "Updated work from server" };
+  const saved = reduceWorkEditorState(dirty, { type: "save-success", form: savedForm });
+  assert.equal(saved.status, "saved");
+  assert.deepEqual(saved.form, savedForm);
+  assert.deepEqual(saved.baseline, savedForm);
 });
