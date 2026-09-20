@@ -133,6 +133,7 @@ export function reduceWorkEditorState(
   event: WorkEditorEvent,
 ): WorkEditorState {
   if (event.type === "field") {
+    if (state.status === "saving") return state;
     const form = { ...state.form, [event.field]: event.value } as WorkFormState;
     return {
       ...state,

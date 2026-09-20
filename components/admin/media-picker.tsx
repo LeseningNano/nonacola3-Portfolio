@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +42,7 @@ export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) 
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerId = `media-picker-${kind}-${useId().replace(/:/g, "")}`;
 
   async function loadFiles() {
     setLoading(true);
@@ -59,11 +60,13 @@ export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) 
   }
 
   function handleOpenChange(nextOpen: boolean) {
+    if (!nextOpen && uploading) return;
     setOpen(nextOpen);
     if (nextOpen) void loadFiles();
   }
 
   function choose(url: string) {
+    if (uploading) return;
     onSelect(url);
     setOpen(false);
   }
@@ -96,7 +99,8 @@ export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) 
       });
       if (!blob.url) throw new Error("上传完成但未返回文件地址");
       setProgress(100);
-      choose(blob.url);
+      onSelect(blob.url);
+      setOpen(false);
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : "上传失败，请重试");
     } finally {
@@ -110,9 +114,15 @@ export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) 
 
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label htmlFor={triggerId}>{label}</Label>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" variant="outline" onClick={() => handleOpenChange(true)}>
+        <Button
+          id={triggerId}
+          type="button"
+          variant="outline"
+          aria-label={label}
+          onClick={() => handleOpenChange(true)}
+        >
           选择媒体
         </Button>
         {value ? <span className="min-w-0 flex-1 truncate text-xs text-neutral-400">{value}</span> : null}
@@ -163,6 +173,7 @@ export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) 
                   <button
                     key={file.url}
                     type="button"
+                    disabled={uploading}
                     onClick={() => choose(file.url)}
                     className="overflow-hidden rounded-lg border border-white/10 text-left transition-colors hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >

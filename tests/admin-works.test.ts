@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { MediaPicker } from "../components/admin/media-picker";
 import {
   ADMIN_NAV_ITEMS,
   getActiveAdminItem,
@@ -158,4 +161,47 @@ test("edit baseline is clean, a field change is dirty, and save success adopts t
   assert.equal(saved.status, "saved");
   assert.deepEqual(saved.form, savedForm);
   assert.deepEqual(saved.baseline, savedForm);
+});
+
+test("field changes are rejected while a save is in flight", () => {
+  const form = { ...createWorkFormState(), title: "Submitted title" };
+  const saving = {
+    form,
+    baseline: createWorkFormState(),
+    status: "saving" as const,
+    error: null,
+  };
+
+  const attemptedEdit = reduceWorkEditorState(saving, {
+    type: "field",
+    field: "title",
+    value: "Late edit",
+  });
+
+  assert.equal(attemptedEdit.form.title, "Submitted title");
+  assert.equal(attemptedEdit.status, "saving");
+});
+
+test("media picker labels identify their distinct trigger buttons", () => {
+  const markup = renderToStaticMarkup(
+    createElement("div", null,
+      createElement(MediaPicker, {
+        kind: "video",
+        value: "",
+        onSelect: () => {},
+        label: "从媒体库选择视频",
+      }),
+      createElement(MediaPicker, {
+        kind: "image",
+        value: "",
+        onSelect: () => {},
+        label: "从媒体库选择缩略图",
+      }),
+    ),
+  );
+
+  assert.match(markup, /<label(?=[^>]+for="media-picker-[^"]+")[^>]*>从媒体库选择视频<\/label>/);
+  assert.match(markup, /<button(?=[^>]+id="media-picker-[^"]+")(?=[^>]+aria-label="从媒体库选择视频")[^>]*>/);
+  assert.match(markup, /<label(?=[^>]+for="media-picker-[^"]+")[^>]*>从媒体库选择缩略图<\/label>/);
+  assert.match(markup, /<button(?=[^>]+id="media-picker-[^"]+")(?=[^>]+aria-label="从媒体库选择缩略图")[^>]*>/);
 });

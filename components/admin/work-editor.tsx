@@ -129,7 +129,7 @@ export function WorkEditor({
       {state.error ? <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{state.error}</p> : null}
 
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.8fr)]">
-        <div className="space-y-6">
+        <fieldset disabled={saving} className="space-y-6">
           <EditorSection title="Basic information">
             <Field label="标题" htmlFor="work-title">
               <Input id="work-title" required value={state.form.title} onChange={(event) => setField("title", event.target.value)} />
@@ -192,7 +192,7 @@ export function WorkEditor({
             <Button type="button" variant="outline" disabled={saving} onClick={() => void save(true)}>保存并返回</Button>
             <Button type="button" disabled={saving} onClick={() => void save(false)}>{saving ? "保存中…" : "保存"}</Button>
           </div>
-        </div>
+        </fieldset>
 
         <div className="xl:sticky xl:top-6">
           <WorkCardPreview value={state.form} />
