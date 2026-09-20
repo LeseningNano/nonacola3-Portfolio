@@ -6,6 +6,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Subagent model policy
 
-- Never use GPT-6 Astra for subagents in this repository.
-- The maximum allowed subagent configuration is `gpt-5.6-sol` with `reasoning_effort: medium`.
-- Use a lower-tier model when it is sufficient, but never exceed this ceiling.
+- Use `gpt-5.6-sol` with `reasoning_effort: medium` for new features, architecture decisions, complex diagnosis, and tasks that need broader reasoning.
+- Use `gpt-5.6-terra` for bounded feature changes, UI adjustments, targeted fixes, and test additions when the implementation plan is already clear.
+- Use `gpt-5.6-luna` only for simple, mechanical, low-risk work when it is sufficient.
+- Do not automatically escalate to GPT-6 Astra. Use it only after Sol and Terra cannot resolve the task, explain the specific blocker to the user, and receive explicit user authorization for that escalation.
+- For every spawned subagent, set both its runtime model and reasoning effort explicitly, then report the actual runtime metadata when the platform makes it available. If it is unavailable, state that it could not be verified rather than inferring it.
