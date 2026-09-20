@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { AdminShell } from "@/components/admin/admin-shell";
 import { auth } from "@/lib/auth";
 
 export default async function DashboardLayout({
@@ -12,5 +13,5 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  return children;
+  return <AdminShell userName={session.user.name}>{children}</AdminShell>;
 }
