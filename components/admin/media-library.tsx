@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { ImageIcon, Loader2, Trash2, Video } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { MediaPicker } from "@/components/admin/media-picker";
@@ -36,11 +36,11 @@ export function MediaLibrary() {
   const [query, setQuery] = useState("");
   const [inventoryRequest] = useState(() => createMediaInventoryRequestController(setLoading));
 
-  function invalidateInventoryRequests() {
+  const invalidateInventoryRequests = useCallback(() => {
     inventoryRequest.invalidate();
-  }
+  }, [inventoryRequest]);
 
-  async function loadInventory() {
+  const loadInventory = useCallback(async () => {
     const request: InventoryRequest = inventoryRequest.start();
     setLoadError(null);
     try {
@@ -59,7 +59,7 @@ export function MediaLibrary() {
     } finally {
       inventoryRequest.finish(request);
     }
-  }
+  }, [inventoryRequest]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => { void loadInventory(); }, 0);
@@ -67,7 +67,7 @@ export function MediaLibrary() {
       window.clearTimeout(timer);
       invalidateInventoryRequests();
     };
-  }, []);
+  }, [invalidateInventoryRequests, loadInventory]);
 
   const visibleFiles = useMemo(
     () => filterMediaFiles(state.files, filter, query),
