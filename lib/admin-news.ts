@@ -19,12 +19,100 @@ export type NewsListEvent =
   | { type: "mutation-success" }
   | { type: "mutation-error" };
 
+export type PostEditorFields = {
+  title: string;
+  body: string;
+  tag: string;
+  intendedPublished: boolean;
+};
+
+export type PostEditorState = PostEditorFields & {
+  kind: PostKind;
+  baseline: PostEditorFields;
+  status: "clean" | "dirty" | "saving" | "saved" | "error";
+  error: string | null;
+};
+
+export type PostEditorEvent =
+  | { type: "field"; field: "title" | "body" | "tag"; value: string }
+  | { type: "save-start"; published: boolean }
+  | { type: "save-success" }
+  | { type: "save-error"; message: string };
+
+export type PostEditorValidation =
+  | { ok: true }
+  | { ok: false; field: "title" | "body"; message: string };
+
 export function serializeAdminPost(post: PrismaAdminPost): PostItem {
   return { ...post, createdAt: post.createdAt.toISOString() };
 }
 
 export function getPostKind(post: Pick<PostItem, "title">): PostKind {
   return post.title === null ? "short" : "article";
+}
+
+export function createPostEditorState(kind: PostKind, post?: PostItem): PostEditorState {
+  const fields: PostEditorFields = {
+    title: post?.title ?? "",
+    body: post?.body ?? "",
+    tag: post?.tag ?? "",
+    intendedPublished: post?.published ?? false,
+  };
+
+  return {
+    kind,
+    ...fields,
+    baseline: { ...fields },
+    status: "clean",
+    error: null,
+  };
+}
+
+export function validatePostEditor(state: PostEditorState): PostEditorValidation {
+  if (state.kind === "article" && !state.title.trim()) {
+    return { ok: false, field: "title", message: "标题不能为空" };
+  }
+  if (!state.body.trim()) {
+    return { ok: false, field: "body", message: "正文不能为空" };
+  }
+  return { ok: true };
+}
+
+export function createPostPayload(
+  state: PostEditorState,
+  published: boolean,
+): { title: string | null; body: string; tag: string | null; published: boolean } {
+  return {
+    title: state.kind === "short" ? null : state.title.trim(),
+    body: state.body.trim(),
+    tag: state.tag.trim() || null,
+    published,
+  };
+}
+
+export function reducePostEditorState(
+  state: PostEditorState,
+  event: PostEditorEvent,
+): PostEditorState {
+  if (event.type === "field") {
+    return { ...state, [event.field]: event.value, status: "dirty", error: null };
+  }
+
+  if (event.type === "save-start") {
+    return { ...state, intendedPublished: event.published, status: "saving", error: null };
+  }
+
+  if (event.type === "save-error") {
+    return { ...state, status: "error", error: event.message };
+  }
+
+  const baseline: PostEditorFields = {
+    title: state.title,
+    body: state.body,
+    tag: state.tag,
+    intendedPublished: state.intendedPublished,
+  };
+  return { ...state, baseline, status: "saved", error: null };
 }
 
 export function normalizeAdminPostTitle(title: string | null | undefined): string | null {

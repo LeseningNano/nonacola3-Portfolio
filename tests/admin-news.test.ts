@@ -3,11 +3,15 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
 import {
+  createPostEditorState,
+  createPostPayload,
   filterAdminPosts,
   getPostKind,
   normalizeAdminPostTitle,
+  reducePostEditorState,
   reduceNewsListState,
   serializeAdminPost,
+  validatePostEditor,
 } from "../lib/admin-news";
 import type { PostItem } from "../lib/types";
 
@@ -70,4 +74,64 @@ test("post endpoints and public News treat only null titles as short updates", (
   assert.match(updateRoute, /normalizeAdminPostTitle\(b\.title\)/);
   assert.match(newsSection, /const isArticle = post\.title !== null;/);
   assert.match(articlePage, /post\.title === null/);
+});
+
+test("short-update draft payload sends null title and explicit published false", () => {
+  const state = {
+    ...createPostEditorState("short"),
+    body: "  update text  ",
+    tag: "  daily  ",
+  };
+
+  assert.deepEqual(createPostPayload(state, false), {
+    title: null,
+    body: "update text",
+    tag: "daily",
+    published: false,
+  });
+});
+
+test("failed News save retains every field and publication intent", () => {
+  let state = createPostEditorState("short");
+  state = reducePostEditorState(state, { type: "field", field: "body", value: "unfinished update" });
+  state = reducePostEditorState(state, { type: "field", field: "tag", value: "daily" });
+  state = reducePostEditorState(state, { type: "save-start", published: false });
+  state = reducePostEditorState(state, { type: "save-error", message: "保存失败" });
+
+  assert.equal(state.kind, "short");
+  assert.equal(state.title, "");
+  assert.equal(state.body, "unfinished update");
+  assert.equal(state.tag, "daily");
+  assert.equal(state.intendedPublished, false);
+  assert.equal(state.status, "error");
+});
+
+test("short-update validation rejects a whitespace-only body without mutating state", () => {
+  const state = { ...createPostEditorState("short"), body: "   " };
+
+  assert.deepEqual(validatePostEditor(state), {
+    ok: false,
+    field: "body",
+    message: "正文不能为空",
+  });
+  assert.equal(state.body, "   ");
+});
+
+test("successful News save replaces the baseline without clearing fields", () => {
+  let state = createPostEditorState("short");
+  state = reducePostEditorState(state, { type: "field", field: "body", value: "saved update" });
+  state = reducePostEditorState(state, { type: "field", field: "tag", value: "daily" });
+  state = reducePostEditorState(state, { type: "save-start", published: true });
+  state = reducePostEditorState(state, { type: "save-success" });
+
+  assert.equal(state.body, "saved update");
+  assert.equal(state.tag, "daily");
+  assert.equal(state.intendedPublished, true);
+  assert.equal(state.status, "saved");
+  assert.deepEqual(state.baseline, {
+    title: "",
+    body: "saved update",
+    tag: "daily",
+    intendedPublished: true,
+  });
 });
