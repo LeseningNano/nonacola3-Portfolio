@@ -1,14 +1,34 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
+import type { ListBlobResult, ListBlobResultBlob } from "@vercel/blob";
 import {
   buildMediaReferenceIndex,
+  collectAllManagedBlobs,
   extractHttpUrls,
   findMediaReferences,
   normalizeManagedBlobUrl,
   type MediaReferenceSnapshot,
 } from "../lib/admin-media";
+import { mediaDeleteSchema } from "../lib/schemas";
 
 const blob = "https://store.public.blob.vercel-storage.com/uploads/hero.mp4";
+
+function listedBlob(
+  url: string,
+  pathname: string,
+  size: number,
+  uploadedAt: string,
+): ListBlobResultBlob {
+  return {
+    url,
+    downloadUrl: `${url}?download=1`,
+    pathname,
+    size,
+    uploadedAt: new Date(uploadedAt),
+    etag: `etag-${pathname}`,
+  };
+}
 
 function mediaSnapshot(overrides: Partial<{
   heroUrl: string | null;
@@ -375,4 +395,59 @@ test("reference index keeps an explicit empty list for unused files", () => {
 
   assert.equal(index[blob].length, 1);
   assert.deepEqual(index[unused], []);
+});
+
+test("Blob listing follows cursors until hasMore is false", async () => {
+  const calls: Array<{ cursor: string | undefined; limit: number | undefined }> = [];
+  const pages: ListBlobResult[] = [
+    {
+      blobs: [listedBlob(blob, "uploads/hero.mp4", 10, "2026-01-01")],
+      cursor: "next",
+      hasMore: true,
+    },
+    {
+      blobs: [listedBlob(`${blob}-2`, "uploads/other.mp4", 20, "2026-01-02")],
+      cursor: undefined,
+      hasMore: false,
+    },
+  ];
+
+  const result = await collectAllManagedBlobs(async (options = {}) => {
+    calls.push({ cursor: options.cursor, limit: options.limit });
+    return pages[calls.length - 1];
+  });
+
+  assert.deepEqual(calls, [
+    { cursor: undefined, limit: 1000 },
+    { cursor: "next", limit: 1000 },
+  ]);
+  assert.deepEqual(result.map(({ url }) => url), [blob, `${blob}-2`]);
+});
+
+test("Blob listing rejects a repeated continuation cursor", async () => {
+  await assert.rejects(
+    collectAllManagedBlobs(async () => ({ blobs: [], cursor: "same", hasMore: true })),
+    /repeated Blob cursor/i,
+  );
+});
+
+test("media deletion schema requires a valid URL and strips unknown fields", () => {
+  assert.deepEqual(mediaDeleteSchema.parse({ url: blob, ignored: true }), { url: blob });
+  assert.equal(mediaDeleteSchema.safeParse({ url: "not a URL" }).success, false);
+});
+
+test("media deletion route authorizes, validates, and freshly rechecks before Blob deletion", () => {
+  const source = readFileSync(new URL("../app/api/media/route.ts", import.meta.url), "utf8");
+  const authorization = source.indexOf("requireAdmin");
+  const normalization = source.indexOf("normalizeManagedBlobUrl");
+  const snapshot = source.indexOf("loadMediaReferenceSnapshot");
+  const references = source.indexOf("findMediaReferences");
+  const deletion = source.indexOf("del(");
+
+  assert.ok(authorization >= 0 && authorization < normalization);
+  assert.ok(normalization < snapshot);
+  assert.ok(snapshot < references && references < deletion);
+  assert.match(source, /status[^\n]*409|NextResponse\.json\([^\n]*references[^\n]*409/);
+  assert.match(source, /fail\([^\n]*422/);
+  assert.match(source, /fail\([^\n]*502/);
 });

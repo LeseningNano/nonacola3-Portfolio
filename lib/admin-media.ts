@@ -23,6 +23,26 @@ export type MediaReferenceSnapshot = {
   posts: Array<{ id: string; title: string | null; body: string }>;
 };
 
+type ManagedBlob = {
+  url: string;
+  downloadUrl: string;
+  pathname: string;
+  size: number;
+  uploadedAt: Date;
+  etag: string;
+};
+
+type ManagedBlobListPage = {
+  blobs: ManagedBlob[];
+  cursor?: string;
+  hasMore: boolean;
+};
+
+type ManagedBlobList = (options?: {
+  cursor?: string;
+  limit?: number;
+}) => Promise<ManagedBlobListPage>;
+
 const managedBlobHostSuffix = ".public.blob.vercel-storage.com";
 
 type HtmlNode = {
@@ -169,4 +189,25 @@ export function buildMediaReferenceIndex(
   snapshot: MediaReferenceSnapshot,
 ): Record<string, MediaReference[]> {
   return Object.fromEntries(urls.map((url) => [url, findMediaReferences(url, snapshot)]));
+}
+
+export async function collectAllManagedBlobs(
+  listFn: ManagedBlobList,
+): Promise<ManagedBlob[]> {
+  const blobs: ManagedBlob[] = [];
+  const seenCursors = new Set<string>();
+  let cursor: string | undefined;
+
+  while (true) {
+    const page = await listFn({ cursor, limit: 1000 });
+    blobs.push(...page.blobs);
+
+    if (!page.hasMore) return blobs;
+    if (!page.cursor || seenCursors.has(page.cursor)) {
+      throw new Error("Blob listing returned a repeated Blob cursor");
+    }
+
+    seenCursors.add(page.cursor);
+    cursor = page.cursor;
+  }
 }

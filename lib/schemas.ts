@@ -45,6 +45,10 @@ export const heroMutateSchema = z.object({
   blobUrl: z.string().min(1).max(2000),
 });
 
+export const mediaDeleteSchema = z.object({
+  url: z.string().url(),
+});
+
 export const reorderSchema = z.object({
   items: z
     .array(
