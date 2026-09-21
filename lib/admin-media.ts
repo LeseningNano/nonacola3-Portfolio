@@ -38,6 +38,7 @@ export type MediaLibraryState = {
   snapshot: MediaFile[] | null;
   deletingUrl: string | null;
   error: string | null;
+  retryFile?: MediaFile | null;
 };
 
 export type MediaLibraryEvent =
@@ -248,19 +249,21 @@ export function reduceMediaLibraryState(
         snapshot: state.files,
         deletingUrl: event.url,
         error: null,
+        retryFile: null,
       };
     case "delete-success":
-      return { ...state, snapshot: null, deletingUrl: null, error: null };
+      return { ...state, snapshot: null, deletingUrl: null, error: null, retryFile: null };
     case "delete-error":
       return {
         files: state.snapshot ?? state.files,
         snapshot: null,
         deletingUrl: null,
         error: event.message,
+        retryFile: state.snapshot?.find((file) => file.url === state.deletingUrl) ?? null,
       };
     case "replace-files":
       if (state.deletingUrl) return state;
-      return { files: event.files, snapshot: null, deletingUrl: null, error: null };
+      return { files: event.files, snapshot: null, deletingUrl: null, error: null, retryFile: null };
   }
 }
 

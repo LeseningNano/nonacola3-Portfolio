@@ -504,3 +504,26 @@ test("media refresh does not discard a pending deletion rollback snapshot", () =
   assert.deepEqual(restored.files, files);
   assert.equal(restored.error, "删除失败");
 });
+
+test("media library invalidates stale inventory responses and exposes accessible operation status", () => {
+  const source = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /useRef/);
+  assert.match(source, /new AbortController\(\)/);
+  assert.match(source, /controller\?\.abort\(\)/);
+  assert.match(source, /signal:\s*controller\.signal/);
+  assert.match(source, /generation !== inventoryRequest\.current\.generation/);
+  assert.match(source, /role="status" aria-live="polite"/);
+  assert.match(source, /重新尝试删除/);
+});
+
+test("failed media deletion keeps the restored file available for an explicit retry", () => {
+  const files = [mediaFile("unused.webp", [])];
+  const pending = reduceMediaLibraryState(
+    { files, snapshot: null, deletingUrl: null, error: null },
+    { type: "delete-start", url: files[0].url },
+  );
+
+  const restored = reduceMediaLibraryState(pending, { type: "delete-error", message: "删除失败" });
+  assert.equal(restored.retryFile?.url, files[0].url);
+});
