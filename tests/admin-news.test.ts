@@ -135,3 +135,77 @@ test("successful News save replaces the baseline without clearing fields", () =>
     intendedPublished: true,
   });
 });
+
+test("article draft payload trims content and preserves explicit published false", () => {
+  const state = {
+    ...createPostEditorState("article"),
+    title: "  Process notes  ",
+    body: "  body  ",
+  };
+
+  assert.deepEqual(createPostPayload(state, false), {
+    title: "Process notes",
+    body: "body",
+    tag: null,
+    published: false,
+  });
+});
+
+test("article validation rejects a whitespace-only title without mutating state", () => {
+  const state = {
+    ...createPostEditorState("article"),
+    title: "   ",
+    body: "body",
+  };
+
+  assert.deepEqual(validatePostEditor(state), {
+    ok: false,
+    field: "title",
+    message: "标题不能为空",
+  });
+  assert.equal(state.title, "   ");
+  assert.equal(state.body, "body");
+});
+
+test("article validation rejects a whitespace-only body without mutating state", () => {
+  const state = {
+    ...createPostEditorState("article"),
+    title: "Process notes",
+    body: "   ",
+  };
+
+  assert.deepEqual(validatePostEditor(state), {
+    ok: false,
+    field: "body",
+    message: "正文不能为空",
+  });
+  assert.equal(state.title, "Process notes");
+  assert.equal(state.body, "   ");
+});
+
+test("article preview reuses the sanitized Markdown rendering pipeline", () => {
+  const source = readFileSync(
+    new URL("../components/admin/article-editor.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /MarkdownEditor/);
+  assert.match(source, /MarkdownBody/);
+  assert.doesNotMatch(source, /dangerouslySetInnerHTML/);
+});
+
+test("News routes await route props and dispatch by exact type and title nullability", () => {
+  const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
+  const newPage = source("app/(admin)/dashboard/news/new/page.tsx");
+  const editPage = source("app/(admin)/dashboard/news/[id]/edit/page.tsx");
+
+  assert.match(newPage, /await searchParams/);
+  assert.match(newPage, /type === "short"/);
+  assert.match(newPage, /type === "article"/);
+  assert.match(newPage, /\/dashboard\/news\/new\?type=short/);
+  assert.match(newPage, /\/dashboard\/news\/new\?type=article/);
+  assert.match(editPage, /await params/);
+  assert.match(editPage, /if \(!post\) notFound\(\)/);
+  assert.match(editPage, /post\.title === null/);
+  assert.match(editPage, /serializeAdminPost\(post\)/);
+});
