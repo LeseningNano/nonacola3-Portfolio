@@ -20,6 +20,7 @@ export type MediaPickerProps = {
   value: string;
   onSelect: (url: string) => void;
   label: string;
+  disabled?: boolean;
 };
 
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|gif)$/i;
@@ -30,7 +31,7 @@ function matchesKind(file: BlobFile, kind: MediaPickerProps["kind"]) {
   return (kind === "image" ? IMAGE_EXTENSIONS : VIDEO_EXTENSIONS).test(pathname);
 }
 
-export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) {
+export function MediaPicker({ kind, value, onSelect, label, disabled = false }: MediaPickerProps) {
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<BlobFile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,7 @@ export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) 
   }
 
   function handleOpenChange(nextOpen: boolean) {
+    if (nextOpen && disabled) return;
     if (!nextOpen && uploading) return;
     setOpen(nextOpen);
     if (nextOpen) void loadFiles();
@@ -117,6 +119,7 @@ export function MediaPicker({ kind, value, onSelect, label }: MediaPickerProps) 
           type="button"
           variant="outline"
           aria-label={label}
+          disabled={disabled}
           onClick={() => handleOpenChange(true)}
         >
           选择媒体

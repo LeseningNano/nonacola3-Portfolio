@@ -64,7 +64,7 @@ export function MediaLibrary() {
 
   async function deleteFile(file: MediaFile) {
     if (file.references.length > 0 || state.deletingUrl) return;
-    const confirmed = window.confirm(`确定删除“${file.pathname}”（${file.sizeMB} MB）吗？此操作无法撤销。`);
+    const confirmed = window.confirm(`确定删除“${file.pathname}”（${file.sizeMB} MB）吗？此操作无法撤销。系统仅检查指定数据库字段中的精确托管 Blob URL；复制、改写或其他字段中的资源无法自动识别。`);
     if (!confirmed) return;
 
     dispatch({ type: "delete-start", url: file.url });
@@ -100,7 +100,7 @@ export function MediaLibrary() {
         title="媒体库"
         description="管理已上传媒体；仅未被引用的文件可以删除。"
         status={<span className="text-sm text-neutral-400">{inventory ? `${inventory.count} 个文件 · ${inventory.totalSizeMB} MB` : "正在读取存储信息…"}</span>}
-        actions={<div className="flex flex-wrap gap-2"><MediaPicker kind="image" value="" onSelect={onMediaSelected} label="上传图片" /><MediaPicker kind="video" value="" onSelect={onMediaSelected} label="上传视频" /></div>}
+        actions={<div className="flex flex-wrap gap-2"><MediaPicker kind="image" value="" onSelect={onMediaSelected} label="上传图片" disabled={Boolean(state.deletingUrl)} /><MediaPicker kind="video" value="" onSelect={onMediaSelected} label="上传视频" disabled={Boolean(state.deletingUrl)} /></div>}
       />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -117,6 +117,7 @@ export function MediaLibrary() {
         </div>
       </div>
 
+      {state.deletingUrl ? <p role="status" aria-live="polite" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-200">正在删除媒体，完成前不能刷新媒体库。</p> : null}
       {state.error ? <p role="alert" className="rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200">删除未完成，文件已恢复：{state.error}</p> : null}
       {loading ? <div className="flex justify-center gap-2 py-16 text-sm text-neutral-400"><Loader2 className="animate-spin" />正在加载媒体库…</div> : null}
       {!loading && loadError ? <div className="space-y-3 rounded-xl border border-red-400/30 px-5 py-12 text-center"><p role="alert" className="text-sm text-red-200">{loadError}</p><Button type="button" variant="outline" onClick={() => void loadInventory()}>重试</Button></div> : null}

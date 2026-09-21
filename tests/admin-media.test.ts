@@ -490,3 +490,17 @@ test("failed Media deletion restores the exact visible item", () => {
   assert.deepEqual(restored.files, files);
   assert.equal(restored.error, "删除失败");
 });
+
+test("media refresh does not discard a pending deletion rollback snapshot", () => {
+  const files = [mediaFile("unused.webp", [])];
+  const pending = reduceMediaLibraryState(
+    { files, snapshot: null, deletingUrl: null, error: null },
+    { type: "delete-start", url: files[0].url },
+  );
+  const refreshed = reduceMediaLibraryState(pending, { type: "replace-files", files });
+  const restored = reduceMediaLibraryState(refreshed, { type: "delete-error", message: "删除失败" });
+
+  assert.equal(refreshed.deletingUrl, files[0].url);
+  assert.deepEqual(restored.files, files);
+  assert.equal(restored.error, "删除失败");
+});

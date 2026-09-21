@@ -259,6 +259,7 @@ export function reduceMediaLibraryState(
         error: event.message,
       };
     case "replace-files":
+      if (state.deletingUrl) return state;
       return { files: event.files, snapshot: null, deletingUrl: null, error: null };
   }
 }
