@@ -517,6 +517,17 @@ test("media library invalidates stale inventory responses and exposes accessible
   assert.match(source, /重新尝试删除/);
 });
 
+test("media library invalidates an in-flight inventory request before starting deletion", () => {
+  const source = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
+  const deleteFile = source.indexOf("async function deleteFile");
+  const invalidation = source.indexOf("invalidateInventoryRequests();", deleteFile);
+  const deletionRequest = source.indexOf('fetch("/api/media"', deleteFile);
+
+  assert.ok(invalidation >= 0, "deletion must invalidate its active inventory request");
+  assert.ok(deletionRequest >= 0, "deletion must issue the media delete request");
+  assert.ok(invalidation < deletionRequest, "inventory invalidation must happen before the delete request starts");
+});
+
 test("failed media deletion keeps the restored file available for an explicit retry", () => {
   const files = [mediaFile("unused.webp", [])];
   const pending = reduceMediaLibraryState(

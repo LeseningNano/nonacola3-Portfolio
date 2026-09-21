@@ -86,6 +86,7 @@ export function MediaLibrary() {
     const confirmed = window.confirm(`确定删除“${file.pathname}”（${file.sizeMB} MB）吗？此操作无法撤销。系统仅检查指定数据库字段中的精确托管 Blob URL；复制、改写或其他字段中的资源无法自动识别。`);
     if (!confirmed) return;
 
+    invalidateInventoryRequests();
     dispatch({ type: "delete-start", url: file.url });
     try {
       const response = await fetch("/api/media", {
@@ -94,7 +95,6 @@ export function MediaLibrary() {
         body: JSON.stringify({ url: file.url }),
       });
       if (!response.ok) throw new Error(await responseError(response));
-      invalidateInventoryRequests();
       dispatch({ type: "delete-success" });
       setInventory((current) => current ? {
         ...current,
