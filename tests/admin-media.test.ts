@@ -7,7 +7,10 @@ import {
   collectAllManagedBlobs,
   extractHttpUrls,
   findMediaReferences,
+  filterMediaFiles,
   normalizeManagedBlobUrl,
+  reduceMediaLibraryState,
+  type MediaFile,
   type MediaReferenceSnapshot,
 } from "../lib/admin-media";
 import { mediaDeleteSchema } from "../lib/schemas";
@@ -27,6 +30,20 @@ function listedBlob(
     size,
     uploadedAt: new Date(uploadedAt),
     etag: `etag-${pathname}`,
+  };
+}
+
+function reference(kind: "hero"): MediaFile["references"][number] {
+  return { kind, id: "singleton", label: "Hero 背景视频", field: "blobUrl" };
+}
+
+function mediaFile(pathname: string, references: MediaFile["references"]): MediaFile {
+  return {
+    url: `https://store.public.blob.vercel-storage.com/uploads/${pathname}`,
+    pathname: `uploads/${pathname}`,
+    size: 1024,
+    sizeMB: "0.00",
+    references,
   };
 }
 
@@ -450,4 +467,26 @@ test("media deletion route authorizes, validates, and freshly rechecks before Bl
   assert.match(source, /status[^\n]*409|NextResponse\.json\([^\n]*references[^\n]*409/);
   assert.match(source, /fail\([^\n]*422/);
   assert.match(source, /fail\([^\n]*502/);
+});
+
+test("Media library filters by kind, unused state, and filename", () => {
+  const files = [mediaFile("hero.mp4", [reference("hero")]), mediaFile("unused.webp", [])];
+
+  assert.deepEqual(filterMediaFiles(files, "video", "").map(({ pathname }) => pathname), ["uploads/hero.mp4"]);
+  assert.deepEqual(filterMediaFiles(files, "unused", "").map(({ pathname }) => pathname), ["uploads/unused.webp"]);
+  assert.deepEqual(filterMediaFiles(files, "all", "UNUSED").map(({ pathname }) => pathname), ["uploads/unused.webp"]);
+});
+
+test("failed Media deletion restores the exact visible item", () => {
+  const files = [mediaFile("unused.webp", [])];
+  const pending = reduceMediaLibraryState(
+    { files, snapshot: null, deletingUrl: null, error: null },
+    { type: "delete-start", url: files[0].url },
+  );
+
+  assert.equal(pending.files.length, 0);
+
+  const restored = reduceMediaLibraryState(pending, { type: "delete-error", message: "删除失败" });
+  assert.deepEqual(restored.files, files);
+  assert.equal(restored.error, "删除失败");
 });

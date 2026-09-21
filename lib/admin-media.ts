@@ -23,6 +23,29 @@ export type MediaReferenceSnapshot = {
   posts: Array<{ id: string; title: string | null; body: string }>;
 };
 
+export type MediaFile = {
+  url: string;
+  pathname: string;
+  size: number;
+  sizeMB: string;
+  references: MediaReference[];
+};
+
+export type MediaLibraryFilter = "all" | "image" | "video" | "unused";
+
+export type MediaLibraryState = {
+  files: MediaFile[];
+  snapshot: MediaFile[] | null;
+  deletingUrl: string | null;
+  error: string | null;
+};
+
+export type MediaLibraryEvent =
+  | { type: "delete-start"; url: string }
+  | { type: "delete-success" }
+  | { type: "delete-error"; message: string }
+  | { type: "replace-files"; files: MediaFile[] };
+
 type ManagedBlob = {
   url: string;
   downloadUrl: string;
@@ -44,6 +67,8 @@ type ManagedBlobList = (options?: {
 }) => Promise<ManagedBlobListPage>;
 
 const managedBlobHostSuffix = ".public.blob.vercel-storage.com";
+const imageExtensions = new Set(["jpg", "jpeg", "png", "webp", "gif", "avif", "svg"]);
+const videoExtensions = new Set(["mp4", "webm", "mov", "avi", "m4v", "ogv"]);
 
 type HtmlNode = {
   attrs?: Array<{ name: string; value: string }>;
@@ -189,6 +214,53 @@ export function buildMediaReferenceIndex(
   snapshot: MediaReferenceSnapshot,
 ): Record<string, MediaReference[]> {
   return Object.fromEntries(urls.map((url) => [url, findMediaReferences(url, snapshot)]));
+}
+
+function mediaKind(pathname: string): "image" | "video" | null {
+  const cleanPathname = pathname.split(/[?#]/, 1)[0] ?? "";
+  const extension = cleanPathname.split(".").pop()?.toLowerCase() ?? "";
+  if (imageExtensions.has(extension)) return "image";
+  if (videoExtensions.has(extension)) return "video";
+  return null;
+}
+
+export function filterMediaFiles(
+  files: MediaFile[],
+  filter: MediaLibraryFilter,
+  query: string,
+): MediaFile[] {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  return files.filter((file) => {
+    if (normalizedQuery && !file.pathname.toLocaleLowerCase().includes(normalizedQuery)) return false;
+    if (filter === "unused") return file.references.length === 0;
+    return filter === "all" || mediaKind(file.pathname) === filter;
+  });
+}
+
+export function reduceMediaLibraryState(
+  state: MediaLibraryState,
+  event: MediaLibraryEvent,
+): MediaLibraryState {
+  switch (event.type) {
+    case "delete-start":
+      return {
+        files: state.files.filter((file) => file.url !== event.url),
+        snapshot: state.files,
+        deletingUrl: event.url,
+        error: null,
+      };
+    case "delete-success":
+      return { ...state, snapshot: null, deletingUrl: null, error: null };
+    case "delete-error":
+      return {
+        files: state.snapshot ?? state.files,
+        snapshot: null,
+        deletingUrl: null,
+        error: event.message,
+      };
+    case "replace-files":
+      return { files: event.files, snapshot: null, deletingUrl: null, error: null };
+  }
 }
 
 export async function collectAllManagedBlobs(

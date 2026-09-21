@@ -11,13 +11,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import type { MediaFile } from "@/lib/admin-media";
 
-type BlobFile = {
-  url: string;
-  pathname: string;
-  size: number;
-  sizeMB: string;
-};
+type BlobFile = Pick<MediaFile, "url" | "pathname" | "size" | "sizeMB" | "references">;
 
 export type MediaPickerProps = {
   kind: "image" | "video";
