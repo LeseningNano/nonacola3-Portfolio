@@ -168,6 +168,53 @@ test("reference lookup covers approved fields and ignores filename-prefix collis
   );
 });
 
+test("reference lookup decodes escaped Markdown destination punctuation", () => {
+  const escapedParenthesisBlob = "https://store.public.blob.vercel-storage.com/uploads/hero).mp4";
+  const snapshot = mediaSnapshot({
+    workDescription: "[asset](https://store.public.blob.vercel-storage.com/uploads/hero\\).mp4)",
+  });
+
+  assert.deepEqual(
+    findMediaReferences(escapedParenthesisBlob, snapshot).map(({ kind }) => kind),
+    ["work-body"],
+  );
+  assert.deepEqual(findMediaReferences(`${escapedParenthesisBlob}-old`, snapshot), []);
+});
+
+test("reference lookup decodes HTML and Markdown character references", () => {
+  const ampersandBlob = "https://store.public.blob.vercel-storage.com/uploads/hero&final.mp4";
+  const snapshot = mediaSnapshot({
+    workDescription: `<video src="https://store.public.blob.vercel-storage.com/uploads/hero&amp;final.mp4"></video>`,
+    postBody: [
+      `<a href="https://store.public.blob.vercel-storage.com/uploads/hero&amp;final.mp4">asset</a>`,
+      `[asset](https://store.public.blob.vercel-storage.com/uploads/hero&amp;final.mp4)`,
+    ].join("\n"),
+  });
+
+  assert.deepEqual(
+    findMediaReferences(ampersandBlob, snapshot).map(({ kind }) => kind),
+    ["work-body", "post-body"],
+  );
+  assert.deepEqual(findMediaReferences(`${ampersandBlob}-old`, snapshot), []);
+});
+
+test("reference lookup trims prose punctuation but preserves it in structured URLs", () => {
+  const structuredBlob = `${blob}?download=!;:`;
+  const snapshot = mediaSnapshot({
+    workDescription: `Download ${blob}!;:`,
+    postBody: `[asset](${structuredBlob})`,
+  });
+
+  assert.deepEqual(
+    findMediaReferences(blob, snapshot).map(({ kind }) => kind),
+    ["work-body"],
+  );
+  assert.deepEqual(
+    findMediaReferences(structuredBlob, snapshot).map(({ kind }) => kind),
+    ["post-body"],
+  );
+});
+
 test("uploaded Showreel and work thumbnails are indexed with stable field references", () => {
   const references = findMediaReferences(blob, mediaSnapshot({
     showreelUrl: blob,

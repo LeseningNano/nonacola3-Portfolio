@@ -1,3 +1,5 @@
+import { parseEntities } from "parse-entities";
+
 export type MediaReference = {
   kind: "hero" | "showreel" | "work-thumbnail" | "work-body" | "post-body";
   id: string;
@@ -21,8 +23,9 @@ const managedBlobHostSuffix = ".public.blob.vercel-storage.com";
 
 const httpUrlStart = /https?:\/\//gi;
 const terminalProsePunctuation = new Set([
-  ".", ",", "。", "，",
+  ".", ",", ";", ":", "!", "?", "。", "，", "；", "：", "！", "？",
 ]);
+const markdownEscapablePunctuation = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/;
 
 function delimiterBalance(value: string, opening: string, closing: string): number {
   let balance = 0;
@@ -56,30 +59,87 @@ function removeEnclosingDelimiter(
 function htmlAttributeContext(
   text: string,
   start: number,
-): "supported" | "unsupported" | null {
+): { quote: string | null } | "unsupported" | null {
   const tagStart = text.lastIndexOf("<", start - 1);
   const tagEnd = text.lastIndexOf(">", start - 1);
   if (tagStart <= tagEnd || tagStart === start - 1) return null;
 
   const prefix = text.slice(tagStart + 1, start);
-  return /(?:^|\s)(?:src|href)\s*=\s*["']?$/i.test(prefix)
-    ? "supported"
-    : "unsupported";
+  const match = /(?:^|\s)(?:src|href)\s*=\s*(["']?)$/i.exec(prefix);
+  return match ? { quote: match[1] || null } : "unsupported";
 }
 
-function extractUrlCandidate(
+function extractHtmlUrlCandidate(
   text: string,
   start: number,
-  preserveTerminalPunctuation: boolean,
+  quote: string | null,
 ): string {
+  let end = start;
+  while (
+    end < text.length
+    && (quote ? text[end] !== quote : !/[\s>]/.test(text[end]))
+  ) {
+    end += 1;
+  }
+
+  return parseEntities(text.slice(start, end));
+}
+
+function markdownDestinationContext(
+  text: string,
+  start: number,
+): "angle" | "parenthesized" | null {
+  const prefix = text.slice(0, start);
+  if (/\]\(\s*<$/.test(prefix)) return "angle";
+  return /\]\(\s*$/.test(prefix) ? "parenthesized" : null;
+}
+
+function extractMarkdownUrlCandidate(
+  text: string,
+  start: number,
+  context: "angle" | "parenthesized",
+): string {
+  let candidate = "";
+  let parenthesisBalance = 0;
+
+  for (let index = start; index < text.length; index += 1) {
+    const character = text[index];
+
+    if (
+      character === "\\"
+      && index + 1 < text.length
+      && markdownEscapablePunctuation.test(text[index + 1])
+    ) {
+      candidate += text[index + 1];
+      index += 1;
+      continue;
+    }
+
+    if (context === "angle") {
+      if (character === ">") break;
+      candidate += character;
+      continue;
+    }
+
+    if (/\s/.test(character)) break;
+    if (character === "(") parenthesisBalance += 1;
+    if (character === ")") {
+      if (parenthesisBalance === 0) break;
+      parenthesisBalance -= 1;
+    }
+    candidate += character;
+  }
+
+  return parseEntities(candidate);
+}
+
+function extractProseUrlCandidate(text: string, start: number): string {
   let end = start;
   while (end < text.length && !/[\s<>"']/.test(text[end])) end += 1;
 
   let candidate = text.slice(start, end);
-  if (!preserveTerminalPunctuation) {
-    while (terminalProsePunctuation.has(candidate.at(-1) ?? "")) {
-      candidate = candidate.slice(0, -1);
-    }
+  while (terminalProsePunctuation.has(candidate.at(-1) ?? "")) {
+    candidate = candidate.slice(0, -1);
   }
 
   return removeEnclosingDelimiter(candidate, text[start - 1]);
@@ -118,12 +178,14 @@ export function extractHttpUrls(text: string | null): string[] {
     const htmlContext = htmlAttributeContext(text, start);
     if (htmlContext === "unsupported") continue;
 
-    const opening = text[start - 1];
-    const preserveTerminalPunctuation = htmlContext === "supported"
-      || opening === '"'
-      || opening === "'"
-      || opening === "<";
-    const candidate = extractUrlCandidate(text, start, preserveTerminalPunctuation);
+    const markdownContext = markdownDestinationContext(text, start);
+    const candidate = htmlContext
+      ? extractHtmlUrlCandidate(text, start, htmlContext.quote)
+      : markdownContext
+        ? extractMarkdownUrlCandidate(text, start, markdownContext)
+        : text[start - 1] === "<"
+          ? extractHtmlUrlCandidate(text, start, ">")
+          : extractProseUrlCandidate(text, start);
     const normalized = normalizeManagedBlobUrl(candidate);
     if (normalized) urls.push(normalized);
   }
