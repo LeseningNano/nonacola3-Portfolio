@@ -145,10 +145,34 @@ test("URL extraction preserves balanced parentheses in paths and queries", () =>
   );
 });
 
-test("URL extraction does not alter an unwrapped URL ending in a closing parenthesis", () => {
-  const blobEndingInParenthesis = "https://store.public.blob.vercel-storage.com/uploads/hero)";
+test("URL extraction excludes an unmatched closing parenthesis after a bare GFM URL", () => {
+  assert.deepEqual(extractHttpUrls(`${blob})`), [blob]);
+});
 
-  assert.deepEqual(extractHttpUrls(blobEndingInParenthesis), [blobEndingInParenthesis]);
+test("URL extraction uses reference definition destinations for links and images", () => {
+  const imageBlob = `${blob}?render=image`;
+
+  assert.deepEqual(
+    extractHttpUrls([
+      "[download][asset]",
+      "![preview][image]",
+      "",
+      `[asset]: ${blob}`,
+      `[image]: ${imageBlob}`,
+    ].join("\n")),
+    [blob, imageBlob],
+  );
+});
+
+test("URL extraction resolves reference definitions from nested Markdown containers", () => {
+  assert.deepEqual(
+    extractHttpUrls([
+      "[download][asset]",
+      "",
+      `> [asset]: ${blob}`,
+    ].join("\n")),
+    [blob],
+  );
 });
 
 test("reference lookup covers approved fields and ignores filename-prefix collisions", () => {
@@ -198,8 +222,9 @@ test("reference lookup decodes HTML and Markdown character references", () => {
   assert.deepEqual(findMediaReferences(`${ampersandBlob}-old`, snapshot), []);
 });
 
-test("reference lookup preserves nonterminated character references in destinations", () => {
+test("reference lookup follows HTML5 decoding for nonterminated character references", () => {
   const copyrightBlob = `${blob}?license=&copy`;
+  const decodedCopyrightBlob = `${blob}?license=©`;
   const copyrightParameterBlob = `${blob}?license=&copy=2`;
   const snapshot = mediaSnapshot({
     workDescription: `[asset](${copyrightBlob})`,
@@ -211,11 +236,51 @@ test("reference lookup preserves nonterminated character references in destinati
 
   assert.deepEqual(
     findMediaReferences(copyrightBlob, snapshot).map(({ kind }) => kind),
-    ["work-body", "post-body"],
+    ["work-body"],
+  );
+  assert.deepEqual(
+    findMediaReferences(decodedCopyrightBlob, snapshot).map(({ kind }) => kind),
+    ["post-body"],
   );
   assert.deepEqual(
     findMediaReferences(copyrightParameterBlob, snapshot).map(({ kind }) => kind),
     ["post-body"],
+  );
+});
+
+test("reference lookup protects reference-style Markdown destinations", () => {
+  const labelBlob = `${blob}?only=label`;
+  const destinationBlob = `${blob}?actual=destination`;
+  const snapshot = mediaSnapshot({
+    workDescription: [
+      `[${labelBlob}][download]`,
+      "![preview][download]",
+      "",
+      `[download]: ${destinationBlob}`,
+    ].join("\n"),
+  });
+
+  assert.deepEqual(findMediaReferences(labelBlob, snapshot), []);
+  assert.deepEqual(
+    findMediaReferences(destinationBlob, snapshot).map(({ kind }) => kind),
+    ["work-body"],
+  );
+});
+
+test("reference lookup excludes unmatched closing parentheses but retains balanced ones in GFM URLs", () => {
+  const balancedBlob = "https://store.public.blob.vercel-storage.com/uploads/(hero)";
+  const snapshot = mediaSnapshot({
+    workDescription: `${blob})\n${balancedBlob}`,
+  });
+
+  assert.deepEqual(
+    findMediaReferences(blob, snapshot).map(({ kind }) => kind),
+    ["work-body"],
+  );
+  assert.deepEqual(findMediaReferences(`${blob})`, snapshot), []);
+  assert.deepEqual(
+    findMediaReferences(balancedBlob, snapshot).map(({ kind }) => kind),
+    ["work-body"],
   );
 });
 
