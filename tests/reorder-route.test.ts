@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { handleReorderPost } from "../app/api/videos/reorder/route";
+import { handleReorderPost } from "../lib/admin-reorder";
 
 test("malformed reorder JSON returns the invalid-payload 422 without starting a transaction", async () => {
   let transactionCalls = 0;
