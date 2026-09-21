@@ -19,6 +19,29 @@ export type MediaReferenceSnapshot = {
 
 const managedBlobHostSuffix = ".public.blob.vercel-storage.com";
 
+function parenthesisBalance(value: string): number {
+  let balance = 0;
+
+  for (const character of value) {
+    if (character === "(") balance += 1;
+    if (character === ")") balance -= 1;
+  }
+
+  return balance;
+}
+
+function removeEnclosingTrailingParentheses(value: string, prefix: string): string {
+  if (!prefix.endsWith("(")) return value;
+
+  const trailingParentheses = value.match(/\)+$/)?.[0].length ?? 0;
+  const unbalancedClosingParentheses = Math.max(0, -parenthesisBalance(value));
+  const delimiterCount = Math.min(trailingParentheses, unbalancedClosingParentheses);
+  if (delimiterCount === 0) return value;
+
+  const candidate = value.slice(0, -delimiterCount);
+  return parenthesisBalance(candidate) === 0 ? candidate : value;
+}
+
 export function normalizeManagedBlobUrl(value: unknown): string | null {
   if (typeof value !== "string") return null;
 
@@ -48,9 +71,7 @@ export function extractHttpUrls(text: string | null): string[] {
   for (const match of text.matchAll(/https?:\/\/[^\s<>"']+/g)) {
     const value = match[0];
     const prefix = text.slice(0, match.index);
-    const candidate = /\]\(\s*$/.test(prefix) && value.endsWith(")")
-      ? value.slice(0, -1)
-      : value;
+    const candidate = removeEnclosingTrailingParentheses(value, prefix);
     const normalized = normalizeManagedBlobUrl(candidate);
     if (normalized) urls.push(normalized);
   }
