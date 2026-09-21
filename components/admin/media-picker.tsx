@@ -20,6 +20,7 @@ export type MediaPickerProps = {
   value: string;
   onSelect: (url: string) => void;
   label: string;
+  accept?: string;
   disabled?: boolean;
 };
 
@@ -31,7 +32,7 @@ function matchesKind(file: BlobFile, kind: MediaPickerProps["kind"]) {
   return (kind === "image" ? IMAGE_EXTENSIONS : VIDEO_EXTENSIONS).test(pathname);
 }
 
-export function MediaPicker({ kind, value, onSelect, label, disabled = false }: MediaPickerProps) {
+export function MediaPicker({ kind, value, onSelect, label, accept: acceptedTypes, disabled = false }: MediaPickerProps) {
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<BlobFile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -77,7 +78,8 @@ export function MediaPicker({ kind, value, onSelect, label, disabled = false }: 
       kind === "image"
         ? ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type)
         : file.type.startsWith("video/");
-    if (!validMime) {
+    const allowedByCaller = !acceptedTypes || acceptedTypes.split(",").map((type) => type.trim()).includes(file.type);
+    if (!validMime || !allowedByCaller) {
       setError(kind === "image" ? "请选择 JPEG、PNG、WebP 或 GIF 图片" : "请选择视频文件");
       event.target.value = "";
       return;
@@ -107,7 +109,7 @@ export function MediaPicker({ kind, value, onSelect, label, disabled = false }: 
     }
   }
 
-  const accept = kind === "image" ? "image/jpeg,image/png,image/webp,image/gif" : "video/*";
+  const accept = acceptedTypes ?? (kind === "image" ? "image/jpeg,image/png,image/webp,image/gif" : "video/*");
   const dialogTitle = kind === "image" ? "选择图片" : "选择视频";
 
   return (
