@@ -13,7 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import type { MediaFile } from "@/lib/admin-media";
 
-type BlobFile = Pick<MediaFile, "url" | "pathname" | "size" | "sizeMB" | "references">;
+export type BlobFile = Pick<MediaFile, "url" | "pathname" | "size" | "sizeMB" | "references">;
 
 export type MediaPickerProps = {
   kind: "image" | "video";
@@ -26,10 +26,43 @@ export type MediaPickerProps = {
 
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|gif)$/i;
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|m4v|ogv)$/i;
+const MIME_TYPE_BY_EXTENSION: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+  ".mov": "video/quicktime",
+  ".avi": "video/x-msvideo",
+  ".m4v": "video/x-m4v",
+  ".ogv": "video/ogg",
+};
 
 function matchesKind(file: BlobFile, kind: MediaPickerProps["kind"]) {
   const pathname = file.pathname.split(/[?#]/, 1)[0] ?? "";
   return (kind === "image" ? IMAGE_EXTENSIONS : VIDEO_EXTENSIONS).test(pathname);
+}
+
+function matchesAcceptedType(file: BlobFile, acceptedTypes?: string) {
+  if (!acceptedTypes) return true;
+
+  const pathname = file.pathname.split(/[?#]/, 1)[0] ?? "";
+  const extension = pathname.match(/\.[^.]+$/)?.[0]?.toLowerCase();
+  const mimeType = extension ? MIME_TYPE_BY_EXTENSION[extension] : undefined;
+
+  return acceptedTypes.split(",").some((acceptedType) => {
+    const type = acceptedType.trim().toLowerCase();
+    if (!type) return false;
+    if (type.startsWith(".")) return type === extension;
+    if (type.endsWith("/*")) return mimeType?.startsWith(type.slice(0, -1)) ?? false;
+    return type === mimeType;
+  });
+}
+
+export function filterMediaPickerFiles(files: BlobFile[], kind: MediaPickerProps["kind"], acceptedTypes?: string) {
+  return files.filter((file) => matchesKind(file, kind) && matchesAcceptedType(file, acceptedTypes));
 }
 
 export function MediaPicker({ kind, value, onSelect, label, accept: acceptedTypes, disabled = false }: MediaPickerProps) {
@@ -49,7 +82,7 @@ export function MediaPicker({ kind, value, onSelect, label, accept: acceptedType
       const response = await fetch("/api/blob-usage");
       if (!response.ok) throw new Error("无法加载媒体文件");
       const data = (await response.json()) as { files?: BlobFile[] };
-      setFiles((data.files ?? []).filter((file) => matchesKind(file, kind)));
+      setFiles(filterMediaPickerFiles(data.files ?? [], kind, acceptedTypes));
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "无法加载媒体文件");
     } finally {

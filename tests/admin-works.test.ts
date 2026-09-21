@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { MediaPicker } from "../components/admin/media-picker";
+import { filterMediaPickerFiles, MediaPicker } from "../components/admin/media-picker";
 import { installUnsavedOrderHistoryGuard } from "../components/admin/work-order-editor";
 import {
   ADMIN_NAV_ITEMS,
@@ -294,4 +294,16 @@ test("media picker labels identify their distinct trigger buttons", () => {
   assert.match(markup, /<button(?=[^>]+id="media-picker-[^"]+")(?=[^>]+aria-label="从媒体库选择视频")[^>]*>/);
   assert.match(markup, /<label(?=[^>]+for="media-picker-[^"]+")[^>]*>从媒体库选择缩略图<\/label>/);
   assert.match(markup, /<button(?=[^>]+id="media-picker-[^"]+")(?=[^>]+aria-label="从媒体库选择缩略图")[^>]*>/);
+});
+
+test("media picker excludes non-MP4 library videos when the caller accepts only MP4", () => {
+  const files = [
+    { url: "https://example.com/hero.mp4", pathname: "uploads/hero.mp4", size: 1, sizeMB: "0.01", references: [] },
+    { url: "https://example.com/showreel.webm", pathname: "uploads/showreel.webm", size: 1, sizeMB: "0.01", references: [] },
+  ];
+
+  assert.deepEqual(
+    filterMediaPickerFiles(files, "video", "video/mp4").map(({ pathname }) => pathname),
+    ["uploads/hero.mp4"],
+  );
 });
