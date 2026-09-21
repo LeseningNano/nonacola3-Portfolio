@@ -267,6 +267,28 @@ test("reference lookup protects reference-style Markdown destinations", () => {
   );
 });
 
+test("reference lookup finds HTML media inside direct and reference-style link labels", () => {
+  const directLabelBlob = `${blob}?location=direct-label`;
+  const referenceLabelBlob = `${blob}?location=reference-label`;
+  const snapshot = mediaSnapshot({
+    workDescription: `[<img src="${directLabelBlob}">](https://example.com/download)`,
+    postBody: [
+      `[<video src="${referenceLabelBlob}"></video>][download]`,
+      "",
+      "[download]: https://example.com/download",
+    ].join("\n"),
+  });
+
+  assert.deepEqual(
+    findMediaReferences(directLabelBlob, snapshot).map(({ kind }) => kind),
+    ["work-body"],
+  );
+  assert.deepEqual(
+    findMediaReferences(referenceLabelBlob, snapshot).map(({ kind }) => kind),
+    ["post-body"],
+  );
+});
+
 test("reference lookup excludes unmatched closing parentheses but retains balanced ones in GFM URLs", () => {
   const balancedBlob = "https://store.public.blob.vercel-storage.com/uploads/(hero)";
   const snapshot = mediaSnapshot({

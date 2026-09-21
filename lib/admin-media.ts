@@ -99,13 +99,16 @@ export function extractHttpUrls(text: string | null): string[] {
   function visit(node: Nodes): void {
     if (node.type === "link") {
       add(node.url);
-      return;
     }
     if (node.type === "image") {
       add(node.url);
       return;
     }
-    if (node.type === "linkReference" || node.type === "imageReference") {
+    if (node.type === "linkReference") {
+      const destination = definitions.get(node.identifier.toUpperCase());
+      if (destination) add(destination);
+    }
+    if (node.type === "imageReference") {
       const destination = definitions.get(node.identifier.toUpperCase());
       if (destination) add(destination);
       return;
