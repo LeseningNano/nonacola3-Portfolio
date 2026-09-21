@@ -198,6 +198,60 @@ test("reference lookup decodes HTML and Markdown character references", () => {
   assert.deepEqual(findMediaReferences(`${ampersandBlob}-old`, snapshot), []);
 });
 
+test("reference lookup preserves nonterminated character references in destinations", () => {
+  const copyrightBlob = `${blob}?license=&copy`;
+  const copyrightParameterBlob = `${blob}?license=&copy=2`;
+  const snapshot = mediaSnapshot({
+    workDescription: `[asset](${copyrightBlob})`,
+    postBody: [
+      `<a href="${copyrightBlob}">asset</a>`,
+      `<video src="${copyrightParameterBlob}"></video>`,
+    ].join("\n"),
+  });
+
+  assert.deepEqual(
+    findMediaReferences(copyrightBlob, snapshot).map(({ kind }) => kind),
+    ["work-body", "post-body"],
+  );
+  assert.deepEqual(
+    findMediaReferences(copyrightParameterBlob, snapshot).map(({ kind }) => kind),
+    ["post-body"],
+  );
+});
+
+test("reference lookup recognizes GFM autolinks inside Markdown styling", () => {
+  const emphasizedBlob = `${blob}?style=emphasis`;
+  const underscoredBlob = `${blob}?style=underscore`;
+  const deletedBlob = `${blob}?style=delete`;
+  const snapshot = mediaSnapshot({
+    workDescription: [
+      `*${emphasizedBlob}*`,
+      `_${underscoredBlob}_`,
+      `~~${deletedBlob}~~`,
+    ].join("\n"),
+  });
+
+  for (const styledBlob of [emphasizedBlob, underscoredBlob, deletedBlob]) {
+    assert.deepEqual(
+      findMediaReferences(styledBlob, snapshot).map(({ kind }) => kind),
+      ["work-body"],
+    );
+    assert.deepEqual(findMediaReferences(`${styledBlob}-old`, snapshot), []);
+  }
+});
+
+test("reference lookup parses HTML attributes after quoted greater-than signs", () => {
+  const snapshot = mediaSnapshot({
+    postBody: `<video title="16 > 9" data-backup="${blob}-old" src="${blob}"></video>`,
+  });
+
+  assert.deepEqual(
+    findMediaReferences(blob, snapshot).map(({ kind }) => kind),
+    ["post-body"],
+  );
+  assert.deepEqual(findMediaReferences(`${blob}-old`, snapshot), []);
+});
+
 test("reference lookup trims prose punctuation but preserves it in structured URLs", () => {
   const structuredBlob = `${blob}?download=!;:`;
   const snapshot = mediaSnapshot({

@@ -1,4 +1,9 @@
+import type { Nodes } from "mdast";
+import { gfmFromMarkdown } from "mdast-util-gfm";
+import { fromMarkdown } from "mdast-util-from-markdown";
+import { gfm } from "micromark-extension-gfm";
 import { parseEntities } from "parse-entities";
+import { parseFragment } from "parse5";
 
 export type MediaReference = {
   kind: "hero" | "showreel" | "work-thumbnail" | "work-body" | "post-body";
@@ -21,11 +26,9 @@ export type MediaReferenceSnapshot = {
 
 const managedBlobHostSuffix = ".public.blob.vercel-storage.com";
 
-const httpUrlStart = /https?:\/\//gi;
 const terminalProsePunctuation = new Set([
   ".", ",", ";", ":", "!", "?", "。", "，", "；", "：", "！", "？",
 ]);
-const markdownEscapablePunctuation = /[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/;
 
 function delimiterBalance(value: string, opening: string, closing: string): number {
   let balance = 0;
@@ -56,83 +59,6 @@ function removeEnclosingDelimiter(
   return candidate;
 }
 
-function htmlAttributeContext(
-  text: string,
-  start: number,
-): { quote: string | null } | "unsupported" | null {
-  const tagStart = text.lastIndexOf("<", start - 1);
-  const tagEnd = text.lastIndexOf(">", start - 1);
-  if (tagStart <= tagEnd || tagStart === start - 1) return null;
-
-  const prefix = text.slice(tagStart + 1, start);
-  const match = /(?:^|\s)(?:src|href)\s*=\s*(["']?)$/i.exec(prefix);
-  return match ? { quote: match[1] || null } : "unsupported";
-}
-
-function extractHtmlUrlCandidate(
-  text: string,
-  start: number,
-  quote: string | null,
-): string {
-  let end = start;
-  while (
-    end < text.length
-    && (quote ? text[end] !== quote : !/[\s>]/.test(text[end]))
-  ) {
-    end += 1;
-  }
-
-  return parseEntities(text.slice(start, end));
-}
-
-function markdownDestinationContext(
-  text: string,
-  start: number,
-): "angle" | "parenthesized" | null {
-  const prefix = text.slice(0, start);
-  if (/\]\(\s*<$/.test(prefix)) return "angle";
-  return /\]\(\s*$/.test(prefix) ? "parenthesized" : null;
-}
-
-function extractMarkdownUrlCandidate(
-  text: string,
-  start: number,
-  context: "angle" | "parenthesized",
-): string {
-  let candidate = "";
-  let parenthesisBalance = 0;
-
-  for (let index = start; index < text.length; index += 1) {
-    const character = text[index];
-
-    if (
-      character === "\\"
-      && index + 1 < text.length
-      && markdownEscapablePunctuation.test(text[index + 1])
-    ) {
-      candidate += text[index + 1];
-      index += 1;
-      continue;
-    }
-
-    if (context === "angle") {
-      if (character === ">") break;
-      candidate += character;
-      continue;
-    }
-
-    if (/\s/.test(character)) break;
-    if (character === "(") parenthesisBalance += 1;
-    if (character === ")") {
-      if (parenthesisBalance === 0) break;
-      parenthesisBalance -= 1;
-    }
-    candidate += character;
-  }
-
-  return parseEntities(candidate);
-}
-
 function extractProseUrlCandidate(text: string, start: number): string {
   let end = start;
   while (end < text.length && !/[\s<>"']/.test(text[end])) end += 1;
@@ -143,6 +69,77 @@ function extractProseUrlCandidate(text: string, start: number): string {
   }
 
   return removeEnclosingDelimiter(candidate, text[start - 1]);
+}
+
+type HtmlNode = {
+  attrs?: Array<{ name: string }>;
+  childNodes?: HtmlNode[];
+  sourceCodeLocation?: {
+    attrs?: Record<string, { startOffset: number; endOffset: number }>;
+  } | null;
+};
+
+function rawHtmlAttributeValue(attribute: string): string | null {
+  const equals = attribute.indexOf("=");
+  if (equals === -1) return null;
+
+  const value = attribute.slice(equals + 1).trimStart();
+  const quote = value[0];
+  if (quote === "\"" || quote === "'") {
+    const end = value.lastIndexOf(quote);
+    return end > 0 ? value.slice(1, end) : null;
+  }
+
+  const end = value.search(/[\s>]/);
+  return end === -1 ? value : value.slice(0, end);
+}
+
+function extractHtmlAttributeUrls(html: string): string[] {
+  const urls: string[] = [];
+  const fragment = parseFragment(html, { sourceCodeLocationInfo: true }) as unknown as HtmlNode;
+
+  function visit(node: HtmlNode): void {
+    for (const attribute of node.attrs ?? []) {
+      if (attribute.name !== "src" && attribute.name !== "href") continue;
+
+      const location = node.sourceCodeLocation?.attrs?.[attribute.name];
+      if (!location) continue;
+
+      const rawValue = rawHtmlAttributeValue(
+        html.slice(location.startOffset, location.endOffset),
+      );
+      if (rawValue === null) continue;
+
+      urls.push(parseEntities(rawValue, {
+        attribute: true,
+        nonTerminated: false,
+      }));
+    }
+
+    for (const child of node.childNodes ?? []) visit(child);
+  }
+
+  visit(fragment);
+  return urls;
+}
+
+function isFormattingAncestor(node: Nodes): boolean {
+  return node.type === "emphasis" || node.type === "strong" || node.type === "delete";
+}
+
+function markdownLinkCandidate(text: string, node: Extract<Nodes, { type: "link" }>, ancestors: Nodes[]): string {
+  const start = node.position?.start.offset;
+  const end = node.position?.end.offset;
+  if (
+    start !== undefined
+    && end !== undefined
+    && !ancestors.some(isFormattingAncestor)
+    && text.slice(start, end).toLowerCase() === node.url.toLowerCase()
+  ) {
+    return extractProseUrlCandidate(text, start);
+  }
+
+  return node.url;
 }
 
 export function normalizeManagedBlobUrl(value: unknown): string | null {
@@ -169,26 +166,37 @@ export function normalizeManagedBlobUrl(value: unknown): string | null {
 export function extractHttpUrls(text: string | null): string[] {
   if (!text) return [];
 
+  const markdown = text;
   const urls: string[] = [];
+  const tree = fromMarkdown(markdown, {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  });
 
-  for (const match of text.matchAll(httpUrlStart)) {
-    const start = match.index;
-    if (start > 0 && /[\p{L}\p{N}_+-]/u.test(text[start - 1])) continue;
-
-    const htmlContext = htmlAttributeContext(text, start);
-    if (htmlContext === "unsupported") continue;
-
-    const markdownContext = markdownDestinationContext(text, start);
-    const candidate = htmlContext
-      ? extractHtmlUrlCandidate(text, start, htmlContext.quote)
-      : markdownContext
-        ? extractMarkdownUrlCandidate(text, start, markdownContext)
-        : text[start - 1] === "<"
-          ? extractHtmlUrlCandidate(text, start, ">")
-          : extractProseUrlCandidate(text, start);
+  function add(candidate: string): void {
     const normalized = normalizeManagedBlobUrl(candidate);
     if (normalized) urls.push(normalized);
   }
+
+  function visit(node: Nodes, ancestors: Nodes[]): void {
+    if (node.type === "link") {
+      add(markdownLinkCandidate(markdown, node, ancestors));
+      return;
+    }
+    if (node.type === "image") {
+      add(node.url);
+      return;
+    }
+    if (node.type === "html") {
+      for (const candidate of extractHtmlAttributeUrls(node.value)) add(candidate);
+      return;
+    }
+    if ("children" in node) {
+      for (const child of node.children) visit(child, [...ancestors, node]);
+    }
+  }
+
+  visit(tree, []);
 
   return urls;
 }
