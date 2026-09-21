@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { ImageIcon, Loader2, Trash2, Video } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { MediaPicker } from "@/components/admin/media-picker";
@@ -12,6 +12,7 @@ import {
   type MediaFile,
   type MediaLibraryFilter,
 } from "@/lib/admin-media";
+import { createMediaInventoryRequestController, type InventoryRequest } from "./media-library-inventory";
 
 type Inventory = {
   count: number;
@@ -33,38 +34,30 @@ export function MediaLibrary() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [filter, setFilter] = useState<MediaLibraryFilter>("all");
   const [query, setQuery] = useState("");
-  const inventoryRequest = useRef<{ generation: number; controller: AbortController | null }>({ generation: 0, controller: null });
+  const [inventoryRequest] = useState(() => createMediaInventoryRequestController(setLoading));
 
   function invalidateInventoryRequests() {
-    inventoryRequest.current.generation += 1;
-    inventoryRequest.current.controller?.abort();
-    inventoryRequest.current.controller = null;
+    inventoryRequest.invalidate();
   }
 
   async function loadInventory() {
-    inventoryRequest.current.controller?.abort();
-    const generation = inventoryRequest.current.generation + 1;
-    const controller = new AbortController();
-    inventoryRequest.current = { generation, controller };
-    setLoading(true);
+    const request: InventoryRequest = inventoryRequest.start();
     setLoadError(null);
     try {
-      const response = await fetch("/api/blob-usage", { signal: controller.signal });
+      const response = await fetch("/api/blob-usage", { signal: request.controller.signal });
       if (!response.ok) throw new Error(await responseError(response));
       const data = (await response.json()) as Partial<Inventory>;
       if (!Array.isArray(data.files) || typeof data.count !== "number" || typeof data.totalSizeMB !== "string") {
         throw new Error("媒体库返回了无效数据");
       }
-      if (generation !== inventoryRequest.current.generation) return;
+      if (!inventoryRequest.isCurrent(request)) return;
       dispatch({ type: "replace-files", files: data.files });
       setInventory({ count: data.count, totalSize: data.totalSize ?? 0, totalSizeMB: data.totalSizeMB });
     } catch (error) {
-      if (generation !== inventoryRequest.current.generation || controller.signal.aborted) return;
+      if (!inventoryRequest.isCurrent(request) || request.controller.signal.aborted) return;
       setLoadError(error instanceof Error ? error.message : fallbackError);
     } finally {
-      if (generation !== inventoryRequest.current.generation) return;
-      setLoading(false);
-      inventoryRequest.current.controller = null;
+      inventoryRequest.finish(request);
     }
   }
 

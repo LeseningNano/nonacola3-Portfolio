@@ -13,6 +13,7 @@ import {
   type MediaFile,
   type MediaReferenceSnapshot,
 } from "../lib/admin-media";
+import { createMediaInventoryRequestController } from "../components/admin/media-library-inventory";
 import { mediaDeleteSchema } from "../lib/schemas";
 
 const blob = "https://store.public.blob.vercel-storage.com/uploads/hero.mp4";
@@ -507,12 +508,12 @@ test("media refresh does not discard a pending deletion rollback snapshot", () =
 
 test("media library invalidates stale inventory responses and exposes accessible operation status", () => {
   const source = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
+  const lifecycleSource = readFileSync(new URL("../components/admin/media-library-inventory.ts", import.meta.url), "utf8");
 
-  assert.match(source, /useRef/);
-  assert.match(source, /new AbortController\(\)/);
-  assert.match(source, /controller\?\.abort\(\)/);
-  assert.match(source, /signal:\s*controller\.signal/);
-  assert.match(source, /generation !== inventoryRequest\.current\.generation/);
+  assert.match(lifecycleSource, /new AbortController\(\)/);
+  assert.match(lifecycleSource, /controller\.abort\(\)/);
+  assert.match(source, /signal:\s*request\.controller\.signal/);
+  assert.match(lifecycleSource, /generation === request\.generation/);
   assert.match(source, /role="status" aria-live="polite"/);
   assert.match(source, /重新尝试删除/);
 });
@@ -526,6 +527,29 @@ test("media library invalidates an in-flight inventory request before starting d
   assert.ok(invalidation >= 0, "deletion must invalidate its active inventory request");
   assert.ok(deletionRequest >= 0, "deletion must issue the media delete request");
   assert.ok(invalidation < deletionRequest, "inventory invalidation must happen before the delete request starts");
+});
+
+test("media inventory aborts a stale load during deletion without leaving refresh locked", () => {
+  let loading = false;
+  const controller = createMediaInventoryRequestController((nextLoading) => {
+    loading = nextLoading;
+  });
+
+  const activeLoad = controller.start();
+  assert.equal(loading, true);
+
+  controller.invalidate();
+  assert.equal(activeLoad.controller.signal.aborted, true);
+  assert.equal(loading, false);
+
+  const refresh = controller.start();
+  assert.equal(loading, true);
+  assert.equal(controller.isCurrent(activeLoad), false);
+  assert.equal(controller.finish(activeLoad), false);
+  assert.equal(loading, true);
+  assert.equal(controller.isCurrent(refresh), true);
+  assert.equal(controller.finish(refresh), true);
+  assert.equal(loading, false);
 });
 
 test("failed media deletion keeps the restored file available for an explicit retry", () => {
