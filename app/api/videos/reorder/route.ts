@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     items.map((item) =>
       db.video.update({
         where: { id: item.id },
-        data: { order: item.order },
+        data: { order: item.order, featured: item.featured },
       })
     )
   );

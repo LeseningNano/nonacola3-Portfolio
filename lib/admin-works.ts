@@ -39,6 +39,29 @@ export type WorkEditorState = {
   error: string | null;
 };
 
+export type ReorderItem = {
+  id: string;
+  order: number;
+  featured: boolean;
+};
+
+export type WorkOrderStatus = "clean" | "dirty" | "saving" | "saved" | "error";
+
+export type WorkOrderState = {
+  initial: ReorderItem[];
+  items: ReorderItem[];
+  status: WorkOrderStatus;
+  error: string | null;
+};
+
+export type WorkOrderEvent =
+  | { type: "move"; from: number; to: number }
+  | { type: "featured"; index: number; featured: boolean }
+  | { type: "cancel" }
+  | { type: "save-start" }
+  | { type: "save-success"; items: ReorderItem[] }
+  | { type: "save-error"; message: string };
+
 type WorkFieldEvent = {
   [Field in keyof WorkFormState]: {
     type: "field";
@@ -83,6 +106,103 @@ export function filterAdminWorks(
       value.toLocaleLowerCase().includes(normalizedQuery),
     );
   });
+}
+
+export function moveWork(
+  items: ReorderItem[],
+  from: number,
+  to: number,
+): ReorderItem[] {
+  if (from < 0 || from >= items.length || to < 0 || to >= items.length) {
+    return items;
+  }
+
+  const moved = [...items];
+  const [item] = moved.splice(from, 1);
+  moved.splice(to, 0, item);
+  return moved.map((current, order) => ({ ...current, order }));
+}
+
+export function validateReorderItems(
+  items: ReorderItem[],
+): { ok: true } | { ok: false; error: string } {
+  const ids = new Set(items.map(({ id }) => id));
+  if (ids.size !== items.length) {
+    return { ok: false, error: "作品 ID 不能重复" };
+  }
+
+  const orders = items.map(({ order }) => order);
+  if (new Set(orders).size !== items.length) {
+    return { ok: false, error: "排序值不能重复" };
+  }
+
+  const sortedOrders = [...orders].sort((left, right) => left - right);
+  if (sortedOrders.some((order, index) => order !== index)) {
+    return { ok: false, error: "排序值必须从 0 开始连续排列" };
+  }
+
+  return { ok: true };
+}
+
+function reorderItemsMatch(left: ReorderItem[], right: ReorderItem[]): boolean {
+  return left.length === right.length && left.every((item, index) => {
+    const other = right[index];
+    return item.id === other.id && item.order === other.order && item.featured === other.featured;
+  });
+}
+
+export function reduceOrderState(
+  state: WorkOrderState,
+  event: WorkOrderEvent,
+): WorkOrderState {
+  if (event.type === "move") {
+    if (state.status === "saving") return state;
+    const items = moveWork(state.items, event.from, event.to);
+    return {
+      ...state,
+      items,
+      status: reorderItemsMatch(items, state.initial) ? "clean" : "dirty",
+      error: null,
+    };
+  }
+
+  if (event.type === "featured") {
+    if (state.status === "saving" || !state.items[event.index]) return state;
+    const items = state.items.map((item, index) =>
+      index === event.index ? { ...item, featured: event.featured } : item,
+    );
+    return {
+      ...state,
+      items,
+      status: reorderItemsMatch(items, state.initial) ? "clean" : "dirty",
+      error: null,
+    };
+  }
+
+  if (event.type === "cancel") {
+    return {
+      initial: state.initial,
+      items: state.initial.map((item) => ({ ...item })),
+      status: "clean",
+      error: null,
+    };
+  }
+
+  if (event.type === "save-start") {
+    return { ...state, status: "saving", error: null };
+  }
+
+  if (event.type === "save-success") {
+    const committed = event.items.map((item) => ({ ...item }));
+    return {
+      initial: committed,
+      items: committed.map((item) => ({ ...item })),
+      status: "saved",
+      error: null,
+    };
+  }
+
+  return { ...state, status: "error", error: event.message };
 }
 
 export function createWorkFormState(work?: Video): WorkFormState {

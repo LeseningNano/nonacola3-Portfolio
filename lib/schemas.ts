@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { validateReorderItems } from "@/lib/admin-works";
 
 export const videoCreateSchema = z.object({
   title: z.string().min(1).max(200),
@@ -50,8 +51,15 @@ export const reorderSchema = z.object({
       z.object({
         id: z.string().min(1),
         order: z.number().int().min(0),
-      })
+        featured: z.boolean(),
+      }).strict()
     )
     .min(1)
-    .max(1000),
-});
+    .max(1000)
+    .superRefine((items, context) => {
+      const result = validateReorderItems(items);
+      if (!result.ok) {
+        context.addIssue({ code: "custom", message: result.error });
+      }
+    }),
+}).strict();

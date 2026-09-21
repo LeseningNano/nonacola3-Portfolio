@@ -12,10 +12,19 @@ import {
   createWorkFormState,
   createWorkPayload,
   filterAdminWorks,
+  moveWork,
+  reduceOrderState,
   reduceWorkEditorState,
   serializeAdminWork,
+  validateReorderItems,
+  type ReorderItem,
 } from "../lib/admin-works";
+import { reorderSchema } from "../lib/schemas";
 import type { Video } from "../lib/types";
+
+function orderItem(id: string, order: number, featured = false): ReorderItem {
+  return { id, order, featured };
+}
 
 function adminWork(
   id: string,
@@ -180,6 +189,40 @@ test("field changes are rejected while a save is in flight", () => {
 
   assert.equal(attemptedEdit.form.title, "Submitted title");
   assert.equal(attemptedEdit.status, "saving");
+});
+
+test("moving a work normalizes every order without mutating the input", () => {
+  const input = [orderItem("a", 0), orderItem("b", 1), orderItem("c", 2)];
+  const moved = moveWork(input, 0, 2);
+
+  assert.deepEqual(moved.map(({ id, order }) => [id, order]), [["b", 0], ["c", 1], ["a", 2]]);
+  assert.deepEqual(input.map(({ id }) => id), ["a", "b", "c"]);
+});
+
+test("ordering validation rejects duplicate ids, duplicate orders, and gaps", () => {
+  assert.equal(validateReorderItems([orderItem("a", 0), orderItem("a", 1)]).ok, false);
+  assert.equal(validateReorderItems([orderItem("a", 0), orderItem("b", 0)]).ok, false);
+  assert.equal(validateReorderItems([orderItem("a", 0), orderItem("b", 2)]).ok, false);
+  assert.equal(validateReorderItems([orderItem("a", 0), orderItem("b", 1)]).ok, true);
+});
+
+test("failed ordering save retains local order and enables retry", () => {
+  const state = {
+    initial: [orderItem("a", 0), orderItem("b", 1)],
+    items: [orderItem("b", 0), orderItem("a", 1)],
+    status: "saving" as const,
+    error: null,
+  };
+  const failed = reduceOrderState(state, { type: "save-error", message: "保存失败" });
+
+  assert.deepEqual(failed.items.map(({ id }) => id), ["b", "a"]);
+  assert.equal(failed.status, "error");
+});
+
+test("reorder schema requires featured and rejects non-contiguous batches", () => {
+  assert.equal(reorderSchema.safeParse({ items: [{ id: "a", order: 0 }] }).success, false);
+  assert.equal(reorderSchema.safeParse({ items: [orderItem("a", 0), orderItem("b", 2)] }).success, false);
+  assert.equal(reorderSchema.safeParse({ items: [orderItem("a", 0), orderItem("b", 1)] }).success, true);
 });
 
 test("media picker labels identify their distinct trigger buttons", () => {
