@@ -59,6 +59,58 @@ test("URL extraction recognizes Markdown and HTML media URLs without prefix matc
   assert.deepEqual(urls, [blob, other]);
 });
 
+test("URL extraction excludes Markdown and prose punctuation", () => {
+  assert.deepEqual(
+    extractHttpUrls([
+      `![period](${blob}).`,
+      `![comma](${blob}),`,
+      `![full-stop](${blob})。`,
+      `[${blob}]`,
+      `(${blob})`,
+      `"${blob}"`,
+      `<${blob}>`,
+    ].join("\n")),
+    [blob, blob, blob, blob, blob, blob, blob],
+  );
+});
+
+test("URL extraction recognizes case-insensitive schemes in Markdown and HTML attributes", () => {
+  const uppercaseScheme = "HTTPS://store.public.blob.vercel-storage.com/uploads/hero.mp4";
+
+  assert.deepEqual(
+    extractHttpUrls([
+      `[hero](${uppercaseScheme})`,
+      `<a HREF='${uppercaseScheme}'>hero</a>`,
+      `<video SRC="${uppercaseScheme}"></video>`,
+    ].join("\n")),
+    [blob, blob, blob],
+  );
+});
+
+test("URL extraction ignores URLs in unsupported HTML attributes", () => {
+  assert.deepEqual(
+    extractHttpUrls(`<div data-backup="${blob}" aria-label="${blob}"></div>`),
+    [],
+  );
+});
+
+test("URL extraction preserves legitimate terminal punctuation inside structured destinations", () => {
+  const markdownUrl = `${blob}?version=.`;
+  const htmlUrl = `${blob}?download=!`;
+
+  assert.deepEqual(
+    extractHttpUrls(`[asset](${markdownUrl})\n<a href="${htmlUrl}">asset</a>`),
+    [markdownUrl, htmlUrl],
+  );
+});
+
+test("URL extraction removes every surplus closing parenthesis from enclosing contexts", () => {
+  assert.deepEqual(
+    extractHttpUrls(`![hero](${blob})))\n((${blob})))`),
+    [blob, blob],
+  );
+});
+
 test("URL extraction preserves a managed Blob URL path ending in a closing parenthesis", () => {
   const blobEndingInParenthesis = "https://store.public.blob.vercel-storage.com/uploads/(hero)";
 
@@ -81,6 +133,15 @@ test("URL extraction keeps balanced path parentheses while removing repeated enc
   assert.deepEqual(
     extractHttpUrls(`![hero](${blobEndingInParenthesis}))`),
     [blobEndingInParenthesis],
+  );
+});
+
+test("URL extraction preserves balanced parentheses in paths and queries", () => {
+  const parenthesizedUrl = "https://store.public.blob.vercel-storage.com/uploads/(hero)?crop=(wide)";
+
+  assert.deepEqual(
+    extractHttpUrls(`See [asset](${parenthesizedUrl}).`),
+    [parenthesizedUrl],
   );
 });
 

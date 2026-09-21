@@ -19,27 +19,70 @@ export type MediaReferenceSnapshot = {
 
 const managedBlobHostSuffix = ".public.blob.vercel-storage.com";
 
-function parenthesisBalance(value: string): number {
+const httpUrlStart = /https?:\/\//gi;
+const terminalProsePunctuation = new Set([
+  ".", ",", "。", "，",
+]);
+
+function delimiterBalance(value: string, opening: string, closing: string): number {
   let balance = 0;
 
   for (const character of value) {
-    if (character === "(") balance += 1;
-    if (character === ")") balance -= 1;
+    if (character === opening) balance += 1;
+    if (character === closing) balance -= 1;
   }
 
   return balance;
 }
 
-function removeEnclosingTrailingParentheses(value: string, prefix: string): string {
-  if (!prefix.endsWith("(")) return value;
+function removeEnclosingDelimiter(
+  value: string,
+  opening: string | undefined,
+): string {
+  if (opening !== "(" && opening !== "[") return value;
+  const closing = opening === "(" ? ")" : "]";
 
-  const trailingParentheses = value.match(/\)+$/)?.[0].length ?? 0;
-  const unbalancedClosingParentheses = Math.max(0, -parenthesisBalance(value));
-  const delimiterCount = Math.min(trailingParentheses, unbalancedClosingParentheses);
-  if (delimiterCount === 0) return value;
+  let candidate = value;
+  while (
+    candidate.endsWith(closing)
+    && delimiterBalance(candidate, opening, closing) < 0
+  ) {
+    candidate = candidate.slice(0, -1);
+  }
 
-  const candidate = value.slice(0, -delimiterCount);
-  return parenthesisBalance(candidate) === 0 ? candidate : value;
+  return candidate;
+}
+
+function htmlAttributeContext(
+  text: string,
+  start: number,
+): "supported" | "unsupported" | null {
+  const tagStart = text.lastIndexOf("<", start - 1);
+  const tagEnd = text.lastIndexOf(">", start - 1);
+  if (tagStart <= tagEnd || tagStart === start - 1) return null;
+
+  const prefix = text.slice(tagStart + 1, start);
+  return /(?:^|\s)(?:src|href)\s*=\s*["']?$/i.test(prefix)
+    ? "supported"
+    : "unsupported";
+}
+
+function extractUrlCandidate(
+  text: string,
+  start: number,
+  preserveTerminalPunctuation: boolean,
+): string {
+  let end = start;
+  while (end < text.length && !/[\s<>"']/.test(text[end])) end += 1;
+
+  let candidate = text.slice(start, end);
+  if (!preserveTerminalPunctuation) {
+    while (terminalProsePunctuation.has(candidate.at(-1) ?? "")) {
+      candidate = candidate.slice(0, -1);
+    }
+  }
+
+  return removeEnclosingDelimiter(candidate, text[start - 1]);
 }
 
 export function normalizeManagedBlobUrl(value: unknown): string | null {
@@ -68,10 +111,19 @@ export function extractHttpUrls(text: string | null): string[] {
 
   const urls: string[] = [];
 
-  for (const match of text.matchAll(/https?:\/\/[^\s<>"']+/g)) {
-    const value = match[0];
-    const prefix = text.slice(0, match.index);
-    const candidate = removeEnclosingTrailingParentheses(value, prefix);
+  for (const match of text.matchAll(httpUrlStart)) {
+    const start = match.index;
+    if (start > 0 && /[\p{L}\p{N}_+-]/u.test(text[start - 1])) continue;
+
+    const htmlContext = htmlAttributeContext(text, start);
+    if (htmlContext === "unsupported") continue;
+
+    const opening = text[start - 1];
+    const preserveTerminalPunctuation = htmlContext === "supported"
+      || opening === '"'
+      || opening === "'"
+      || opening === "<";
+    const candidate = extractUrlCandidate(text, start, preserveTerminalPunctuation);
     const normalized = normalizeManagedBlobUrl(candidate);
     if (normalized) urls.push(normalized);
   }
