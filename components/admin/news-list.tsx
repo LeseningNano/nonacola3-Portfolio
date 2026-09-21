@@ -111,11 +111,13 @@ export function NewsList({ initialPosts }: { initialPosts: PostItem[] }) {
             <tbody>{visiblePosts.map((post) => {
               const kind = getPostKind(post);
               const pending = state.pendingId === post.id;
-              const content = post.title ?? post.body;
+              const content = kind === "article"
+                ? post.title === "" ? "未命名文章" : post.title ?? "未命名文章"
+                : post.body;
               return (
                 <tr key={post.id} className="border-b border-white/10 last:border-0">
                   <td className="px-4 py-3 text-neutral-400">{kind === "article" ? "文章" : "短动态"}</td>
-                  <td className="max-w-96 px-4 py-3"><p className="truncate font-medium text-white">{content}</p>{post.title ? <p className="mt-1 truncate text-xs text-neutral-500">{post.body}</p> : null}</td>
+                  <td className="max-w-96 px-4 py-3"><p className="truncate font-medium text-white">{content}</p>{kind === "article" ? <p className="mt-1 truncate text-xs text-neutral-500">{post.body}</p> : null}</td>
                   <td className="px-4 py-3 text-neutral-400">{post.tag ?? "—"}</td>
                   <td className="px-4 py-3 text-neutral-400"><time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString("zh-CN")}</time></td>
                   <td className="px-4 py-3"><span className={post.published ? "text-emerald-200" : "text-amber-200"}>{post.published ? "已发布" : "草稿"}</span></td>

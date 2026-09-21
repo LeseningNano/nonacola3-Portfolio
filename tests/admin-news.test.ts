@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   filterAdminPosts,
   getPostKind,
+  normalizeAdminPostTitle,
   reduceNewsListState,
   serializeAdminPost,
 } from "../lib/admin-news";
@@ -48,4 +49,10 @@ test("failed optimistic News mutation restores the exact previous list", () => {
 test("admin Post serialization converts createdAt to ISO", () => {
   const serialized = serializeAdminPost({ id: "a", title: null, body: "body", tag: null, published: true, createdAt: new Date("2026-01-01T00:00:00.000Z") });
   assert.equal(serialized.createdAt, "2026-01-01T00:00:00.000Z");
+});
+
+test("admin post title normalization preserves the empty article-title value", () => {
+  assert.equal(normalizeAdminPostTitle(null), null);
+  assert.equal(normalizeAdminPostTitle(""), "");
+  assert.equal(normalizeAdminPostTitle(" Article "), "Article");
 });

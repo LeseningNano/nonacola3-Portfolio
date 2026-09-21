@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/api-auth";
 import { ok, success, fail, notFound, revalidateTags } from "@/lib/api-utils";
 import { postMutateSchema } from "@/lib/schemas";
+import { normalizeAdminPostTitle } from "@/lib/admin-news";
 
 export async function PUT(
   req: NextRequest,
@@ -19,7 +20,7 @@ export async function PUT(
   const b = parsed.data;
   const body = b.body.trim();
   if (!body) return fail("内容不能为空");
-  const title = b.title?.trim() || null;
+  const title = normalizeAdminPostTitle(b.title);
   const tag = b.tag?.trim() || null;
 
   const data: { title: string | null; body: string; tag: string | null; published?: boolean } = {

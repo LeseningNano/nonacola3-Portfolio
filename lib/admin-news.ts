@@ -27,6 +27,10 @@ export function getPostKind(post: Pick<PostItem, "title">): PostKind {
   return post.title === null ? "short" : "article";
 }
 
+export function normalizeAdminPostTitle(title: string | null | undefined): string | null {
+  return title == null ? null : title.trim();
+}
+
 export function filterAdminPosts(
   posts: PostItem[],
   filter: NewsFilter,
