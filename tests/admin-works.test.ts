@@ -3,6 +3,7 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MediaPicker } from "../components/admin/media-picker";
+import { installUnsavedOrderHistoryGuard } from "../components/admin/work-order-editor";
 import {
   ADMIN_NAV_ITEMS,
   getActiveAdminItem,
@@ -223,6 +224,52 @@ test("reorder schema requires featured and rejects non-contiguous batches", () =
   assert.equal(reorderSchema.safeParse({ items: [{ id: "a", order: 0 }] }).success, false);
   assert.equal(reorderSchema.safeParse({ items: [orderItem("a", 0), orderItem("b", 2)] }).success, false);
   assert.equal(reorderSchema.safeParse({ items: [orderItem("a", 0), orderItem("b", 1)] }).success, true);
+});
+
+test("dirty ordering guard restores the editor entry when Back navigation is cancelled", () => {
+  const listeners = new Set<() => void>();
+  const calls = { confirm: 0, back: 0, forward: 0 };
+  const history = {
+    state: { page: "editor" } as Record<string, unknown>,
+    replaceState(state: unknown) {
+      this.state = state as Record<string, unknown>;
+    },
+    pushState(state: unknown) {
+      this.state = state as Record<string, unknown>;
+    },
+    back() {
+      calls.back += 1;
+    },
+    forward() {
+      calls.forward += 1;
+    },
+  };
+  const target = {
+    addEventListener(_type: "popstate", listener: () => void) {
+      listeners.add(listener);
+    },
+    removeEventListener(_type: "popstate", listener: () => void) {
+      listeners.delete(listener);
+    },
+  };
+
+  const cleanup = installUnsavedOrderHistoryGuard({
+    history,
+    target,
+    href: "https://example.com/dashboard/works/order",
+    confirmLeave: () => {
+      calls.confirm += 1;
+      return false;
+    },
+  });
+  const guardEntry = history.state;
+  history.state = { ...guardEntry, __workOrderGuardPosition: "base" };
+  listeners.forEach((listener) => listener());
+
+  assert.equal(calls.confirm, 1);
+  assert.equal(calls.forward, 1);
+  assert.equal(calls.back, 0);
+  cleanup();
 });
 
 test("media picker labels identify their distinct trigger buttons", () => {

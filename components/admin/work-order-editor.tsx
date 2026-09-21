@@ -11,6 +11,70 @@ import {
 } from "@/lib/admin-works";
 import type { Video } from "@/lib/types";
 
+type OrderHistory = {
+  state: unknown;
+  replaceState: (data: unknown, unused: string, url?: string | URL | null) => void;
+  pushState: (data: unknown, unused: string, url?: string | URL | null) => void;
+  back: () => void;
+  forward: () => void;
+};
+
+type PopstateTarget = {
+  addEventListener: (type: "popstate", listener: () => void) => void;
+  removeEventListener: (type: "popstate", listener: () => void) => void;
+};
+
+let nextHistoryGuardId = 1;
+
+export function installUnsavedOrderHistoryGuard({
+  history,
+  target,
+  href,
+  confirmLeave,
+}: {
+  history: OrderHistory;
+  target: PopstateTarget;
+  href: string;
+  confirmLeave: () => boolean;
+}) {
+  const originalState = history.state;
+  const state = originalState && typeof originalState === "object" ? originalState : {};
+  const guardId = nextHistoryGuardId++;
+  const baseState = { ...state, __workOrderGuardId: guardId, __workOrderGuardPosition: "base" };
+  const topState = { ...state, __workOrderGuardId: guardId, __workOrderGuardPosition: "top" };
+  let leaving = false;
+
+  history.replaceState(baseState, "", href);
+  history.pushState(topState, "", href);
+
+  const handlePopstate = () => {
+    const current = history.state as Record<string, unknown> | null;
+    if (current?.__workOrderGuardId !== guardId || current.__workOrderGuardPosition !== "base") return;
+
+    if (confirmLeave()) {
+      leaving = true;
+      history.back();
+    } else {
+      history.forward();
+    }
+  };
+
+  target.addEventListener("popstate", handlePopstate);
+
+  return () => {
+    target.removeEventListener("popstate", handlePopstate);
+    const current = history.state as Record<string, unknown> | null;
+    if (leaving || current?.__workOrderGuardId !== guardId || current.__workOrderGuardPosition !== "top") return;
+
+    const restoreOriginalEntry = () => {
+      target.removeEventListener("popstate", restoreOriginalEntry);
+      history.replaceState(originalState, "", href);
+    };
+    target.addEventListener("popstate", restoreOriginalEntry);
+    history.back();
+  };
+}
+
 export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
   const toast = useToast();
   const [announcement, setAnnouncement] = useState("");
@@ -46,12 +110,19 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
         event.stopPropagation();
       }
     };
+    const removeHistoryGuard = installUnsavedOrderHistoryGuard({
+      history: window.history,
+      target: window,
+      href: window.location.href,
+      confirmLeave: () => window.confirm("有尚未保存的排序更改，确定要离开吗？"),
+    });
 
     window.addEventListener("beforeunload", warnBeforeUnload);
     document.addEventListener("click", confirmLinkExit, true);
     return () => {
       window.removeEventListener("beforeunload", warnBeforeUnload);
       document.removeEventListener("click", confirmLinkExit, true);
+      removeHistoryGuard();
     };
   }, [isDirty]);
 
