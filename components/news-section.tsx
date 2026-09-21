@@ -31,7 +31,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
       ) : (
         <Reveal variant="content" delay={320} className="mt-8 border-t border-neutral-800">
           {recent.map((post) => {
-            const isArticle = Boolean(post.title);
+            const isArticle = post.title !== null;
             const inner = (
               <>
                 <span className="text-xs text-neutral-500 font-mono flex-shrink-0 w-12 md:w-12 pt-0.5 md:pt-0">
@@ -45,19 +45,19 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
                     {post.tag}
                   </span>
                 )}
-                {post.title && (
+                {isArticle && (
                   <span className="hidden md:inline text-xs text-neutral-500 group-hover:text-white transition-colors flex-shrink-0 ml-auto">
                     阅读全文 →
                   </span>
                 )}
-                {post.title && (
+                {isArticle && (
                   <span className="md:hidden text-base text-neutral-600 group-hover:text-neutral-300 transition-colors duration-200 flex-shrink-0 leading-none">›</span>
                 )}
               </>
             );
             const rowClass =
               "group relative flex items-start md:items-center gap-3 md:gap-4 px-3 md:px-4 py-3.5 border-b border-neutral-900 hover:bg-white/5 transition-colors duration-200 before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-white before:scale-y-0 hover:before:scale-y-100 before:transition-transform before:duration-200 before:origin-center";
-            return post.title ? (
+            return isArticle ? (
               <IntentPrefetchLink key={post.id} href={`/news/${post.id}`} className={rowClass}>
                 {inner}
               </IntentPrefetchLink>

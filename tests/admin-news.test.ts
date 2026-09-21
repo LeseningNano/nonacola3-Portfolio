@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import test from "node:test";
 import {
   filterAdminPosts,
@@ -55,4 +57,17 @@ test("admin post title normalization preserves the empty article-title value", (
   assert.equal(normalizeAdminPostTitle(null), null);
   assert.equal(normalizeAdminPostTitle(""), "");
   assert.equal(normalizeAdminPostTitle(" Article "), "Article");
+});
+
+test("post endpoints and public News treat only null titles as short updates", () => {
+  const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
+  const createRoute = source("app/api/posts/route.ts");
+  const updateRoute = source("app/api/posts/[id]/route.ts");
+  const newsSection = source("components/news-section.tsx");
+  const articlePage = source("app/news/[id]/page.tsx");
+
+  assert.match(createRoute, /normalizeAdminPostTitle\(b\.title\)/);
+  assert.match(updateRoute, /normalizeAdminPostTitle\(b\.title\)/);
+  assert.match(newsSection, /const isArticle = post\.title !== null;/);
+  assert.match(articlePage, /post\.title === null/);
 });
