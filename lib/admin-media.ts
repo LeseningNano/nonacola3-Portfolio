@@ -43,11 +43,14 @@ export function normalizeManagedBlobUrl(value: unknown): string | null {
 export function extractHttpUrls(text: string | null): string[] {
   if (!text) return [];
 
-  const matches = text.match(/https?:\/\/[^\s<>"']+/g) ?? [];
   const urls: string[] = [];
 
-  for (const match of matches) {
-    const candidate = match.replace(/^[([{'"`]+|[)\]}'"`]+$/g, "");
+  for (const match of text.matchAll(/https?:\/\/[^\s<>"']+/g)) {
+    const value = match[0];
+    const prefix = text.slice(0, match.index);
+    const candidate = /\]\(\s*$/.test(prefix) && value.endsWith(")")
+      ? value.slice(0, -1)
+      : value;
     const normalized = normalizeManagedBlobUrl(candidate);
     if (normalized) urls.push(normalized);
   }

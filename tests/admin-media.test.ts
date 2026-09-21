@@ -59,6 +59,15 @@ test("URL extraction recognizes Markdown and HTML media URLs without prefix matc
   assert.deepEqual(urls, [blob, other]);
 });
 
+test("URL extraction preserves a managed Blob URL path ending in a closing parenthesis", () => {
+  const blobEndingInParenthesis = "https://store.public.blob.vercel-storage.com/uploads/hero)";
+
+  assert.deepEqual(
+    extractHttpUrls(`![hero](${blobEndingInParenthesis})`),
+    [blobEndingInParenthesis],
+  );
+});
+
 test("reference lookup covers approved fields and ignores filename-prefix collisions", () => {
   const snapshot = mediaSnapshot({
     heroUrl: blob,
