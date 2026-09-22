@@ -4,11 +4,12 @@ import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { ArrowLeft, ExternalLink, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { WorkCardPreview } from "@/components/admin/work-card-preview";
 import { MarkdownEditor } from "@/components/markdown-editor";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -119,106 +120,90 @@ export function WorkEditor({
           : "所有更改已保存";
 
   return (
-    <div className="space-y-6">
-      <div className="sticky top-14 z-10 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#0a0a0a]/95 px-4 py-3 backdrop-blur md:top-0 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
-        <Button type="button" variant="ghost" onClick={leaveEditor}>
-          <ArrowLeft /> 返回
+    <div className="min-w-0">
+      <AdminEditorHeader
+        title={mode === "create" && !workId ? "新建作品" : state.form.title.trim() || "未命名作品"}
+        status={statusText}
+        backAction={(
+          <Button type="button" variant="ghost" onClick={leaveEditor} className="shrink-0">
+            <ArrowLeft aria-hidden="true" /> 返回
+          </Button>
+        )}
+      >
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!workId}
+          onClick={() => workId && window.open(`/works/${workId}`, "_blank", "noopener,noreferrer")}
+        >
+          <ExternalLink aria-hidden="true" /> 查看公开页面
         </Button>
-        <div className="flex flex-wrap gap-2">
-          <span className="self-center text-xs text-neutral-400" aria-live="polite">{statusText}</span>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={!workId}
-            onClick={() => workId && window.open(`/works/${workId}`, "_blank", "noopener,noreferrer")}
-          >
-            <ExternalLink /> 查看公开页面
-          </Button>
-          <Button type="button" variant="outline" disabled={saving} onClick={() => void save(true)}>
-            保存并返回
-          </Button>
-          <Button type="button" disabled={saving} onClick={() => void save(false)}>
-            <Save /> {saving ? "保存中…" : "保存"}
-          </Button>
-        </div>
-      </div>
+        <Button type="button" variant="outline" disabled={saving} onClick={() => void save(true)}>
+          保存并返回
+        </Button>
+        <Button type="button" disabled={saving} onClick={() => void save(false)}>
+          <Save aria-hidden="true" /> {saving ? "保存中…" : "保存更改"}
+        </Button>
+      </AdminEditorHeader>
 
-      <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
-      {state.error ? <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{state.error}</p> : null}
+      <div className="space-y-5 pt-5">
+        <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
+        {state.error ? <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{state.error}</p> : null}
 
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.8fr)]">
-        <fieldset disabled={saving} className="space-y-6">
-          <EditorSection title="Basic information">
-            <Field label="标题" htmlFor="work-title">
-              <Input id="work-title" required value={state.form.title} onChange={(event) => setField("title", event.target.value)} />
-            </Field>
-            <Field label="分类" htmlFor="work-category">
-              <Input id="work-category" required value={state.form.category} onChange={(event) => setField("category", event.target.value)} />
-            </Field>
-          </EditorSection>
+        <div className="grid min-w-0 items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.8fr)]">
+          <fieldset disabled={saving} className="min-w-0 space-y-8">
+            <AdminFormSection title="基本信息" description="作品名称、类型、日期与精选状态。">
+              <Field label="标题" htmlFor="work-title">
+                <Input id="work-title" required value={state.form.title} onChange={(event) => setField("title", event.target.value)} />
+              </Field>
+              <Field label="分类" htmlFor="work-category">
+                <Input id="work-category" required value={state.form.category} onChange={(event) => setField("category", event.target.value)} />
+              </Field>
+              <Field label="日期" htmlFor="work-date">
+                <Input id="work-date" type="date" value={state.form.date} onChange={(event) => setField("date", event.target.value)} />
+              </Field>
+              <div className="flex min-h-10 items-center justify-between gap-4">
+                <Label htmlFor="work-featured">精选作品</Label>
+                <Switch id="work-featured" checked={state.form.featured} onCheckedChange={(checked) => setField("featured", checked)} />
+              </div>
+            </AdminFormSection>
 
-          <EditorSection title="Media">
-            <Field label="视频或嵌入地址" htmlFor="work-embed-url">
-              <Input id="work-embed-url" type="url" required value={state.form.embedUrl} onChange={(event) => setField("embedUrl", event.target.value)} />
-            </Field>
-            <MediaPicker kind="video" value={state.form.embedUrl} onSelect={(url) => setField("embedUrl", url)} label="从媒体库选择视频" />
-            <Field label="缩略图地址" htmlFor="work-thumbnail">
-              <Input id="work-thumbnail" type="url" value={state.form.thumbnail} onChange={(event) => setField("thumbnail", event.target.value)} />
-            </Field>
-            <MediaPicker kind="image" value={state.form.thumbnail} onSelect={(url) => setField("thumbnail", url)} label="从媒体库选择缩略图" />
-          </EditorSection>
+            <AdminFormSection title="媒体" description="公开页面使用的视频与封面。">
+              <Field label="视频或嵌入地址" htmlFor="work-embed-url">
+                <Input id="work-embed-url" type="url" required value={state.form.embedUrl} onChange={(event) => setField("embedUrl", event.target.value)} />
+              </Field>
+              <MediaPicker kind="video" value={state.form.embedUrl} onSelect={(url) => setField("embedUrl", url)} label="从媒体库选择视频" />
+              <Field label="缩略图地址" htmlFor="work-thumbnail">
+                <Input id="work-thumbnail" type="url" value={state.form.thumbnail} onChange={(event) => setField("thumbnail", event.target.value)} />
+              </Field>
+              <MediaPicker kind="image" value={state.form.thumbnail} onSelect={(url) => setField("thumbnail", url)} label="从媒体库选择缩略图" />
+            </AdminFormSection>
 
-          <EditorSection title="Presentation information">
-            <Field label="卡片摘要" htmlFor="work-summary">
-              <textarea id="work-summary" rows={3} value={state.form.summary} onChange={(event) => setField("summary", event.target.value)} className={textareaClassName} />
-            </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <AdminFormSection title="卡片信息" description="用于 Works 页面和快速浏览。">
+              <Field label="卡片摘要" htmlFor="work-summary">
+                <textarea id="work-summary" rows={3} value={state.form.summary} onChange={(event) => setField("summary", event.target.value)} className={textareaClassName} />
+              </Field>
               <Field label="职责" htmlFor="work-role">
                 <Input id="work-role" value={state.form.role} onChange={(event) => setField("role", event.target.value)} />
               </Field>
               <Field label="工具" htmlFor="work-tools">
                 <Input id="work-tools" value={state.form.tools} onChange={(event) => setField("tools", event.target.value)} />
               </Field>
-              <Field label="日期" htmlFor="work-date">
-                <Input id="work-date" type="date" value={state.form.date} onChange={(event) => setField("date", event.target.value)} />
+            </AdminFormSection>
+
+            <AdminFormSection title="Case Study" description="作品详情页的 Markdown 内容。">
+              <Field label="详细说明" htmlFor="work-description">
+                <MarkdownEditor value={state.form.description} onChange={(value) => setField("description", value)} textareaProps={{ id: "work-description", rows: 12 }} />
               </Field>
-              <Field label="排序权重" htmlFor="work-order">
-                <Input
-                  id="work-order"
-                  type="number"
-                  min={0}
-                  step={1}
-                  value={state.form.order}
-                  onChange={(event) => setField("order", Math.max(0, Math.trunc(event.target.valueAsNumber || 0)))}
-                />
-              </Field>
-            </div>
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/10 p-3">
-              <Label htmlFor="work-featured">精选作品</Label>
-              <Switch id="work-featured" checked={state.form.featured} onCheckedChange={(checked) => setField("featured", checked)} />
-            </div>
-          </EditorSection>
+            </AdminFormSection>
+          </fieldset>
 
-          <EditorSection title="Case Study">
-            <Field label="详细说明" htmlFor="work-description">
-              <MarkdownEditor value={state.form.description} onChange={(value) => setField("description", value)} textareaProps={{ id: "work-description", rows: 12 }} />
-            </Field>
-          </EditorSection>
-
-          <div className="flex flex-wrap justify-end gap-2">
-            <Button type="button" variant="ghost" onClick={leaveEditor}>取消</Button>
-            <Button type="button" variant="outline" disabled={saving} onClick={() => void save(true)}>保存并返回</Button>
-            <Button type="button" disabled={saving} onClick={() => void save(false)}>{saving ? "保存中…" : "保存"}</Button>
-          </div>
-        </fieldset>
-
-        <div className="xl:sticky xl:top-24">
-          <details open className="space-y-3">
-            <summary className="cursor-pointer text-sm font-medium text-white">作品卡片预览</summary>
-            <div className="mx-auto">
+          <div className="min-w-0 xl:sticky xl:top-24">
+            <details open className="min-w-0 space-y-3">
+              <summary className="cursor-pointer text-sm font-medium text-white">作品卡片预览</summary>
               <WorkCardPreview value={state.form} />
-            </div>
-          </details>
+            </details>
+          </div>
         </div>
       </div>
     </div>
@@ -228,15 +213,6 @@ export function WorkEditor({
 function createInitialState(work?: Video) {
   const form = createWorkFormState(work);
   return { form, baseline: { ...form }, status: "clean" as const, error: null };
-}
-
-function EditorSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <Card className="bg-neutral-950/40">
-      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
-      <CardContent className="space-y-4">{children}</CardContent>
-    </Card>
-  );
 }
 
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {

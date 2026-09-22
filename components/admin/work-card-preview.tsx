@@ -39,9 +39,9 @@ export function WorkCardPreview({ value }: { value: WorkFormState }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl bg-neutral-950/60 p-4">
+      <div className="min-w-0 rounded-xl bg-neutral-950/60 p-3 sm:p-4">
         <article
-          className={`mx-auto space-y-5 transition-[max-width] ${viewport === "mobile" ? "max-w-sm" : "max-w-3xl"}`}
+          className={`mx-auto min-w-0 space-y-5 transition-[max-width] ${viewport === "mobile" ? "max-w-sm" : "max-w-3xl"}`}
         >
           <div className="relative aspect-video overflow-hidden bg-neutral-900">
             {value.thumbnail ? (
@@ -56,15 +56,15 @@ export function WorkCardPreview({ value }: { value: WorkFormState }) {
             )}
           </div>
           <div>
-            <h3 className="text-2xl text-white">{value.title.trim() || "未命名作品"}</h3>
-            <p className="mt-1 text-sm text-neutral-400">{value.category.trim() || "未分类"}</p>
+            <h3 className="break-words text-2xl text-white">{value.title.trim() || "未命名作品"}</h3>
+            <p className="mt-1 break-words text-sm text-neutral-400">{value.category.trim() || "未分类"}</p>
             {role || tools ? (
               <dl className="mt-5 space-y-2 text-sm">
                 {role ? <Metadata label="Role" value={role} /> : null}
                 {tools ? <Metadata label="Tools" value={tools} /> : null}
               </dl>
             ) : null}
-            {summary ? <p className="mt-5 text-sm leading-6 text-neutral-400">{summary}</p> : null}
+            {summary ? <p className="mt-5 break-words text-sm leading-6 text-neutral-400">{summary}</p> : null}
             <p className="mt-5 text-sm text-neutral-300">View Case Study →</p>
           </div>
         </article>
@@ -75,9 +75,9 @@ export function WorkCardPreview({ value }: { value: WorkFormState }) {
 
 function Metadata({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[4rem_1fr] gap-4">
+    <div className="grid min-w-0 grid-cols-[4rem_minmax(0,1fr)] gap-4">
       <dt className="text-neutral-400">{label}</dt>
-      <dd className="text-neutral-300">{value}</dd>
+      <dd className="min-w-0 break-words text-neutral-300">{value}</dd>
     </div>
   );
 }

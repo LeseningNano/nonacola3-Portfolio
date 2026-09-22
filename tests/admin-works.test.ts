@@ -121,16 +121,24 @@ test("Work ordering delegates dirty shell navigation to the shared guard", () =>
   assert.doesNotMatch(source, /document\.addEventListener\("click", confirmLinkExit/);
 });
 
-test("Work editor keeps a sticky action header and a collapsible responsive card preview", () => {
+test("Work editor has one action header and no editable order control", () => {
   const source = readFileSync(resolve(process.cwd(), "components/admin/work-editor.tsx"), "utf8");
-  assert.match(source, /sticky top-14/);
-  assert.match(source, /md:top-0/);
+  assert.match(source, /AdminEditorHeader/);
+  assert.match(source, /AdminFormSection/);
+  assert.doesNotMatch(source, /id="work-order"/);
+  assert.equal((source.match(/保存并返回/g) ?? []).length, 1);
+  assert.equal((source.match(/<WorkCardPreview\b/g) ?? []).length, 1);
   assert.match(source, /xl:top-24/);
   assert.match(source, /<details open/);
   assert.match(source, /statusText/);
+  const header = readFileSync(resolve(process.cwd(), "components/admin/admin-editor-header.tsx"), "utf8");
+  assert.match(header, /sticky top-14/);
+  assert.match(header, /md:top-0/);
   const preview = readFileSync(resolve(process.cwd(), "components/admin/work-card-preview.tsx"), "utf8");
   assert.match(preview, /setViewport\("mobile"\)/);
   assert.match(preview, /setViewport\("desktop"\)/);
+  assert.match(preview, /break-words/);
+  assert.doesNotMatch(preview, /overflow-x-auto/);
 });
 
 test("admin works serialization emits ISO dates without mutating nullable fields", () => {
