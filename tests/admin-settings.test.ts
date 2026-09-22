@@ -41,8 +41,7 @@ test("page settings reuse the shared Media picker for Hero and uploaded Showreel
   assert.match(source, /blobUrl: heroState\.draft\.videoUrl/);
   assert.match(source, /posterUrl: heroState\.draft\.posterUrl/);
   assert.match(source, /\/api\/showreel/);
-  assert.match(source, /useAdminNavigationGuard\(confirmNavigation\)/);
-  assert.match(source, /addEventListener\("beforeunload"/);
+  assert.match(source, /useAdminNavigationGuard\(confirmNavigation,\s*isDirty\)/);
   assert.match(source, /isSaveableSettingDirty\(heroState\)\s*\|\|\s*isSaveableSettingDirty\(showreelState\)/);
   assert.doesNotMatch(source, /@vercel\/blob\/client/);
   assert.match(route, /posterUrl/);

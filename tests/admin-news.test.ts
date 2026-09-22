@@ -204,8 +204,7 @@ test("both News editors register their dirty-navigation policy with the Admin sh
     "components/admin/article-editor.tsx",
   ]) {
     const editor = source(path);
-    assert.match(editor, /useAdminNavigationGuard\(confirmNavigation\)/);
-    assert.match(editor, /addEventListener\("beforeunload", warnBeforeUnload\)/);
+    assert.match(editor, /useAdminNavigationGuard\(confirmNavigation,\s*isDirty\)/);
   }
 });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useMemo, useReducer, useRef, useState } from "react";
 import { ArrowLeft, EyeOff, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
@@ -59,20 +59,11 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
   );
   const actions = getPostEditorActions(state.intendedPublished);
 
-  useAdminNavigationGuard(confirmNavigation);
-
-  useEffect(() => {
-    if (!isDirty) return;
-    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    window.addEventListener("beforeunload", warnBeforeUnload);
-    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
-  }, [isDirty]);
+  const allowNextHistoryPop = useAdminNavigationGuard(confirmNavigation, isDirty);
 
   function leaveEditor() {
     if (!confirmNavigation()) return;
+    allowNextHistoryPop();
     router.back();
   }
 

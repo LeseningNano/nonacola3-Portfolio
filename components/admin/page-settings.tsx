@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useReducer } from "react";
 import { Loader2, Save } from "lucide-react";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
@@ -46,17 +46,7 @@ export function PageSettings({ initialHero, initialShowreel }: PageSettingsProps
     return window.confirm("有尚未保存的更改，确定要离开吗？");
   }, [isDirty]);
 
-  useAdminNavigationGuard(confirmNavigation);
-
-  useEffect(() => {
-    if (!isDirty) return;
-    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    window.addEventListener("beforeunload", warnBeforeUnload);
-    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
-  }, [isDirty]);
+  useAdminNavigationGuard(confirmNavigation, isDirty);
 
   function changeHero(value: Partial<HeroSettingsValue>) {
     heroDispatch({ type: "change", value: { ...heroState.draft, ...value } });

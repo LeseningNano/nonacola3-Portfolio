@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useMemo, useReducer, useState } from "react";
 import { ArrowDown, ArrowUp, GripVertical, Save } from "lucide-react";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
@@ -12,70 +12,6 @@ import {
   type WorkOrderState,
 } from "@/lib/admin-works";
 import type { Video } from "@/lib/types";
-
-type OrderHistory = {
-  state: unknown;
-  replaceState: (data: unknown, unused: string, url?: string | URL | null) => void;
-  pushState: (data: unknown, unused: string, url?: string | URL | null) => void;
-  back: () => void;
-  forward: () => void;
-};
-
-type PopstateTarget = {
-  addEventListener: (type: "popstate", listener: () => void) => void;
-  removeEventListener: (type: "popstate", listener: () => void) => void;
-};
-
-let nextHistoryGuardId = 1;
-
-export function installUnsavedOrderHistoryGuard({
-  history,
-  target,
-  href,
-  confirmLeave,
-}: {
-  history: OrderHistory;
-  target: PopstateTarget;
-  href: string;
-  confirmLeave: () => boolean;
-}) {
-  const originalState = history.state;
-  const state = originalState && typeof originalState === "object" ? originalState : {};
-  const guardId = nextHistoryGuardId++;
-  const baseState = { ...state, __workOrderGuardId: guardId, __workOrderGuardPosition: "base" };
-  const topState = { ...state, __workOrderGuardId: guardId, __workOrderGuardPosition: "top" };
-  let leaving = false;
-
-  history.replaceState(baseState, "", href);
-  history.pushState(topState, "", href);
-
-  const handlePopstate = () => {
-    const current = history.state as Record<string, unknown> | null;
-    if (current?.__workOrderGuardId !== guardId || current.__workOrderGuardPosition !== "base") return;
-
-    if (confirmLeave()) {
-      leaving = true;
-      history.back();
-    } else {
-      history.forward();
-    }
-  };
-
-  target.addEventListener("popstate", handlePopstate);
-
-  return () => {
-    target.removeEventListener("popstate", handlePopstate);
-    const current = history.state as Record<string, unknown> | null;
-    if (leaving || current?.__workOrderGuardId !== guardId || current.__workOrderGuardPosition !== "top") return;
-
-    const restoreOriginalEntry = () => {
-      target.removeEventListener("popstate", restoreOriginalEntry);
-      history.replaceState(originalState, "", href);
-    };
-    target.addEventListener("popstate", restoreOriginalEntry);
-    history.back();
-  };
-}
 
 export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
   const toast = useToast();
@@ -101,28 +37,7 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
     [isDirty],
   );
 
-  useAdminNavigationGuard(confirmNavigation);
-
-  useEffect(() => {
-    if (!isDirty) return;
-
-    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    const removeHistoryGuard = installUnsavedOrderHistoryGuard({
-      history: window.history,
-      target: window,
-      href: window.location.href,
-      confirmLeave: confirmNavigation,
-    });
-
-    window.addEventListener("beforeunload", warnBeforeUnload);
-    return () => {
-      window.removeEventListener("beforeunload", warnBeforeUnload);
-      removeHistoryGuard();
-    };
-  }, [confirmNavigation, isDirty]);
+  useAdminNavigationGuard(confirmNavigation, isDirty);
 
   function move(from: number, to: number) {
     dispatch({ type: "move", from, to });

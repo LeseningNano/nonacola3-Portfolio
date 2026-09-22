@@ -5,7 +5,7 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { filterMediaPickerFiles, MediaPicker } from "../components/admin/media-picker";
-import { installUnsavedOrderHistoryGuard } from "../components/admin/work-order-editor";
+import { installUnsavedAdminHistoryGuard } from "../lib/admin-history-guard";
 import {
   ADMIN_NAV_ITEMS,
   guardAdminAction,
@@ -117,7 +117,7 @@ test("sign out proceeds when navigation is clean or confirmed", () => {
 
 test("Work ordering delegates dirty shell navigation to the shared guard", () => {
   const source = readFileSync(resolve(process.cwd(), "components/admin/work-order-editor.tsx"), "utf8");
-  assert.match(source, /useAdminNavigationGuard\(confirmNavigation\)/);
+  assert.match(source, /useAdminNavigationGuard\(confirmNavigation,\s*isDirty\)/);
   assert.doesNotMatch(source, /document\.addEventListener\("click", confirmLinkExit/);
 });
 
@@ -348,23 +348,83 @@ test("dirty ordering guard restores the editor entry when Back navigation is can
     },
   };
 
-  const cleanup = installUnsavedOrderHistoryGuard({
+  const cleanup = installUnsavedAdminHistoryGuard({
     history,
     target,
     href: "https://example.com/dashboard/works/order",
+    currentHref: () => "https://example.com/dashboard/works/order",
     confirmLeave: () => {
       calls.confirm += 1;
       return false;
     },
   });
   const guardEntry = history.state;
-  history.state = { ...guardEntry, __workOrderGuardPosition: "base" };
+  history.state = { ...guardEntry, __adminHistoryGuardPosition: "base" };
   listeners.forEach((listener) => listener());
 
   assert.equal(calls.confirm, 1);
   assert.equal(calls.forward, 1);
   assert.equal(calls.back, 0);
-  cleanup();
+  cleanup.remove();
+});
+
+test("dirty browser Back proceeds only after one confirmation", () => {
+  const listeners = new Set<() => void>();
+  const calls = { confirm: 0, back: 0, forward: 0 };
+  const history = {
+    state: { page: "editor" } as Record<string, unknown>,
+    replaceState(state: unknown) { this.state = state as Record<string, unknown>; },
+    pushState(state: unknown) { this.state = state as Record<string, unknown>; },
+    back() { calls.back += 1; },
+    forward() { calls.forward += 1; },
+  };
+  const target = {
+    addEventListener(_type: "popstate", listener: () => void) { listeners.add(listener); },
+    removeEventListener(_type: "popstate", listener: () => void) { listeners.delete(listener); },
+  };
+
+  const cleanup = installUnsavedAdminHistoryGuard({
+    history,
+    target,
+    href: "https://example.com/dashboard/works/example/edit",
+    currentHref: () => "https://example.com/dashboard/works/example/edit",
+    confirmLeave: () => { calls.confirm += 1; return true; },
+  });
+  history.state = { ...history.state, __adminHistoryGuardPosition: "base" };
+  listeners.forEach((listener) => listener());
+
+  assert.deepEqual(calls, { confirm: 1, back: 1, forward: 0 });
+  cleanup.remove();
+});
+
+test("Next.js route history state does not make editor cleanup undo client navigation", () => {
+  const listeners = new Set<() => void>();
+  const calls = { back: 0 };
+  let currentHref = "https://example.com/dashboard/works/example/edit";
+  const history = {
+    state: { page: "editor" } as Record<string, unknown>,
+    replaceState(state: unknown) { this.state = state as Record<string, unknown>; },
+    pushState(state: unknown) { this.state = state as Record<string, unknown>; },
+    back() { calls.back += 1; },
+    forward() {},
+  };
+  const target = {
+    addEventListener(_type: "popstate", listener: () => void) { listeners.add(listener); },
+    removeEventListener(_type: "popstate", listener: () => void) { listeners.delete(listener); },
+  };
+
+  const cleanup = installUnsavedAdminHistoryGuard({
+    history,
+    target,
+    href: currentHref,
+    currentHref: () => currentHref,
+    confirmLeave: () => true,
+  });
+  history.pushState({ ...history.state, __NA: true, route: "/dashboard/works" });
+  currentHref = "https://example.com/dashboard/works";
+  cleanup.remove();
+
+  assert.equal(calls.back, 0);
 });
 
 test("media picker labels identify their distinct trigger buttons", () => {

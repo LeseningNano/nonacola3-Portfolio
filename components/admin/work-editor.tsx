@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useMemo, useReducer, useState } from "react";
 import { ArrowLeft, ExternalLink, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
@@ -48,17 +48,7 @@ export function WorkEditor({
     [isDirty],
   );
 
-  useAdminNavigationGuard(confirmNavigation);
-
-  useEffect(() => {
-    if (!isDirty) return;
-    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-    };
-    window.addEventListener("beforeunload", warnBeforeUnload);
-    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
-  }, [isDirty]);
+  const allowNextHistoryPop = useAdminNavigationGuard(confirmNavigation, isDirty);
 
   function setField<Field extends keyof WorkFormState>(field: Field, value: WorkFormState[Field]) {
     dispatch({ type: "field", field, value } as Parameters<typeof reduceWorkEditorState>[1]);
@@ -66,6 +56,7 @@ export function WorkEditor({
 
   function leaveEditor() {
     if (!confirmNavigation()) return;
+    allowNextHistoryPop();
     router.back();
   }
 

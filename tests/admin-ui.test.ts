@@ -44,3 +44,22 @@ test("Dashboard shell has no global command/search bar and list identities can w
     assert.match(source, /truncate|break-words/);
   }
 });
+
+test("every dirty editor protects both client history and browser unload", () => {
+  const editorPaths = [
+    "../components/admin/work-order-editor.tsx",
+    "../components/admin/work-editor.tsx",
+    "../components/admin/short-post-editor.tsx",
+    "../components/admin/article-editor.tsx",
+    "../components/admin/page-settings.tsx",
+  ];
+
+  for (const path of editorPaths) {
+    const source = readFileSync(new URL(path, import.meta.url), "utf8");
+    assert.match(source, /useAdminNavigationGuard\(confirmNavigation,\s*isDirty\)/, path);
+  }
+
+  const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
+  assert.match(shell, /installUnsavedAdminHistoryGuard/);
+  assert.match(shell, /addEventListener\("beforeunload"/);
+});

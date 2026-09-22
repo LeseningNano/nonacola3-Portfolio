@@ -7,6 +7,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { FolderKanban, Images, LogOut, Menu, Newspaper, PanelsTopLeft, X } from "lucide-react";
 import { logoutAdmin } from "@/app/(admin)/dashboard/actions";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { installUnsavedAdminHistoryGuard, type UnsavedAdminHistoryGuard } from "@/lib/admin-history-guard";
 import { ADMIN_NAV_GROUPS, getActiveAdminItem, guardAdminAction } from "@/lib/admin-navigation";
 
 type AdminShellProps = {
@@ -45,10 +46,38 @@ function AdminNavigationGuardProvider({ children }: { children: ReactNode }) {
   return <AdminNavigationGuardContext.Provider value={value}>{children}</AdminNavigationGuardContext.Provider>;
 }
 
-export function useAdminNavigationGuard(guard: NavigationGuard) {
+export function useAdminNavigationGuard(guard: NavigationGuard, isDirty = false): () => void {
   const context = useContext(AdminNavigationGuardContext);
+  const historyGuardRef = useRef<UnsavedAdminHistoryGuard | null>(null);
+  const allowNextHistoryPop = useCallback(() => historyGuardRef.current?.allowNextPop(), []);
 
   useEffect(() => context?.registerNavigationGuard(guard), [context, guard]);
+
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    const historyGuard = installUnsavedAdminHistoryGuard({
+      history: window.history,
+      target: window,
+      href: window.location.href,
+      currentHref: () => window.location.href,
+      confirmLeave: guard,
+    });
+    historyGuardRef.current = historyGuard;
+    window.addEventListener("beforeunload", warnBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", warnBeforeUnload);
+      historyGuard.remove();
+      if (historyGuardRef.current === historyGuard) historyGuardRef.current = null;
+    };
+  }, [guard, isDirty]);
+
+  return allowNextHistoryPop;
 }
 
 function useGuardedNavigation(onNavigate?: () => void) {
