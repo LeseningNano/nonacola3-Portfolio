@@ -17,18 +17,18 @@ test("exports the shared curved-scroll container used by portfolio pages", () =>
 });
 
 test("uses the native smooth-scroll fallback on mobile and reduced-motion desktop", () => {
-  const module = smoothScrollModule as typeof smoothScrollModule & {
+  const smoothScroll = smoothScrollModule as typeof smoothScrollModule & {
     shouldUseNativeSmoothScroll?: (desktop: boolean, reducedMotion: boolean) => boolean;
   };
 
-  assert.equal(typeof module.shouldUseNativeSmoothScroll, "function");
-  assert.equal(module.shouldUseNativeSmoothScroll!(false, false), true);
-  assert.equal(module.shouldUseNativeSmoothScroll!(true, true), true);
-  assert.equal(module.shouldUseNativeSmoothScroll!(true, false), false);
+  assert.equal(typeof smoothScroll.shouldUseNativeSmoothScroll, "function");
+  assert.equal(smoothScroll.shouldUseNativeSmoothScroll!(false, false), true);
+  assert.equal(smoothScroll.shouldUseNativeSmoothScroll!(true, true), true);
+  assert.equal(smoothScroll.shouldUseNativeSmoothScroll!(true, false), false);
 });
 
 test("does not claim scroll keys from interactive controls", () => {
-  const module = smoothScrollModule as typeof smoothScrollModule & {
+  const smoothScroll = smoothScrollModule as typeof smoothScrollModule & {
     shouldIgnoreScrollKey?: (
       tagName: string,
       isContentEditable: boolean,
@@ -36,11 +36,11 @@ test("does not claim scroll keys from interactive controls", () => {
     ) => boolean;
   };
 
-  assert.equal(typeof module.shouldIgnoreScrollKey, "function");
+  assert.equal(typeof smoothScroll.shouldIgnoreScrollKey, "function");
   for (const tagName of ["BUTTON", "SELECT", "INPUT", "TEXTAREA", "A"]) {
-    assert.equal(module.shouldIgnoreScrollKey!(tagName, false, false), true);
+    assert.equal(smoothScroll.shouldIgnoreScrollKey!(tagName, false, false), true);
   }
-  assert.equal(module.shouldIgnoreScrollKey!("DIV", true, false), true);
-  assert.equal(module.shouldIgnoreScrollKey!("DIV", false, true), true);
-  assert.equal(module.shouldIgnoreScrollKey!("BODY", false, false), false);
+  assert.equal(smoothScroll.shouldIgnoreScrollKey!("DIV", true, false), true);
+  assert.equal(smoothScroll.shouldIgnoreScrollKey!("DIV", false, true), true);
+  assert.equal(smoothScroll.shouldIgnoreScrollKey!("BODY", false, false), false);
 });

@@ -12,6 +12,11 @@ const AUTO_CLOSE_MS = 3000;
 export function ServerNotice() {
   const pathname = usePathname();
   const active = shouldShowServerNotice(pathname);
+
+  return <ServerNoticeContent key={active ? "active" : "inactive"} active={active} />;
+}
+
+function ServerNoticeContent({ active }: { active: boolean }) {
   const [mounted, setMounted] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [closing, setClosing] = useState(false);
@@ -39,14 +44,6 @@ export function ServerNotice() {
       window.removeEventListener("portfolio-intro-done", handleIntroDone);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [active]);
-
-  // 切换页面时立即关闭（导航栏恢复自身透明逻辑）
-  useEffect(() => {
-    if (active) return;
-    setMounted(false);
-    setExpanded(false);
-    setClosing(false);
   }, [active]);
 
   // 展开：通知导航栏进入不透明态；3s 后自动关闭（本会话不再显示）。
