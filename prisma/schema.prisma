@@ -30,6 +30,7 @@ model Video {
 model HeroVideo {
   id        String   @id @default("singleton")
   blobUrl   String
+  posterUrl String?
   updatedAt DateTime @updatedAt
 }
 

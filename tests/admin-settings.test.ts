@@ -5,6 +5,24 @@ import {
   createSaveableSettingState,
   reduceSaveableSettingState,
 } from "../lib/admin-settings";
+import { createHeroPosterUpdate, resolveHeroMedia } from "../lib/hero";
+import { heroMutateSchema } from "../lib/schemas";
+
+test("Hero media falls back to the bundled poster", () => {
+  assert.deepEqual(resolveHeroMedia({ blobUrl: "https://example.com/hero.mp4", posterUrl: null }), {
+    blobUrl: "https://example.com/hero.mp4",
+    posterUrl: "/hero-poster.webp",
+  });
+  assert.equal(resolveHeroMedia({ blobUrl: "hero.mp4", posterUrl: "   " })?.posterUrl, "/hero-poster.webp");
+  assert.equal(resolveHeroMedia(null), null);
+});
+
+test("Hero mutation allows poster changes while preserving legacy omissions", () => {
+  assert.equal(heroMutateSchema.safeParse({ blobUrl: "https://example.com/hero.mp4" }).success, true);
+  assert.equal(heroMutateSchema.safeParse({ blobUrl: "https://example.com/hero.mp4", posterUrl: "https://example.com/poster.webp" }).success, true);
+  assert.deepEqual(createHeroPosterUpdate(undefined), {});
+  assert.deepEqual(createHeroPosterUpdate("   "), { posterUrl: null });
+});
 
 test("page settings reuse the shared Media picker for Hero and uploaded Showreel", () => {
   const source = readFileSync(new URL("../components/admin/page-settings.tsx", import.meta.url), "utf8");

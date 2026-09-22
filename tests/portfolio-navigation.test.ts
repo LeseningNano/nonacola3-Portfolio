@@ -41,6 +41,25 @@ test("homepage hero shows a scroll hint beside the call to action", () => {
   assert.match(markup, /motion-reduce:animate-none/);
 });
 
+test("homepage Hero supports a custom poster and retains the bundled fallback", () => {
+  const custom = renderToStaticMarkup(createElement(HeroVideo, {
+    videoUrl: "https://example.com/hero.mp4",
+    posterUrl: "https://example.com/custom-poster.webp",
+  }));
+  const empty = renderToStaticMarkup(createElement(HeroVideo, {
+    videoUrl: "https://example.com/hero.mp4",
+    posterUrl: null,
+  }));
+  const blank = renderToStaticMarkup(createElement(HeroVideo, {
+    videoUrl: "https://example.com/hero.mp4",
+    posterUrl: "   ",
+  }));
+
+  assert.match(custom, /https:\/\/example\.com\/custom-poster\.webp/);
+  assert.match(empty, /hero-poster\.webp/);
+  assert.match(blank, /hero-poster\.webp/);
+});
+
 test("homepage hero groups identity and Works action over a mobile bottom gradient", () => {
   const markup = renderToStaticMarkup(createElement(HeroVideo, { videoUrl: null }));
 

@@ -14,10 +14,12 @@ import {
 
 export function HomeClient({
   heroVideoUrl,
+  heroPosterUrl,
   videos,
   posts,
 }: {
   heroVideoUrl: string | null;
+  heroPosterUrl: string | null;
   videos: VideoRow[];
   posts: PostItem[];
 }) {
@@ -42,7 +44,7 @@ export function HomeClient({
 
   return (
     <SmoothScrollContainer>
-      <HeroVideo videoUrl={heroVideoUrl} />
+      <HeroVideo videoUrl={heroVideoUrl} posterUrl={heroPosterUrl} />
       <VideoGrid videos={videos} />
       <NewsSection posts={posts} />
       <AboutSection />

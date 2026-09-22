@@ -43,6 +43,7 @@ export const showreelMutateSchema = z.object({
 
 export const heroMutateSchema = z.object({
   blobUrl: z.string().min(1).max(2000),
+  posterUrl: z.string().max(2000).nullable().optional(),
 });
 
 export const mediaDeleteSchema = z.object({

@@ -1,9 +1,11 @@
 import { getHero, getVideos, getPublishedPosts } from "@/lib/data";
+import { resolveHeroMedia } from "@/lib/hero";
 import { HomeClient } from "@/components/home-client";
 import type { VideoRow, PostItem } from "@/lib/types";
 
 export default async function Home() {
-  const [hero, videos, posts] = await Promise.all([getHero(), getVideos(), getPublishedPosts()]);
+  const [heroRecord, videos, posts] = await Promise.all([getHero(), getVideos(), getPublishedPosts()]);
+  const hero = resolveHeroMedia(heroRecord);
 
   const serializedVideos: VideoRow[] = videos.map((v) => ({
     id: v.id,
@@ -32,6 +34,7 @@ export default async function Home() {
   return (
     <HomeClient
       heroVideoUrl={hero?.blobUrl ?? null}
+      heroPosterUrl={hero?.posterUrl ?? null}
       videos={serializedVideos}
       posts={serializedPosts}
     />

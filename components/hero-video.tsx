@@ -4,10 +4,11 @@ import { useEffect, useRef, useState, useLayoutEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/lib/config";
+import { DEFAULT_HERO_POSTER_URL } from "@/lib/hero";
 import { LoadingScreen } from "./loading-screen";
 import { SCROLL_CONTAINER_ID } from "./smooth-scroll-container";
 
-export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
+export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; posterUrl?: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
@@ -23,6 +24,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
   const rafId = useRef(0);
   const introDoneRef = useRef(false);
   const nudgeRaf = useRef(0);
+  const effectivePosterUrl = posterUrl?.trim() || DEFAULT_HERO_POSTER_URL;
 
   // Parallax + scroll-driven styles: write to DOM directly, no React re-render
   useLayoutEffect(() => {
@@ -244,7 +246,7 @@ export function HeroVideo({ videoUrl }: { videoUrl: string | null }) {
               ref={posterRef}
               className="absolute inset-0 w-full h-full bg-cover bg-center scale-110"
               style={{
-                backgroundImage: "url('/hero-poster.webp')",
+                backgroundImage: `url(${JSON.stringify(effectivePosterUrl)})`,
                 filter: "blur(4px) brightness(0.5)",
               }}
             />

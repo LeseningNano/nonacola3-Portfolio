@@ -4,13 +4,14 @@ import { requireAdmin } from "@/lib/api-auth";
 import { ok, success, fail } from "@/lib/api-utils";
 import { db } from "@/lib/db";
 import { getHero } from "@/lib/data";
+import { createHeroPosterUpdate, resolveHeroMedia } from "@/lib/hero";
 import { heroMutateSchema } from "@/lib/schemas";
 
 export const dynamic = "force-static";
 export const revalidate = 300;
 
 export async function GET() {
-  const hero = await getHero();
+  const hero = resolveHeroMedia(await getHero());
   const response = ok(hero);
   response.headers.set(
     "Cache-Control",
@@ -28,11 +29,12 @@ export async function PUT(req: NextRequest) {
     return fail(parsed.error.issues[0]?.message ?? "参数无效", 422);
   }
   const { blobUrl } = parsed.data;
+  const posterUpdate = createHeroPosterUpdate(parsed.data.posterUrl);
 
   await db.heroVideo.upsert({
     where: { id: "singleton" },
-    update: { blobUrl },
-    create: { id: "singleton", blobUrl },
+    update: { blobUrl, ...posterUpdate },
+    create: { id: "singleton", blobUrl, posterUrl: parsed.data.posterUrl?.trim() || null },
   });
 
   revalidateTag("hero", { expire: 0 });
