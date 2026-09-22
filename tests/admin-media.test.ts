@@ -50,6 +50,7 @@ function mediaFile(pathname: string, references: MediaFile["references"]): Media
 
 function mediaSnapshot(overrides: Partial<{
   heroUrl: string | null;
+  heroPosterUrl: string | null;
   showreelUrl: string;
   showreelType: string;
   workEmbedUrl: string;
@@ -58,7 +59,7 @@ function mediaSnapshot(overrides: Partial<{
   postBody: string;
 }> = {}): MediaReferenceSnapshot {
   return {
-    hero: overrides.heroUrl === null ? null : { blobUrl: overrides.heroUrl ?? "" },
+    hero: overrides.heroUrl === null ? null : { blobUrl: overrides.heroUrl ?? "", posterUrl: overrides.heroPosterUrl ?? null },
     showreel: {
       showreelUrl: overrides.showreelUrl ?? "",
       videoType: overrides.showreelType ?? "url",
@@ -230,6 +231,34 @@ test("reference lookup covers approved fields and ignores filename-prefix collis
     findMediaReferences(`${blob}-old`, snapshot).map(({ kind }) => kind),
     ["post-body"],
   );
+});
+
+test("Hero poster Blob is protected as an exact managed reference", () => {
+  const poster = "https://assets.public.blob.vercel-storage.com/hero-poster.webp";
+  const references = findMediaReferences(poster, {
+    hero: { blobUrl: "https://assets.public.blob.vercel-storage.com/hero.mp4", posterUrl: poster },
+    showreel: null,
+    videos: [],
+    posts: [],
+  });
+
+  assert.deepEqual(references, [{
+    kind: "hero-poster",
+    id: "singleton",
+    label: "Hero 视频封面",
+    field: "posterUrl",
+  }]);
+  assert.deepEqual(findMediaReferences(`${poster}?download=1`, {
+    hero: { blobUrl: "", posterUrl: poster },
+    showreel: null,
+    videos: [],
+    posts: [],
+  }), []);
+});
+
+test("media reference snapshot loads the Hero poster with its video URL", () => {
+  const source = readFileSync(new URL("../lib/admin-media.server.ts", import.meta.url), "utf8");
+  assert.match(source, /select:\s*\{\s*blobUrl:\s*true,\s*posterUrl:\s*true\s*\}/);
 });
 
 test("reference lookup decodes escaped Markdown destination punctuation", () => {
@@ -523,9 +552,14 @@ test("failed Media deletion restores the exact visible item", () => {
   assert.equal(restored.error, "删除失败");
 });
 
-test("a deletion conflict restores the file with fresh references and no retry", () => {
+test("a deletion conflict restores a newly referenced Hero poster without retry", () => {
   const files = [mediaFile("unused.webp", [])];
-  const freshReferences = [reference("hero")];
+  const freshReferences: MediaFile["references"] = [{
+    kind: "hero-poster",
+    id: "singleton",
+    label: "Hero 视频封面",
+    field: "posterUrl",
+  }];
   const pending = reduceMediaLibraryState(
     { files, snapshot: null, deletingUrl: null, error: null },
     { type: "delete-start", url: files[0].url },
@@ -540,6 +574,16 @@ test("a deletion conflict restores the file with fresh references and no retry",
   assert.deepEqual(restored.files, [{ ...files[0], references: freshReferences }]);
   assert.equal(restored.error, "文件现已被引用，不能删除。");
   assert.equal(restored.retryFile, null);
+});
+
+test("Media library uses the shared toolbar and responsive four-column grid", () => {
+  const source = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /AdminToolbar/);
+  assert.match(source, /grid-cols-2/);
+  assert.match(source, /2xl:grid-cols-4/);
+  assert.match(source, /title=\{file\.pathname\}/);
+  assert.match(source, /Hero 视频封面/);
 });
 
 test("media library consumes fresh conflict references instead of offering a stale retry", () => {

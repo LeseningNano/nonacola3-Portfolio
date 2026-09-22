@@ -5,14 +5,14 @@ import { gfm } from "micromark-extension-gfm";
 import { parseFragment } from "parse5";
 
 export type MediaReference = {
-  kind: "hero" | "showreel" | "work-embed" | "work-thumbnail" | "work-body" | "post-body";
+  kind: "hero" | "hero-poster" | "showreel" | "work-embed" | "work-thumbnail" | "work-body" | "post-body";
   id: string;
   label: string;
   field: string;
 };
 
 export type MediaReferenceSnapshot = {
-  hero: { blobUrl: string } | null;
+  hero: { blobUrl: string; posterUrl: string | null } | null;
   showreel: { showreelUrl: string; videoType: string } | null;
   videos: Array<{
     id: string;
@@ -185,6 +185,10 @@ export function findMediaReferences(
   const references: MediaReference[] = [];
   if (normalizeManagedBlobUrl(snapshot.hero?.blobUrl) === url) {
     references.push({ kind: "hero", id: "singleton", label: "Hero 背景视频", field: "blobUrl" });
+  }
+
+  if (normalizeManagedBlobUrl(snapshot.hero?.posterUrl) === url) {
+    references.push({ kind: "hero-poster", id: "singleton", label: "Hero 视频封面", field: "posterUrl" });
   }
 
   if (normalizeManagedBlobUrl(snapshot.showreel?.showreelUrl) === url) {

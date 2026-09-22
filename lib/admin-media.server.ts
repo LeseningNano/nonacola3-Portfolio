@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 
 export async function loadMediaReferenceSnapshot(): Promise<MediaReferenceSnapshot> {
   const [hero, showreel, videos, posts] = await Promise.all([
-    db.heroVideo.findUnique({ where: { id: "singleton" }, select: { blobUrl: true } }),
+    db.heroVideo.findUnique({ where: { id: "singleton" }, select: { blobUrl: true, posterUrl: true } }),
     db.showreel.findUnique({
       where: { id: "singleton" },
       select: { showreelUrl: true, videoType: true },
