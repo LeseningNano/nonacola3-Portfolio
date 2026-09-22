@@ -12,7 +12,7 @@ export async function loadMediaReferenceSnapshot(): Promise<MediaReferenceSnapsh
       select: { showreelUrl: true, videoType: true },
     }),
     db.video.findMany({
-      select: { id: true, title: true, thumbnail: true, description: true },
+      select: { id: true, title: true, embedUrl: true, thumbnail: true, description: true },
     }),
     db.post.findMany({ select: { id: true, title: true, body: true } }),
   ]);

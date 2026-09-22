@@ -52,6 +52,7 @@ function mediaSnapshot(overrides: Partial<{
   heroUrl: string | null;
   showreelUrl: string;
   showreelType: string;
+  workEmbedUrl: string;
   workThumbnail: string | null;
   workDescription: string | null;
   postBody: string;
@@ -65,6 +66,7 @@ function mediaSnapshot(overrides: Partial<{
     videos: [{
       id: "work-1",
       title: "Sample work",
+      embedUrl: overrides.workEmbedUrl ?? "",
       thumbnail: overrides.workThumbnail ?? null,
       description: overrides.workDescription ?? null,
     }],
@@ -405,6 +407,15 @@ test("uploaded Showreel and work thumbnails are indexed with stable field refere
     { kind: "showreel", id: "singleton", label: "Showreel", field: "showreelUrl" },
     { kind: "work-thumbnail", id: "work-1", label: "Sample work", field: "thumbnail" },
   ]);
+});
+
+test("managed Work embed URLs are protected with an exact normalized reference", () => {
+  const snapshot = mediaSnapshot({ workEmbedUrl: `${blob}#player` });
+
+  assert.deepEqual(findMediaReferences(blob, snapshot), [
+    { kind: "work-embed", id: "work-1", label: "Sample work", field: "embedUrl" },
+  ]);
+  assert.deepEqual(findMediaReferences(`${blob}?download=1`, snapshot), []);
 });
 
 test("reference index keeps an explicit empty list for unused files", () => {

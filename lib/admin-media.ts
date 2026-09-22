@@ -5,7 +5,7 @@ import { gfm } from "micromark-extension-gfm";
 import { parseFragment } from "parse5";
 
 export type MediaReference = {
-  kind: "hero" | "showreel" | "work-thumbnail" | "work-body" | "post-body";
+  kind: "hero" | "showreel" | "work-embed" | "work-thumbnail" | "work-body" | "post-body";
   id: string;
   label: string;
   field: string;
@@ -17,6 +17,7 @@ export type MediaReferenceSnapshot = {
   videos: Array<{
     id: string;
     title: string;
+    embedUrl: string;
     thumbnail: string | null;
     description: string | null;
   }>;
@@ -193,6 +194,9 @@ export function findMediaReferences(
   }
 
   for (const video of snapshot.videos) {
+    if (normalizeManagedBlobUrl(video.embedUrl) === url) {
+      references.push({ kind: "work-embed", id: video.id, label: video.title, field: "embedUrl" });
+    }
     if (normalizeManagedBlobUrl(video.thumbnail) === url) {
       references.push({ kind: "work-thumbnail", id: video.id, label: video.title, field: "thumbnail" });
     }
