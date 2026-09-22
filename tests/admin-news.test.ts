@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { NewsList } from "../components/admin/news-list";
 import {
   createPostEditorState,
   createPostPayload,
@@ -42,6 +45,18 @@ test("News filters preserve newest-first source order and search title or body",
   assert.deepEqual(filterAdminPosts(posts, "published", "").map(({ id }) => id), ["a"]);
   assert.deepEqual(filterAdminPosts(posts, "draft", "beta").map(({ id }) => id), ["b"]);
   assert.deepEqual(filterAdminPosts(posts, "all", "article").map(({ id }) => id), ["a"]);
+});
+
+test("draft News entries do not expose a public Preview action", () => {
+  const draftMarkup = renderToStaticMarkup(
+    createElement(NewsList, { initialPosts: [post("draft", "Unpublished article", "body", false)] }),
+  );
+  const publishedMarkup = renderToStaticMarkup(
+    createElement(NewsList, { initialPosts: [post("published", "Published article", "body", true)] }),
+  );
+
+  assert.doesNotMatch(draftMarkup, /aria-label="预览 Unpublished article"/);
+  assert.match(publishedMarkup, /aria-label="预览 Published article"/);
 });
 
 test("failed optimistic News mutation restores the exact previous list", () => {
