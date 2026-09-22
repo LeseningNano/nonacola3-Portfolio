@@ -87,7 +87,17 @@ export function MediaLibrary() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: file.url }),
       });
-      if (!response.ok) throw new Error(await responseError(response));
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({})) as { error?: unknown; references?: unknown };
+        if (response.status === 409 && isMediaReferences(payload.references)) {
+          const message = "文件现已被引用，不能删除。";
+          dispatch({ type: "delete-conflict", message, references: payload.references });
+          setFilter("all");
+          toastError(message);
+          return;
+        }
+        throw new Error(errorMessage(payload));
+      }
       dispatch({ type: "delete-success" });
       setInventory((current) => current ? {
         ...current,
@@ -170,9 +180,23 @@ function MediaCard({ file, deleting, onDelete }: { file: MediaFile; deleting: bo
 
 async function responseError(response: Response): Promise<string> {
   try {
-    const payload = (await response.json()) as { error?: unknown };
-    return typeof payload.error === "string" && payload.error ? payload.error : fallbackError;
+    return errorMessage((await response.json()) as { error?: unknown });
   } catch {
     return fallbackError;
   }
+}
+
+function errorMessage(payload: { error?: unknown }): string {
+  return typeof payload.error === "string" && payload.error ? payload.error : fallbackError;
+}
+
+function isMediaReferences(value: unknown): value is MediaFile["references"] {
+  return Array.isArray(value) && value.every((reference) => (
+    typeof reference === "object"
+    && reference !== null
+    && typeof reference.kind === "string"
+    && typeof reference.id === "string"
+    && typeof reference.label === "string"
+    && typeof reference.field === "string"
+  ));
 }

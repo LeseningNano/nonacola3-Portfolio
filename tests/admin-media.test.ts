@@ -503,6 +503,46 @@ test("failed Media deletion restores the exact visible item", () => {
   assert.equal(restored.error, "删除失败");
 });
 
+test("a deletion conflict restores the file with fresh references and no retry", () => {
+  const files = [mediaFile("unused.webp", [])];
+  const freshReferences = [reference("hero")];
+  const pending = reduceMediaLibraryState(
+    { files, snapshot: null, deletingUrl: null, error: null },
+    { type: "delete-start", url: files[0].url },
+  );
+
+  const restored = reduceMediaLibraryState(pending, {
+    type: "delete-conflict",
+    message: "文件现已被引用，不能删除。",
+    references: freshReferences,
+  });
+
+  assert.deepEqual(restored.files, [{ ...files[0], references: freshReferences }]);
+  assert.equal(restored.error, "文件现已被引用，不能删除。");
+  assert.equal(restored.retryFile, null);
+});
+
+test("media library consumes fresh conflict references instead of offering a stale retry", () => {
+  const source = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
+  const deleteFile = source.indexOf("async function deleteFile");
+  const conflict = source.indexOf("response.status === 409", deleteFile);
+  const dispatch = source.indexOf('type: "delete-conflict"', conflict);
+
+  assert.ok(deleteFile >= 0, "the media deletion handler must exist");
+  assert.ok(conflict >= 0, "the fresh-reference conflict response must be handled in the deletion handler");
+  assert.ok(dispatch > conflict, "the conflict response must update the restored file with its references");
+  assert.match(source, /文件现已被引用，不能删除。/);
+  assert.match(source, /isMediaReferences/);
+});
+
+test("media library reveals a newly referenced conflict file from the unused filter", () => {
+  const source = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
+  const conflict = source.indexOf("response.status === 409");
+  const filterReset = source.indexOf('setFilter("all")', conflict);
+
+  assert.ok(filterReset > conflict, "a conflict must reveal the restored referenced file instead of leaving it hidden by the unused filter");
+});
+
 test("media refresh does not discard a pending deletion rollback snapshot", () => {
   const files = [mediaFile("unused.webp", [])];
   const pending = reduceMediaLibraryState(

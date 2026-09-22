@@ -46,6 +46,7 @@ export type MediaLibraryEvent =
   | { type: "delete-start"; url: string }
   | { type: "delete-success" }
   | { type: "delete-error"; message: string }
+  | { type: "delete-conflict"; message: string; references: MediaReference[] }
   | { type: "replace-files"; files: MediaFile[] };
 
 type ManagedBlob = {
@@ -264,6 +265,16 @@ export function reduceMediaLibraryState(
         deletingUrl: null,
         error: event.message,
         retryFile: state.snapshot?.find((file) => file.url === state.deletingUrl) ?? null,
+      };
+    case "delete-conflict":
+      return {
+        files: (state.snapshot ?? state.files).map((file) => (
+          file.url === state.deletingUrl ? { ...file, references: event.references } : file
+        )),
+        snapshot: null,
+        deletingUrl: null,
+        error: event.message,
+        retryFile: null,
       };
     case "replace-files":
       if (state.deletingUrl) return state;
