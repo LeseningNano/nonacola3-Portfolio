@@ -12,21 +12,11 @@ export default async function NewNewsPage({
   const { type } = await searchParams;
 
   if (type === "short") {
-    return (
-      <div className="space-y-6">
-        <AdminPageHeader title="新建短动态" />
-        <ShortPostEditor />
-      </div>
-    );
+    return <ShortPostEditor />;
   }
 
   if (type === "article") {
-    return (
-      <div className="space-y-6">
-        <AdminPageHeader title="新建文章" />
-        <ArticleEditor />
-      </div>
-    );
+    return <ArticleEditor />;
   }
 
   return (

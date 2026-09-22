@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { ArrowLeft, Save, Send } from "lucide-react";
+import { ArrowLeft, EyeOff, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { MarkdownBody } from "@/components/markdown-body";
 import { MarkdownEditor } from "@/components/markdown-editor";
 import { useToast } from "@/components/toast";
@@ -13,6 +15,7 @@ import {
   confirmPostEditorNavigation,
   createPostEditorState,
   createPostPayload,
+  getPostEditorActions,
   reducePostEditorState,
   validatePostEditor,
 } from "@/lib/admin-news";
@@ -54,6 +57,7 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
     () => confirmPostEditorNavigation(isDirty, () => window.confirm("有尚未保存的更改，确定要离开吗？")),
     [isDirty],
   );
+  const actions = getPostEditorActions(state.intendedPublished);
 
   useAdminNavigationGuard(confirmNavigation);
 
@@ -121,21 +125,25 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button type="button" variant="ghost" onClick={leaveEditor}>
-          <ArrowLeft /> 返回
+    <div className="min-w-0 space-y-5">
+      <AdminEditorHeader
+        title={initialPost ? initialPost.title?.trim() || "未命名文章" : "新建文章"}
+        status={statusText}
+        backAction={(
+          <Button type="button" variant="ghost" onClick={leaveEditor} className="shrink-0">
+            <ArrowLeft aria-hidden="true" /> 返回
+          </Button>
+        )}
+      >
+        <Button type="button" variant="outline" disabled={saving} onClick={() => void save(actions.secondary.published)}>
+          {state.intendedPublished ? <EyeOff aria-hidden="true" /> : <Save aria-hidden="true" />}
+          {actions.secondary.label}
         </Button>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-neutral-500" aria-hidden="true">{statusText}</span>
-          <Button type="button" variant="outline" disabled={saving} onClick={() => void save(false)}>
-            <Save /> {saving ? "保存中…" : "保存草稿"}
-          </Button>
-          <Button type="button" disabled={saving} onClick={() => void save(true)}>
-            <Send /> 发布
-          </Button>
-        </div>
-      </div>
+        <Button type="button" disabled={saving} onClick={() => void save(actions.primary.published)}>
+          {state.intendedPublished ? <Save aria-hidden="true" /> : <Send aria-hidden="true" />}
+          {actions.primary.label}
+        </Button>
+      </AdminEditorHeader>
 
       <p className="sr-only" role="status" aria-live="polite">{announcement || statusText}</p>
       {state.error ? (
@@ -144,8 +152,8 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
         </p>
       ) : null}
 
-      <fieldset disabled={saving} className="space-y-5">
-        <div className="grid gap-5 rounded-xl border border-white/10 bg-neutral-950/40 p-5 sm:grid-cols-2 sm:p-6">
+      <fieldset disabled={saving} className="min-w-0 space-y-8">
+        <AdminFormSection title="基本信息" description="文章标题和可选分类标签。">
           <div className="space-y-2">
             <Label htmlFor="article-title">标题</Label>
             <input
@@ -167,30 +175,32 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
               placeholder="例如：创作笔记"
             />
           </div>
-        </div>
+        </AdminFormSection>
 
-        <div className="grid gap-5 lg:grid-cols-2">
-          <section className="space-y-2" aria-labelledby="article-editor-label">
-            <Label id="article-editor-label" htmlFor="article-body">正文</Label>
-            <MarkdownEditor
-              value={state.body}
-              onChange={(value) => dispatch({ type: "field", field: "body", value })}
-              textareaProps={{
-                id: "article-body",
-                rows: 20,
-                placeholder: "使用 Markdown 撰写正文…",
-                "aria-labelledby": "article-editor-label",
-              }}
-            />
-          </section>
+        <AdminFormSection title="正文与预览" description="使用 Markdown 撰写文章，预览沿用公开内容渲染方式。">
+          <div className="grid min-w-0 gap-5 lg:grid-cols-2">
+            <section className="min-w-0 space-y-2" aria-labelledby="article-editor-label">
+              <Label id="article-editor-label" htmlFor="article-body">正文</Label>
+              <MarkdownEditor
+                value={state.body}
+                onChange={(value) => dispatch({ type: "field", field: "body", value })}
+                textareaProps={{
+                  id: "article-body",
+                  rows: 20,
+                  placeholder: "使用 Markdown 撰写正文…",
+                  "aria-labelledby": "article-editor-label",
+                }}
+              />
+            </section>
 
-          <section className="space-y-2" aria-labelledby="article-preview-label">
-            <h2 id="article-preview-label" className="text-sm font-medium text-neutral-200">实时预览</h2>
-            <div className="min-h-80 rounded-xl border border-white/10 bg-neutral-950/40 p-5 sm:p-6">
-              {state.body.trim() ? <MarkdownBody content={state.body} /> : <p className="text-sm text-neutral-500">尚无内容可预览。</p>}
-            </div>
-          </section>
-        </div>
+            <section className="min-w-0 space-y-2" aria-labelledby="article-preview-label">
+              <h2 id="article-preview-label" className="text-sm font-medium text-neutral-200">实时预览</h2>
+              <div className="min-h-80 min-w-0 rounded-lg border border-white/10 bg-neutral-950/40 p-4 sm:p-5">
+                {state.body.trim() ? <MarkdownBody content={state.body} /> : <p className="text-sm text-neutral-500">尚无内容可预览。</p>}
+              </div>
+            </section>
+          </div>
+        </AdminFormSection>
       </fieldset>
     </div>
   );

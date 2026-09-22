@@ -10,6 +10,7 @@ import {
   createPostEditorState,
   createPostPayload,
   filterAdminPosts,
+  getPostEditorActions,
   getPostKind,
   normalizeAdminPostTitle,
   reducePostEditorState,
@@ -46,6 +47,35 @@ test("News filters preserve newest-first source order and search title or body",
   assert.deepEqual(filterAdminPosts(posts, "published", "").map(({ id }) => id), ["a"]);
   assert.deepEqual(filterAdminPosts(posts, "draft", "beta").map(({ id }) => id), ["b"]);
   assert.deepEqual(filterAdminPosts(posts, "all", "article").map(({ id }) => id), ["a"]);
+});
+
+test("News editor actions reflect current publication state", () => {
+  assert.deepEqual(getPostEditorActions(false), {
+    secondary: { label: "保存草稿", published: false },
+    primary: { label: "发布", published: true },
+  });
+  assert.deepEqual(getPostEditorActions(true), {
+    secondary: { label: "转为草稿", published: false },
+    primary: { label: "保存更改", published: true },
+  });
+});
+
+test("News list uses direct type destinations and shared row status", () => {
+  const source = readFileSync(new URL("../components/admin/news-list.tsx", import.meta.url), "utf8");
+  assert.match(source, /AdminStatusBadge/);
+  assert.match(source, /\/dashboard\/news\/new\?type=short/);
+  assert.match(source, /\/dashboard\/news\/new\?type=article/);
+  assert.doesNotMatch(source, /min-w-\[880px\]/);
+});
+
+test("News editors use shared state-aware headers and continuous form sections", () => {
+  const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
+  for (const editor of ["components/admin/short-post-editor.tsx", "components/admin/article-editor.tsx"]) {
+    const contents = source(editor);
+    assert.match(contents, /AdminEditorHeader/);
+    assert.match(contents, /AdminFormSection/);
+    assert.match(contents, /getPostEditorActions\(state\.intendedPublished\)/);
+  }
 });
 
 test("draft News entries do not expose a public Preview action", () => {
@@ -243,8 +273,9 @@ test("News routes await route props and dispatch by exact type and title nullabi
   const editPage = source("app/(admin)/dashboard/news/[id]/edit/page.tsx");
 
   assert.match(newPage, /await searchParams/);
-  assert.match(newPage, /type === "short"/);
-  assert.match(newPage, /type === "article"/);
+  assert.match(newPage, /type === "short"\)\s*\{\s*return <ShortPostEditor \/>;/);
+  assert.match(newPage, /type === "article"\)\s*\{\s*return <ArticleEditor \/>;/);
+  assert.match(newPage, /title="新建内容"/);
   assert.match(newPage, /\/dashboard\/news\/new\?type=short/);
   assert.match(newPage, /\/dashboard\/news\/new\?type=article/);
   assert.match(editPage, /await params/);

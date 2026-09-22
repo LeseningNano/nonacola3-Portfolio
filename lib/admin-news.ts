@@ -26,6 +26,11 @@ export type PostEditorFields = {
   intendedPublished: boolean;
 };
 
+export type PostEditorActions = {
+  secondary: { label: string; published: false };
+  primary: { label: string; published: true };
+};
+
 export type PostEditorState = PostEditorFields & {
   kind: PostKind;
   baseline: PostEditorFields;
@@ -49,6 +54,18 @@ export function serializeAdminPost(post: PrismaAdminPost): PostItem {
 
 export function getPostKind(post: Pick<PostItem, "title">): PostKind {
   return post.title === null ? "short" : "article";
+}
+
+export function getPostEditorActions(published: boolean): PostEditorActions {
+  return published
+    ? {
+        secondary: { label: "转为草稿", published: false },
+        primary: { label: "保存更改", published: true },
+      }
+    : {
+        secondary: { label: "保存草稿", published: false },
+        primary: { label: "发布", published: true },
+      };
 }
 
 export function createPostEditorState(kind: PostKind, post?: PostItem): PostEditorState {

@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { ArrowLeft, Save, Send } from "lucide-react";
+import { ArrowLeft, EyeOff, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
+import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/toast";
@@ -11,6 +13,7 @@ import {
   confirmPostEditorNavigation,
   createPostEditorState,
   createPostPayload,
+  getPostEditorActions,
   reducePostEditorState,
   validatePostEditor,
 } from "@/lib/admin-news";
@@ -38,6 +41,16 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
     [state],
   );
   const saving = state.status === "saving";
+  const statusText = saving
+    ? "保存中…"
+    : state.status === "saved"
+      ? "已保存"
+      : state.status === "error"
+        ? "保存失败"
+        : isDirty
+          ? "有未保存的更改"
+          : "所有更改已保存";
+  const actions = getPostEditorActions(state.intendedPublished);
   const confirmNavigation = useCallback(
     () => confirmPostEditorNavigation(isDirty, () => window.confirm("有尚未保存的更改，确定要离开吗？")),
     [isDirty],
@@ -101,50 +114,59 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button type="button" variant="ghost" onClick={leaveEditor}>
-          <ArrowLeft /> 返回
+    <div className="mx-auto max-w-3xl space-y-5">
+      <AdminEditorHeader
+        title={initialPost ? "编辑短动态" : "新建短动态"}
+        status={statusText}
+        backAction={(
+          <Button type="button" variant="ghost" onClick={leaveEditor} className="shrink-0">
+            <ArrowLeft aria-hidden="true" /> 返回
+          </Button>
+        )}
+      >
+        <Button type="button" variant="outline" disabled={saving} onClick={() => void save(actions.secondary.published)}>
+          {state.intendedPublished ? <EyeOff aria-hidden="true" /> : <Save aria-hidden="true" />}
+          {actions.secondary.label}
         </Button>
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" disabled={saving} onClick={() => void save(false)}>
-            <Save /> {saving ? "保存中…" : "保存草稿"}
-          </Button>
-          <Button type="button" disabled={saving} onClick={() => void save(true)}>
-            <Send /> 发布
-          </Button>
-        </div>
-      </div>
+        <Button type="button" disabled={saving} onClick={() => void save(actions.primary.published)}>
+          {state.intendedPublished ? <Save aria-hidden="true" /> : <Send aria-hidden="true" />}
+          {actions.primary.label}
+        </Button>
+      </AdminEditorHeader>
 
-      <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
+      <p className="sr-only" role="status" aria-live="polite">{announcement || statusText}</p>
       {state.error ? <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{state.error}</p> : null}
 
-      <fieldset disabled={saving} className="space-y-5 rounded-xl border border-white/10 bg-neutral-950/40 p-5 sm:p-6">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between gap-4">
-            <Label htmlFor="short-post-body">正文</Label>
-            <span className="text-xs text-neutral-500" aria-live="polite">{state.body.length} 字</span>
+      <fieldset disabled={saving} className="min-w-0 space-y-8">
+        <AdminFormSection title="正文" description="简短记录创作进展、想法或动态。">
+          <div className="min-w-0 space-y-2">
+            <div className="flex items-center justify-between gap-4">
+              <Label htmlFor="short-post-body">短动态</Label>
+              <span className="text-xs text-neutral-500" aria-live="polite">{state.body.length} 字</span>
+            </div>
+            <textarea
+              ref={bodyRef}
+              id="short-post-body"
+              rows={9}
+              value={state.body}
+              onChange={(event) => dispatch({ type: "field", field: "body", value: event.target.value })}
+              className={textareaClassName}
+              placeholder="写下此刻的动态…"
+            />
           </div>
-          <textarea
-            ref={bodyRef}
-            id="short-post-body"
-            rows={9}
-            value={state.body}
-            onChange={(event) => dispatch({ type: "field", field: "body", value: event.target.value })}
-            className={textareaClassName}
-            placeholder="写下此刻的动态…"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="short-post-tag">标签（可选）</Label>
-          <input
-            id="short-post-tag"
-            value={state.tag}
-            onChange={(event) => dispatch({ type: "field", field: "tag", value: event.target.value })}
-            className="h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
-            placeholder="例如：日常"
-          />
-        </div>
+        </AdminFormSection>
+        <AdminFormSection title="标签" description="可选，用于归类这条动态。">
+          <div className="space-y-2">
+            <Label htmlFor="short-post-tag">标签（可选）</Label>
+            <input
+              id="short-post-tag"
+              value={state.tag}
+              onChange={(event) => dispatch({ type: "field", field: "tag", value: event.target.value })}
+              className="h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+              placeholder="例如：日常"
+            />
+          </div>
+        </AdminFormSection>
       </fieldset>
     </div>
   );
