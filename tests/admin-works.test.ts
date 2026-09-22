@@ -67,6 +67,7 @@ test("administrator route detection includes dashboard and legacy video editors 
 
 test("administrator navigation resolves nested modules", () => {
   assert.deepEqual(ADMIN_NAV_ITEMS.map(({ id }) => id), ["works", "news", "settings", "media"]);
+  assert.equal(ADMIN_NAV_ITEMS[2].label, "页面媒体");
   assert.equal(getActiveAdminItem("/dashboard/works/order"), "works");
   assert.equal(getActiveAdminItem("/dashboard/news/example/edit"), "news");
   assert.equal(getActiveAdminItem("/dashboard/settings"), "settings");
