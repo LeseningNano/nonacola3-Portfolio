@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -19,4 +20,27 @@ test("ordinary and featured states share the same badge structure", () => {
   assert.match(featured, /data-admin-status="featured"/);
   assert.match(ordinary, /rounded-full/);
   assert.match(featured, /rounded-full/);
+});
+
+test("admin editors retain visible focus and mobile sticky offsets", () => {
+  const header = readFileSync(new URL("../components/admin/admin-editor-header.tsx", import.meta.url), "utf8");
+  const menu = readFileSync(new URL("../components/ui/menu.tsx", import.meta.url), "utf8");
+
+  assert.match(header, /top-14/);
+  assert.match(header, /md:top-0/);
+  assert.match(menu, /focus:/);
+  assert.match(menu, /outline-none/);
+});
+
+test("Dashboard shell has no global command/search bar and list identities can wrap or truncate", () => {
+  const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
+  const works = readFileSync(new URL("../components/admin/works-list.tsx", import.meta.url), "utf8");
+  const news = readFileSync(new URL("../components/admin/news-list.tsx", import.meta.url), "utf8");
+  const media = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(shell, /CommandPalette|command palette|globalSearch|面包屑|全局搜索/i);
+  for (const source of [works, news, media]) {
+    assert.match(source, /min-w-0/);
+    assert.match(source, /truncate|break-words/);
+  }
 });
