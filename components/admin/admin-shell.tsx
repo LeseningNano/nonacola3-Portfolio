@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { MouseEvent, ReactNode } from "react";
+import type { FormEvent, MouseEvent, ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { logoutAdmin } from "@/app/(admin)/dashboard/actions";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ADMIN_NAV_ITEMS, getActiveAdminItem } from "@/lib/admin-navigation";
+import { ADMIN_NAV_ITEMS, getActiveAdminItem, guardAdminAction } from "@/lib/admin-navigation";
 
 type AdminShellProps = {
   children: ReactNode;
@@ -84,7 +84,11 @@ function AdminNavigation({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function AdminAccount({ userName }: { userName?: string | null }) {
+  const context = useContext(AdminNavigationGuardContext);
   const handleNavigation = useGuardedNavigation();
+  const handleSignOut = useCallback((event: FormEvent<HTMLFormElement>) => {
+    guardAdminAction(event, context?.confirmNavigation);
+  }, [context]);
 
   return (
     <div className="border-t border-white/10 pt-4">
@@ -92,7 +96,7 @@ function AdminAccount({ userName }: { userName?: string | null }) {
       <Link href="/" onClick={handleNavigation} className="block rounded-md px-3 py-2 text-sm text-neutral-400 transition-colors hover:bg-white/10 hover:text-white">
         View site
       </Link>
-      <form action={logoutAdmin}>
+      <form action={logoutAdmin} onSubmit={handleSignOut}>
         <button type="submit" className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-neutral-400 transition-colors hover:bg-white/10 hover:text-white">
           <LogOut aria-hidden="true" className="size-4" />
           Sign out

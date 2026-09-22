@@ -187,10 +187,7 @@ export function findMediaReferences(
     references.push({ kind: "hero", id: "singleton", label: "Hero 背景视频", field: "blobUrl" });
   }
 
-  if (
-    snapshot.showreel?.videoType === "upload"
-    && normalizeManagedBlobUrl(snapshot.showreel.showreelUrl) === url
-  ) {
+  if (normalizeManagedBlobUrl(snapshot.showreel?.showreelUrl) === url) {
     references.push({ kind: "showreel", id: "singleton", label: "Showreel", field: "showreelUrl" });
   }
 

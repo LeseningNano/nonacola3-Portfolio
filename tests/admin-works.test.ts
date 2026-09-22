@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -6,6 +8,7 @@ import { filterMediaPickerFiles, MediaPicker } from "../components/admin/media-p
 import { installUnsavedOrderHistoryGuard } from "../components/admin/work-order-editor";
 import {
   ADMIN_NAV_ITEMS,
+  guardAdminAction,
   getActiveAdminItem,
   isAdminPath,
 } from "../lib/admin-navigation";
@@ -69,6 +72,36 @@ test("administrator navigation resolves nested modules", () => {
   assert.equal(getActiveAdminItem("/dashboard/settings"), "settings");
   assert.equal(getActiveAdminItem("/dashboard/media"), "media");
   assert.equal(getActiveAdminItem("/login"), null);
+});
+
+test("sign out is cancelled when the active editor declines navigation", () => {
+  let prevented = false;
+  let confirmationCalls = 0;
+
+  guardAdminAction(
+    { preventDefault: () => { prevented = true; } },
+    () => {
+      confirmationCalls += 1;
+      return false;
+    },
+  );
+
+  assert.equal(confirmationCalls, 1);
+  assert.equal(prevented, true);
+});
+
+test("sign out proceeds when navigation is clean or confirmed", () => {
+  for (const confirmNavigation of [() => true, undefined]) {
+    let prevented = false;
+    guardAdminAction({ preventDefault: () => { prevented = true; } }, confirmNavigation);
+    assert.equal(prevented, false);
+  }
+});
+
+test("Work ordering delegates dirty shell navigation to the shared guard", () => {
+  const source = readFileSync(resolve(process.cwd(), "components/admin/work-order-editor.tsx"), "utf8");
+  assert.match(source, /useAdminNavigationGuard\(confirmNavigation\)/);
+  assert.doesNotMatch(source, /document\.addEventListener\("click", confirmLinkExit/);
 });
 
 test("admin works serialization emits ISO dates without mutating nullable fields", () => {

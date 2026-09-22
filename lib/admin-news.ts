@@ -78,6 +78,13 @@ export function validatePostEditor(state: PostEditorState): PostEditorValidation
   return { ok: true };
 }
 
+export function confirmPostEditorNavigation(
+  isDirty: boolean,
+  confirmLeave: () => boolean,
+) {
+  return !isDirty || confirmLeave();
+}
+
 export function createPostPayload(
   state: PostEditorState,
   published: boolean,

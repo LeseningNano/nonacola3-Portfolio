@@ -7,6 +7,17 @@ export const ADMIN_NAV_ITEMS = [
 
 export type AdminNavItem = (typeof ADMIN_NAV_ITEMS)[number];
 
+type PreventableNavigationEvent = {
+  preventDefault: () => void;
+};
+
+export function guardAdminAction(
+  event: PreventableNavigationEvent,
+  confirmNavigation?: () => boolean,
+) {
+  if (confirmNavigation && !confirmNavigation()) event.preventDefault();
+}
+
 export function isAdminPath(pathname: string) {
   return pathname === "/dashboard" || pathname.startsWith("/dashboard/") ||
     pathname === "/videos/new" || /^\/videos\/[^/]+\/edit$/.test(pathname);

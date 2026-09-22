@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { ArrowLeft, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { MarkdownBody } from "@/components/markdown-body";
 import { MarkdownEditor } from "@/components/markdown-editor";
 import { useToast } from "@/components/toast";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
+  confirmPostEditorNavigation,
   createPostEditorState,
   createPostPayload,
   reducePostEditorState,
@@ -48,9 +50,25 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
         : isDirty
           ? "有未保存的更改"
           : "所有更改已保存";
+  const confirmNavigation = useCallback(
+    () => confirmPostEditorNavigation(isDirty, () => window.confirm("有尚未保存的更改，确定要离开吗？")),
+    [isDirty],
+  );
+
+  useAdminNavigationGuard(confirmNavigation);
+
+  useEffect(() => {
+    if (!isDirty) return;
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [isDirty]);
 
   function leaveEditor() {
-    if (isDirty && !window.confirm("有尚未保存的更改，确定要离开吗？")) return;
+    if (!confirmNavigation()) return;
     router.back();
   }
 

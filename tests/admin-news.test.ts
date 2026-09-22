@@ -6,6 +6,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { NewsList } from "../components/admin/news-list";
 import {
+  confirmPostEditorNavigation,
   createPostEditorState,
   createPostPayload,
   filterAdminPosts,
@@ -149,6 +150,33 @@ test("successful News save replaces the baseline without clearing fields", () =>
     tag: "daily",
     intendedPublished: true,
   });
+});
+
+test("News editor navigation confirms only when content is dirty", () => {
+  let confirmationCalls = 0;
+  const confirmLeave = () => {
+    confirmationCalls += 1;
+    return false;
+  };
+
+  assert.equal(confirmPostEditorNavigation(false, confirmLeave), true);
+  assert.equal(confirmationCalls, 0);
+  assert.equal(confirmPostEditorNavigation(true, confirmLeave), false);
+  assert.equal(confirmationCalls, 1);
+  assert.equal(confirmPostEditorNavigation(true, () => true), true);
+});
+
+test("both News editors register their dirty-navigation policy with the Admin shell", () => {
+  const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
+
+  for (const path of [
+    "components/admin/short-post-editor.tsx",
+    "components/admin/article-editor.tsx",
+  ]) {
+    const editor = source(path);
+    assert.match(editor, /useAdminNavigationGuard\(confirmNavigation\)/);
+    assert.match(editor, /addEventListener\("beforeunload", warnBeforeUnload\)/);
+  }
 });
 
 test("article draft payload trims content and preserves explicit published false", () => {

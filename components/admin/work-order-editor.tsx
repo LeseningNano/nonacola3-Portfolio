@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { ArrowDown, ArrowUp, GripVertical, Save } from "lucide-react";
+import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/toast";
 import {
@@ -94,6 +95,12 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
     [state.initial, state.items],
   );
   const saving = state.status === "saving";
+  const confirmNavigation = useCallback(
+    () => !isDirty || window.confirm("有尚未保存的排序更改，确定要离开吗？"),
+    [isDirty],
+  );
+
+  useAdminNavigationGuard(confirmNavigation);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -102,29 +109,19 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
       event.preventDefault();
       event.returnValue = "";
     };
-    const confirmLinkExit = (event: MouseEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element) || !target.closest("a[href]")) return;
-      if (!window.confirm("有尚未保存的排序更改，确定要离开吗？")) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    };
     const removeHistoryGuard = installUnsavedOrderHistoryGuard({
       history: window.history,
       target: window,
       href: window.location.href,
-      confirmLeave: () => window.confirm("有尚未保存的排序更改，确定要离开吗？"),
+      confirmLeave: confirmNavigation,
     });
 
     window.addEventListener("beforeunload", warnBeforeUnload);
-    document.addEventListener("click", confirmLinkExit, true);
     return () => {
       window.removeEventListener("beforeunload", warnBeforeUnload);
-      document.removeEventListener("click", confirmLinkExit, true);
       removeHistoryGuard();
     };
-  }, [isDirty]);
+  }, [confirmNavigation, isDirty]);
 
   function move(from: number, to: number) {
     dispatch({ type: "move", from, to });

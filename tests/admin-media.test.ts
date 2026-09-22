@@ -409,6 +409,26 @@ test("uploaded Showreel and work thumbnails are indexed with stable field refere
   ]);
 });
 
+test("managed Showreel Blob URLs stay referenced despite a stale url discriminator", () => {
+  const references = findMediaReferences(blob, mediaSnapshot({
+    showreelUrl: `${blob}#preview`,
+    showreelType: "url",
+  }));
+
+  assert.deepEqual(references, [
+    { kind: "showreel", id: "singleton", label: "Showreel", field: "showreelUrl" },
+  ]);
+});
+
+test("external Showreel embeds are not treated as managed media references", () => {
+  const references = findMediaReferences(blob, mediaSnapshot({
+    showreelUrl: "https://www.youtube.com/watch?v=example",
+    showreelType: "url",
+  }));
+
+  assert.deepEqual(references, []);
+});
+
 test("managed Work embed URLs are protected with an exact normalized reference", () => {
   const snapshot = mediaSnapshot({ workEmbedUrl: `${blob}#player` });
 

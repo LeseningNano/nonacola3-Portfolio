@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { ArrowLeft, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/toast";
 import {
+  confirmPostEditorNavigation,
   createPostEditorState,
   createPostPayload,
   reducePostEditorState,
@@ -36,9 +38,25 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
     [state],
   );
   const saving = state.status === "saving";
+  const confirmNavigation = useCallback(
+    () => confirmPostEditorNavigation(isDirty, () => window.confirm("有尚未保存的更改，确定要离开吗？")),
+    [isDirty],
+  );
+
+  useAdminNavigationGuard(confirmNavigation);
+
+  useEffect(() => {
+    if (!isDirty) return;
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [isDirty]);
 
   function leaveEditor() {
-    if (isDirty && !window.confirm("有尚未保存的更改，确定要离开吗？")) return;
+    if (!confirmNavigation()) return;
     router.back();
   }
 
