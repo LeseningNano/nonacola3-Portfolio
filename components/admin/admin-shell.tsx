@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import type { MouseEvent, ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { LogOut, Menu, X } from "lucide-react";
 import { logoutAdmin } from "@/app/(admin)/dashboard/actions";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -14,9 +14,53 @@ type AdminShellProps = {
   userName?: string | null;
 };
 
+type NavigationGuard = () => boolean;
+
+const AdminNavigationGuardContext = createContext<{
+  registerNavigationGuard: (guard: NavigationGuard) => () => void;
+  confirmNavigation: () => boolean;
+} | null>(null);
+
+function AdminNavigationGuardProvider({ children }: { children: ReactNode }) {
+  const guardRef = useRef<NavigationGuard | null>(null);
+  const registerNavigationGuard = useCallback((guard: NavigationGuard) => {
+    guardRef.current = guard;
+    return () => {
+      if (guardRef.current === guard) guardRef.current = null;
+    };
+  }, []);
+  const confirmNavigation = useCallback(() => guardRef.current?.() ?? true, []);
+  const value = useMemo(
+    () => ({ registerNavigationGuard, confirmNavigation }),
+    [confirmNavigation, registerNavigationGuard],
+  );
+
+  return <AdminNavigationGuardContext.Provider value={value}>{children}</AdminNavigationGuardContext.Provider>;
+}
+
+export function useAdminNavigationGuard(guard: NavigationGuard) {
+  const context = useContext(AdminNavigationGuardContext);
+
+  useEffect(() => context?.registerNavigationGuard(guard), [context, guard]);
+}
+
+function useGuardedNavigation(onNavigate?: () => void) {
+  const context = useContext(AdminNavigationGuardContext);
+
+  return useCallback((event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) return;
+    if (context && !context.confirmNavigation()) {
+      event.preventDefault();
+      return;
+    }
+    onNavigate?.();
+  }, [context, onNavigate]);
+}
+
 function AdminNavigation({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const activeItem = getActiveAdminItem(pathname);
+  const handleNavigation = useGuardedNavigation(onNavigate);
 
   return (
     <nav aria-label="管理员导航" className="flex flex-col gap-1">
@@ -25,7 +69,7 @@ function AdminNavigation({ onNavigate }: { onNavigate?: () => void }) {
           key={item.id}
           href={item.href}
           aria-current={activeItem === item.id ? "page" : undefined}
-          onClick={onNavigate}
+          onClick={handleNavigation}
           className={`rounded-md px-3 py-2 text-sm transition-colors ${
             activeItem === item.id
               ? "bg-white text-black"
@@ -40,10 +84,12 @@ function AdminNavigation({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function AdminAccount({ userName }: { userName?: string | null }) {
+  const handleNavigation = useGuardedNavigation();
+
   return (
     <div className="border-t border-white/10 pt-4">
       {userName ? <p className="mb-3 truncate px-3 text-sm text-neutral-400">{userName}</p> : null}
-      <Link href="/" className="block rounded-md px-3 py-2 text-sm text-neutral-400 transition-colors hover:bg-white/10 hover:text-white">
+      <Link href="/" onClick={handleNavigation} className="block rounded-md px-3 py-2 text-sm text-neutral-400 transition-colors hover:bg-white/10 hover:text-white">
         View site
       </Link>
       <form action={logoutAdmin}>
@@ -71,16 +117,16 @@ export function AdminShell({ children, userName }: AdminShellProps) {
     if (!open) requestAnimationFrame(() => triggerRef.current?.focus());
   }
 
-  return (
+  return <AdminNavigationGuardProvider>
     <div className="min-h-screen bg-[#0a0a0a] text-white [--admin-sidebar-width:12rem]">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[var(--admin-sidebar-width)] flex-col border-r border-white/10 bg-[#0a0a0a] p-4 md:flex">
-        <Link href="/dashboard" className="mb-8 px-3 text-sm font-medium tracking-wide text-white">ADMIN</Link>
+        <AdminBrand className="mb-8 px-3 text-sm font-medium tracking-wide text-white" />
         <AdminNavigation />
         <div className="mt-auto"><AdminAccount userName={userName} /></div>
       </aside>
 
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-white/10 bg-[#0a0a0a]/95 px-4 backdrop-blur md:hidden">
-        <Link href="/dashboard" className="text-sm font-medium tracking-wide text-white">ADMIN</Link>
+        <AdminBrand className="text-sm font-medium tracking-wide text-white" />
         <Dialog open={mobileNavigationOpen} onOpenChange={handleMobileNavigationChange}>
           <DialogTrigger
             ref={triggerRef}
@@ -106,5 +152,11 @@ export function AdminShell({ children, userName }: AdminShellProps) {
         {children}
       </main>
     </div>
-  );
+  </AdminNavigationGuardProvider>;
+}
+
+function AdminBrand({ className }: { className: string }) {
+  const handleNavigation = useGuardedNavigation();
+
+  return <Link href="/dashboard" onClick={handleNavigation} className={className}>ADMIN</Link>;
 }

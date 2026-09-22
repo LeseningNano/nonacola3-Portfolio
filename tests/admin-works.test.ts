@@ -10,6 +10,7 @@ import {
   isAdminPath,
 } from "../lib/admin-navigation";
 import {
+  confirmWorkEditorNavigation,
   createWorkFormState,
   createWorkPayload,
   filterAdminWorks,
@@ -171,6 +172,30 @@ test("edit baseline is clean, a field change is dirty, and save success adopts t
   assert.equal(saved.status, "saved");
   assert.deepEqual(saved.form, savedForm);
   assert.deepEqual(saved.baseline, savedForm);
+});
+
+test("work editor navigation allows clean state without asking for confirmation", () => {
+  let confirmationCalls = 0;
+
+  const allowed = confirmWorkEditorNavigation(false, () => {
+    confirmationCalls += 1;
+    return false;
+  });
+
+  assert.equal(allowed, true);
+  assert.equal(confirmationCalls, 0);
+});
+
+test("work editor navigation blocks a declined unsaved-changes confirmation", () => {
+  const allowed = confirmWorkEditorNavigation(true, () => false);
+
+  assert.equal(allowed, false);
+});
+
+test("work editor navigation allows a confirmed unsaved-changes confirmation", () => {
+  const allowed = confirmWorkEditorNavigation(true, () => true);
+
+  assert.equal(allowed, true);
 });
 
 test("field changes are rejected while a save is in flight", () => {

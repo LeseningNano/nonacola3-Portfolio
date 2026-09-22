@@ -242,6 +242,13 @@ export function createWorkPayload(state: WorkFormState): WorkPayload {
   };
 }
 
+export function confirmWorkEditorNavigation(
+  isDirty: boolean,
+  confirmLeave: () => boolean,
+): boolean {
+  return !isDirty || confirmLeave();
+}
+
 function formsMatch(left: WorkFormState, right: WorkFormState): boolean {
   return (Object.keys(left) as (keyof WorkFormState)[]).every(
     (field) => left[field] === right[field],

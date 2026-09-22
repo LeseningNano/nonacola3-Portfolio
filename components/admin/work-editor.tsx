@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { ArrowLeft, ExternalLink, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { WorkCardPreview } from "@/components/admin/work-card-preview";
 import { MarkdownEditor } from "@/components/markdown-editor";
@@ -15,6 +16,7 @@ import { useToast } from "@/components/toast";
 import {
   createWorkFormState,
   createWorkPayload,
+  confirmWorkEditorNavigation,
   reduceWorkEditorState,
   type WorkFormState,
 } from "@/lib/admin-works";
@@ -40,6 +42,12 @@ export function WorkEditor({
     () => JSON.stringify(state.form) !== JSON.stringify(state.baseline),
     [state.form, state.baseline],
   );
+  const confirmNavigation = useCallback(
+    () => confirmWorkEditorNavigation(isDirty, () => window.confirm("有尚未保存的更改，确定要离开吗？")),
+    [isDirty],
+  );
+
+  useAdminNavigationGuard(confirmNavigation);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -56,7 +64,7 @@ export function WorkEditor({
   }
 
   function leaveEditor() {
-    if (isDirty && !window.confirm("有尚未保存的更改，确定要离开吗？")) return;
+    if (!confirmNavigation()) return;
     router.back();
   }
 
