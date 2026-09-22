@@ -198,7 +198,7 @@ export function AdminShell({ children, userName }: AdminShellProps) {
         </Dialog>
       </header>
 
-      <main className="min-w-0 px-4 py-6 md:pl-[var(--admin-sidebar-width)] md:pr-6 md:py-8 lg:pr-8">
+      <main className="min-w-0 px-4 py-6 md:ml-[var(--admin-sidebar-width)] md:px-6 md:py-8 lg:px-8">
         {children}
       </main>
     </div>

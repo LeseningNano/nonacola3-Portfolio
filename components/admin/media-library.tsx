@@ -127,6 +127,11 @@ export function MediaLibrary() {
         title="媒体库"
         description="管理已上传媒体；仅未被引用的文件可以删除。"
         status={<span className="text-xs text-neutral-500">{inventory ? `${inventory.count} 个文件 · ${inventory.totalSizeMB} MB` : "正在读取存储信息…"}</span>}
+        actions={<>
+          <Button type="button" size="sm" variant="outline" onClick={() => void loadInventory()} disabled={Boolean(state.deletingUrl) || loading}>刷新列表</Button>
+          <MediaPicker kind="image" value="" onSelect={onMediaSelected} label="上传图片" uploadOnly disabled={Boolean(state.deletingUrl)} />
+          <MediaPicker kind="video" value="" onSelect={onMediaSelected} label="上传视频" uploadOnly disabled={Boolean(state.deletingUrl)} />
+        </>}
       />
 
       <AdminToolbar
@@ -138,11 +143,6 @@ export function MediaLibrary() {
           ))}
         </div>}
         search={<Input id="media-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="按文件名搜索" aria-label="按文件名搜索" />}
-        actions={<div className="flex flex-wrap gap-2">
-          <Button type="button" size="sm" variant="outline" onClick={() => void loadInventory()} disabled={Boolean(state.deletingUrl) || loading}>刷新媒体库</Button>
-          <MediaPicker kind="image" value="" onSelect={onMediaSelected} label="上传图片" disabled={Boolean(state.deletingUrl)} />
-          <MediaPicker kind="video" value="" onSelect={onMediaSelected} label="上传视频" disabled={Boolean(state.deletingUrl)} />
-        </div>}
       />
 
       {state.deletingUrl ? <p role="status" aria-live="polite" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-200">正在删除媒体，完成前不能刷新媒体库。</p> : null}

@@ -112,7 +112,7 @@ function HeroSettingsCard({
 }) {
   const disabled = state.status === "saving";
   return (
-    <AdminFormSection title="Hero 背景" description="视频与封面分开选择，通过同一个保存操作一起更新首页。">
+    <AdminFormSection title="Hero 背景" description="视频与封面分开选择，通过同一个保存操作一起更新首页。" layout="stacked">
       <div className="space-y-6">
         <MediaAssetRow
           title="背景视频"
@@ -165,7 +165,7 @@ function ShowreelSettingsCard({
   const value = state.draft;
   const disabled = state.status === "saving";
   return (
-    <AdminFormSection title="Works Showreel" description="设置 Works 页面展示的影片来源，保存后才会更新公开页面。">
+    <AdminFormSection title="Works Showreel" description="设置 Works 页面展示的影片来源，保存后才会更新公开页面。" layout="stacked">
       <div className="space-y-4">
         <div className="flex flex-wrap gap-2" aria-label="Showreel 来源类型">
           {(["url", "upload"] as const).map((type) => (
@@ -184,8 +184,10 @@ function ShowreelSettingsCard({
         </div>
 
         {value.videoType === "url" ? (
-          <div className="space-y-3">
-            <div className="space-y-2">
+          <MediaAssetRow
+            title="嵌入预览"
+            preview={<EmbedPreview url={value.url} />}
+            controls={<div className="space-y-2">
               <Label htmlFor="showreel-url">Showreel 嵌入链接</Label>
               <Input
                 id="showreel-url"
@@ -195,21 +197,25 @@ function ShowreelSettingsCard({
                 disabled={disabled}
                 placeholder="粘贴 YouTube 或 Bilibili 链接"
               />
-            </div>
-            <EmbedPreview url={value.url} />
-          </div>
+            </div>}
+          />
         ) : (
-          <div className="space-y-3">
-            <MediaAssetPreview
-              kind="video"
-              url={state.saved.videoType === "upload" ? state.saved.url : ""}
-              label="当前已保存的 Showreel 视频"
-            />
-            <MediaPicker kind="video" value={value.url} onSelect={(url) => onChange({ url })} label="更换 Showreel 视频" disabled={disabled} />
-            {value.url && value.url !== state.saved.url ? (
-              <MediaAssetPreview kind="video" url={value.url} label="待保存的视频预览" />
-            ) : null}
-          </div>
+          <MediaAssetRow
+            title="Showreel 视频"
+            preview={
+              <MediaAssetPreview
+                kind="video"
+                url={state.saved.videoType === "upload" ? state.saved.url : ""}
+                label="当前已保存的 Showreel 视频"
+              />
+            }
+            controls={<div className="min-w-0 space-y-3">
+              <MediaPicker kind="video" value={value.url} onSelect={(url) => onChange({ url })} label="更换 Showreel 视频" disabled={disabled} />
+              {value.url && value.url !== state.saved.url ? (
+                <MediaAssetPreview kind="video" url={value.url} label="待保存的视频预览" />
+              ) : null}
+            </div>}
+          />
         )}
         <SourceDetails saved={state.saved.url} draft={value.url} source={value.videoType === "url" ? "嵌入链接" : "上传视频"} />
         <SettingsSaveAction state={state} onSave={onSave} />
@@ -220,7 +226,7 @@ function ShowreelSettingsCard({
 
 function MediaAssetRow({ title, preview, controls }: { title: string; preview: ReactNode; controls: ReactNode }) {
   return (
-    <section className="grid min-w-0 gap-3 border-b border-white/10 pb-5 last:border-0 last:pb-0 sm:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(15rem,0.8fr)]">
+    <section className="grid min-w-0 gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(17rem,0.85fr)] lg:gap-6">
       <div className="min-w-0">
         <h3 className="mb-2 text-xs font-medium text-neutral-300">{title}</h3>
         {preview}

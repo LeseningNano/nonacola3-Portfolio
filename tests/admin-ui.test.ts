@@ -4,6 +4,8 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AdminStatusBadge } from "../components/admin/admin-status-badge";
+import { AdminFormSection } from "../components/admin/admin-form-section";
+import { MediaPicker } from "../components/admin/media-picker";
 import { ADMIN_NAV_GROUPS } from "../lib/admin-navigation";
 
 test("admin navigation groups content, page media, and library by responsibility", () => {
@@ -62,4 +64,39 @@ test("every dirty editor protects both client history and browser unload", () =>
   const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
   assert.match(shell, /installUnsavedAdminHistoryGuard/);
   assert.match(shell, /addEventListener\("beforeunload"/);
+});
+
+test("Dashboard content keeps equal desktop gutters beside the sidebar", () => {
+  const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
+  const mainClasses = shell.match(/<main className="([^"]+)"/)?.[1] ?? "";
+
+  assert.match(mainClasses, /md:ml-\[var\(--admin-sidebar-width\)\]/);
+  assert.match(mainClasses, /md:px-6/);
+  assert.match(mainClasses, /lg:px-8/);
+  assert.doesNotMatch(mainClasses, /md:pl-\[var\(--admin-sidebar-width\)\]/);
+});
+
+test("page media sections can use the full content width without a second narrow form column", () => {
+  const markup = renderToStaticMarkup(AdminFormSection({
+    title: "页面媒体",
+    description: "预览与操作",
+    layout: "stacked",
+    children: createElement("div", null, "媒体预览"),
+  }));
+  assert.match(markup, /页面媒体/);
+  assert.match(markup, /媒体预览/);
+  assert.doesNotMatch(markup, /lg:grid-cols-/);
+});
+
+test("media library upload actions name the file type and offer a direct file input", () => {
+  const markup = renderToStaticMarkup(createElement(MediaPicker, {
+    kind: "image",
+    value: "",
+    onSelect: () => {},
+    label: "上传图片",
+    uploadOnly: true,
+  }));
+  assert.match(markup, />上传图片<\/button>/);
+  assert.match(markup, /type="file"/);
+  assert.doesNotMatch(markup, /选择媒体/);
 });

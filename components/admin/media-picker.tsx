@@ -22,6 +22,7 @@ export type MediaPickerProps = {
   label: string;
   accept?: string;
   disabled?: boolean;
+  uploadOnly?: boolean;
 };
 
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|gif)$/i;
@@ -65,7 +66,7 @@ export function filterMediaPickerFiles(files: BlobFile[], kind: MediaPickerProps
   return files.filter((file) => matchesKind(file, kind) && matchesAcceptedType(file, acceptedTypes));
 }
 
-export function MediaPicker({ kind, value, onSelect, label, accept: acceptedTypes, disabled = false }: MediaPickerProps) {
+export function MediaPicker({ kind, value, onSelect, label, accept: acceptedTypes, disabled = false, uploadOnly = false }: MediaPickerProps) {
   const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<BlobFile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -144,6 +145,27 @@ export function MediaPicker({ kind, value, onSelect, label, accept: acceptedType
 
   const accept = acceptedTypes ?? (kind === "image" ? "image/jpeg,image/png,image/webp,image/gif" : "video/*");
   const dialogTitle = kind === "image" ? "选择图片" : "选择视频";
+
+  if (uploadOnly) {
+    return (
+      <div className="space-y-2">
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          aria-label={label}
+          onChange={handleUpload}
+          className="hidden"
+          tabIndex={-1}
+        />
+        <Button type="button" size="sm" variant="outline" disabled={disabled || uploading} onClick={() => inputRef.current?.click()}>
+          {uploading ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Upload aria-hidden="true" />}
+          {uploading ? `上传中 ${progress}%` : label}
+        </Button>
+        {error ? <p role="alert" className="max-w-60 text-xs text-red-300">{error}</p> : null}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2">
