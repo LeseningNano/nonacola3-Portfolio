@@ -27,8 +27,15 @@ export async function POST(req: NextRequest) {
         contentType: file.type,
       });
       return NextResponse.json({ url: blob.url });
-    } catch (err: any) {
-      return fail(`Blob upload failed: ${err?.message || "unknown"}`, 500);
+    } catch (err: unknown) {
+      const message =
+        typeof err === "object" &&
+        err !== null &&
+        "message" in err &&
+        typeof err.message === "string"
+          ? err.message
+          : "unknown";
+      return fail(`Blob upload failed: ${message}`, 500);
     }
   }
 

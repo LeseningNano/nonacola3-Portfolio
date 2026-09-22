@@ -1,38 +1,10 @@
-import { db } from "@/lib/db";
-import { VideoForm } from "@/components/admin/video-form";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
-export default async function EditVideoPage({
+export default async function LegacyEditWorkPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const video = await db.video.findUnique({ where: { id } });
-
-  if (!video) notFound();
-
-  return (
-    <div className="min-h-screen pt-24 pb-8 px-8 max-w-2xl mx-auto">
-      <VideoForm
-        mode="edit"
-        initialData={{
-          id: video.id,
-          title: video.title,
-          description: video.description ?? "",
-          summary: video.summary ?? "",
-          role: video.role ?? "",
-          tools: video.tools ?? "",
-          category: video.category,
-          embedUrl: video.embedUrl,
-          thumbnail: video.thumbnail ?? "",
-          featured: video.featured,
-          order: video.order,
-          date: video.date ? new Date(video.date).toISOString().split("T")[0] : "",
-        }}
-      />
-    </div>
-  );
+  redirect(`/dashboard/works/${id}/edit`);
 }

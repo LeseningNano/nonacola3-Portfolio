@@ -1,28 +1,24 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/api-auth";
-import { success, fail, revalidateTags } from "@/lib/api-utils";
-import { reorderSchema } from "@/lib/schemas";
+import { revalidateTags } from "@/lib/api-utils";
+import { handleReorderPost, type ReorderRouteDependencies } from "@/lib/admin-reorder";
+
+const reorderRouteDependencies: ReorderRouteDependencies = {
+  authorize: requireAdmin,
+  commit: async (items) => {
+    await db.$transaction(
+      items.map((item) =>
+        db.video.update({
+          where: { id: item.id },
+          data: { order: item.order, featured: item.featured },
+        })
+      )
+    );
+  },
+  revalidate: () => revalidateTags("videos"),
+};
 
 export async function POST(req: NextRequest) {
-  const authorizationError = await requireAdmin();
-  if (authorizationError) return authorizationError;
-
-  const parsed = reorderSchema.safeParse(await req.json());
-  if (!parsed.success) {
-    return fail(parsed.error.issues[0]?.message ?? "参数无效", 422);
-  }
-  const { items } = parsed.data;
-
-  await db.$transaction(
-    items.map((item) =>
-      db.video.update({
-        where: { id: item.id },
-        data: { order: item.order },
-      })
-    )
-  );
-
-  revalidateTags("videos");
-  return success();
+  return handleReorderPost(req, reorderRouteDependencies);
 }

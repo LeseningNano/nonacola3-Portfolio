@@ -10,14 +10,14 @@ export const revalidate = 300;
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const post = await getPost(id);
-  if (!post?.title || !post.published) return {};
+  if (!post || post.title === null || !post.published) return {};
   return { title: post.title };
 }
 
 export default async function NewsPostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const post = await getPost(id);
-  if (!post || !post.title || !post.published) notFound();
+  if (!post || post.title === null || !post.published) notFound();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-16 px-6 md:px-12">

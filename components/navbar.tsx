@@ -9,6 +9,7 @@ import {
   getPortfolioMenuPrimary,
   shouldGateNavbarOnIntro,
 } from "@/lib/portfolio-navigation";
+import { isAdminPath } from "@/lib/admin-navigation";
 
 const SECTIONS = [
   { id: "works", label: "WORKS" },
@@ -31,6 +32,7 @@ export function Navbar() {
   // 其他路由直接显示。reduced-motion 下不做隐藏。
   const [revealed, setRevealed] = useState(() => !shouldGateNavbarOnIntro(pathname));
 
+  /* eslint-disable react-hooks/set-state-in-effect -- route transitions must synchronously reset the reveal state before paint. */
   useLayoutEffect(() => {
     if (!shouldGateNavbarOnIntro(pathname)) {
       setRevealed(true);
@@ -42,6 +44,7 @@ export function Navbar() {
     }
     setRevealed(false);
   }, [pathname]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // 用 useLayoutEffect 订阅：首页回访时 HeroVideo 在 useLayoutEffect 里同步派发
   // portfolio-intro-done，useEffect 订阅会晚于该派发导致事件丢失。
@@ -105,6 +108,7 @@ export function Navbar() {
     }
   }
 
+  /* eslint-disable react-hooks/set-state-in-effect -- route changes must immediately close the existing public navigation menu. */
   useEffect(() => {
     cancelAnimationFrame(openRafRef.current);
     if (closeTimerRef.current) {
@@ -114,6 +118,7 @@ export function Navbar() {
     setOpen(false);
     setMounted(false);
   }, [pathname]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     function check() {
@@ -156,6 +161,8 @@ export function Navbar() {
       cancelAnimationFrame(openRafRef.current);
     };
   }, []);
+
+  if (isAdminPath(pathname)) return null;
 
   return (
     <nav
