@@ -75,6 +75,22 @@ test("administrator navigation resolves nested modules", () => {
   assert.equal(getActiveAdminItem("/login"), null);
 });
 
+test("Works uses linked identity, shared badges, and a mobile-safe list", () => {
+  const source = readFileSync(resolve(process.cwd(), "components/admin/works-list.tsx"), "utf8");
+  assert.match(source, /AdminStatusBadge/);
+  assert.match(source, /href={`\/dashboard\/works\/\$\{work\.id\}\/edit`}/);
+  assert.doesNotMatch(source, /min-w-\[760px\]/);
+  assert.match(source, /data-admin-work-row/);
+});
+
+test("Works ordering retains accessible movement and an explicit save-order action", () => {
+  const source = readFileSync(resolve(process.cwd(), "components/admin/work-order-editor.tsx"), "utf8");
+  assert.match(source, /aria-label={`上移 \$\{work\?\.title/);
+  assert.match(source, /aria-label={`下移 \$\{work\?\.title/);
+  assert.match(source, /保存排序/);
+  assert.match(source, /AdminStatusBadge/);
+});
+
 test("sign out is cancelled when the active editor declines navigation", () => {
   let prevented = false;
   let confirmationCalls = 0;

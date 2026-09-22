@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { ArrowDown, ArrowUp, GripVertical, Save } from "lucide-react";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
+import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/toast";
 import {
@@ -176,7 +177,7 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
         </p>
       ) : null}
 
-      <ol className={isDirty ? "space-y-2 pb-24" : "space-y-2"}>
+      <ol className={`divide-y divide-white/10 border-y border-white/10 ${isDirty ? "pb-24" : ""}`}>
         {state.items.map((item, index) => {
           const work = worksById.get(item.id);
           const insertionVisible = insertionIndex === index && draggingIndex !== index;
@@ -205,7 +206,7 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
                   aria-hidden="true"
                 />
               ) : null}
-              <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]">
+              <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 py-3 sm:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]">
                 <button
                   type="button"
                   draggable={!saving}
@@ -241,9 +242,9 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
                     checked={item.featured}
                     disabled={saving}
                     onChange={(event) => dispatch({ type: "featured", index, featured: event.target.checked })}
-                    className="size-4 accent-white"
+                    className="size-4 accent-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   />
-                  精选
+                  <AdminStatusBadge tone={item.featured ? "featured" : "neutral"}>{item.featured ? "精选" : "普通"}</AdminStatusBadge>
                 </label>
 
                 <div className="col-span-4 flex justify-end gap-1 sm:col-span-1">
@@ -283,7 +284,7 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
                 取消
               </Button>
               <Button type="button" disabled={saving} onClick={() => void save()}>
-                <Save /> {saving ? "保存中…" : state.status === "error" ? "重试保存" : "保存"}
+                <Save /> {saving ? "保存中…" : state.status === "error" ? "重试保存排序" : "保存排序"}
               </Button>
             </div>
           </div>
