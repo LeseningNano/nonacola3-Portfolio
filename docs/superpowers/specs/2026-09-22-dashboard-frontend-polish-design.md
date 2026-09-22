@@ -22,7 +22,7 @@ The current implementation is functionally complete but visually reads as an int
 - The work editor repeats save actions and separates every group into another heavy card.
 - Navigation, account actions, filters, status labels, and empty states do not yet share a unified visual grammar.
 - Mobile layouts preserve functionality but are not sufficiently reorganized for touch and narrow screens.
-- Hero video and its loading poster cannot be managed together from Page settings.
+- Hero video and its loading poster cannot be managed together from the current page settings screen.
 
 ## 3. Approved Direction
 
@@ -44,10 +44,13 @@ The sidebar contains:
 
 - Portfolio identity mark.
 - A `内容` group with `作品` and `News`.
-- A `网站` group with `页面设置` and `媒体库`.
+- A `网站` group with `页面媒体`.
+- A `资源` group with `媒体库`.
 - Administrator identity and account actions at the bottom.
 
-Navigation items combine a small icon and visible label. The active item uses a quiet filled neutral surface rather than a bright white block. The workspace has a compact context bar for breadcrumb and future command/search affordances, followed by the page content.
+Navigation items combine a small icon and visible label. The active item uses a quiet filled neutral surface rather than a bright white block. Works remains the default Dashboard destination.
+
+The desktop shell does not add a global breadcrumb bar or command/search palette. With four primary modules, the active sidebar item and page heading already provide sufficient location context. Removing the redundant top bar preserves vertical space and avoids introducing unsupported global-search behavior.
 
 ### Mobile
 
@@ -79,7 +82,9 @@ Desktop rows display:
 5. Updated date.
 6. Overflow actions.
 
-The page header contains `新建作品`. The toolbar contains All/Featured filters, search, and `调整顺序`. Preview, edit, and delete remain available, but frequent row interaction should open editing while secondary actions live in the overflow menu.
+The page header contains `新建作品`. The toolbar contains All/Featured filters, search, and `调整顺序`. The thumbnail and title form the primary edit link rather than making a row with nested controls behave as one large button. Public preview remains a visible auxiliary action; delete stays in the overflow menu.
+
+Display order is managed only in the dedicated ordering mode. The ordinary Work editor does not expose an order/weight field, preventing two competing paths from changing the same hierarchy.
 
 Mobile rows keep thumbnail, title, status, and the overflow action visible. Lower-priority metadata collapses beneath the title or is omitted from the row while remaining available in the editor.
 
@@ -102,9 +107,9 @@ The bottom duplicate save controls are removed.
 
 The form uses section headings, short explanations, and horizontal separators rather than enclosing every section in a separate card. Sections remain:
 
-1. Basic information.
+1. Basic information: title, category, date, and featured state.
 2. Media.
-3. Presentation information.
+3. Card information: summary, role, and tools.
 4. Case Study.
 
 Media fields show the current preview, filename, type/size when available, and actions to replace or choose from the Media library. The preview column reproduces the public Works card only, updates with form state, and does not duplicate the entire Case Study page.
@@ -117,6 +122,13 @@ The sticky header reduces to the essential back, state, and save controls. The f
 
 News uses the same page header, toolbar, row system, overflow menu, and badge grammar as Works.
 
+`新建内容` opens a compact menu with two direct destinations:
+
+- `短动态`.
+- `Markdown 文章`.
+
+Selecting a type opens its editor immediately. The existing `/dashboard/news/new` route may remain as a compatibility route, but the normal workflow does not require an intermediate selection page.
+
 Rows show:
 
 - Title or short-update opening text plus excerpt.
@@ -127,9 +139,17 @@ Rows show:
 
 Article and short-update editors adopt the same continuous form layout and sticky save-state header as the Work editor. Article preview remains available without adding a separate unrelated visual system.
 
-## 9. Page Settings
+Editor actions reflect the publication state instead of using a generic save label:
 
-Page settings uses focused media groups rather than two large generic cards. Each group shows its purpose, current status, current preview, filename/source details, and replacement action.
+- Draft content exposes `保存草稿` and `发布`.
+- Published content exposes `保存更改` and `转为草稿`.
+- Mutation failures preserve the intended publication state and all edited fields.
+
+## 9. Page Media
+
+The sidebar label and page heading use `页面媒体`, accurately describing the current Hero and Showreel scope. The existing `/dashboard/settings` route remains unchanged for compatibility.
+
+Page Media uses focused media groups rather than two large generic cards. Each group shows its purpose, current status, current preview, filename/source details, and replacement action.
 
 ### Hero background
 
