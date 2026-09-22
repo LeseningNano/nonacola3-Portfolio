@@ -15,6 +15,10 @@ export function createSaveableSettingState<T>(value: T): SaveableSettingState<T>
   return { saved: value, draft: value, status: "clean", error: null };
 }
 
+export function isSaveableSettingDirty<T>(state: SaveableSettingState<T>): boolean {
+  return JSON.stringify(state.saved) !== JSON.stringify(state.draft);
+}
+
 export function reduceSaveableSettingState<T>(
   state: SaveableSettingState<T>,
   event: SaveableSettingEvent<T>,
