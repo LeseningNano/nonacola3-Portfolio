@@ -104,6 +104,18 @@ test("Work ordering delegates dirty shell navigation to the shared guard", () =>
   assert.doesNotMatch(source, /document\.addEventListener\("click", confirmLinkExit/);
 });
 
+test("Work editor keeps a sticky action header and a collapsible responsive card preview", () => {
+  const source = readFileSync(resolve(process.cwd(), "components/admin/work-editor.tsx"), "utf8");
+  assert.match(source, /sticky top-14/);
+  assert.match(source, /md:top-0/);
+  assert.match(source, /xl:top-24/);
+  assert.match(source, /<details open/);
+  assert.match(source, /statusText/);
+  const preview = readFileSync(resolve(process.cwd(), "components/admin/work-card-preview.tsx"), "utf8");
+  assert.match(preview, /setViewport\("mobile"\)/);
+  assert.match(preview, /setViewport\("desktop"\)/);
+});
+
 test("admin works serialization emits ISO dates without mutating nullable fields", () => {
   const serialized = serializeAdminWork({
     id: "one",

@@ -108,14 +108,24 @@ export function WorkEditor({
   }
 
   const saving = state.status === "saving";
+  const statusText = saving
+    ? "保存中…"
+    : state.status === "error"
+      ? "保存失败"
+      : state.status === "saved"
+        ? "已保存"
+        : isDirty
+          ? "有未保存的更改"
+          : "所有更改已保存";
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="sticky top-14 z-10 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#0a0a0a]/95 px-4 py-3 backdrop-blur md:top-0 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
         <Button type="button" variant="ghost" onClick={leaveEditor}>
           <ArrowLeft /> 返回
         </Button>
         <div className="flex flex-wrap gap-2">
+          <span className="self-center text-xs text-neutral-400" aria-live="polite">{statusText}</span>
           <Button
             type="button"
             variant="outline"
@@ -202,8 +212,13 @@ export function WorkEditor({
           </div>
         </fieldset>
 
-        <div className="xl:sticky xl:top-6">
-          <WorkCardPreview value={state.form} />
+        <div className="xl:sticky xl:top-24">
+          <details open className="space-y-3">
+            <summary className="cursor-pointer text-sm font-medium text-white">作品卡片预览</summary>
+            <div className="mx-auto">
+              <WorkCardPreview value={state.form} />
+            </div>
+          </details>
         </div>
       </div>
     </div>
