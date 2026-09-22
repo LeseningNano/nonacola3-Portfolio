@@ -5,6 +5,7 @@ import { ImageIcon, Loader2, Trash2, Video } from "lucide-react";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
+import { AdminMediaSkeleton } from "@/components/admin/admin-media-skeleton";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -148,11 +149,11 @@ export function MediaLibrary() {
       {state.deletingUrl ? <p role="status" aria-live="polite" className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-200">正在删除媒体，完成前不能刷新媒体库。</p> : null}
       {successMessage ? <p role="status" aria-live="polite" className="sr-only">{successMessage}</p> : null}
       {state.error ? <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-400/30 bg-red-400/10 px-3 py-2 text-sm text-red-200"><p role="alert">删除未完成，文件已恢复：{state.error}</p>{state.retryFile ? <Button type="button" size="sm" variant="outline" onClick={() => void deleteFile(state.retryFile!)}>重新尝试删除 {state.retryFile.pathname}</Button> : null}</div> : null}
-      {loading ? <div role="status" aria-live="polite" className="flex justify-center gap-2 py-16 text-sm text-neutral-400"><Loader2 className="animate-spin" />正在加载媒体库…</div> : null}
+      {loading ? <AdminMediaSkeleton /> : null}
       {!loading && loadError ? <div className="space-y-3 rounded-xl border border-red-400/30 px-5 py-12 text-center"><p role="alert" className="text-sm text-red-200">{loadError}</p><Button type="button" variant="outline" onClick={() => void loadInventory()}>重试</Button></div> : null}
       {!loading && !loadError && state.files.length === 0 ? <EmptyState /> : null}
       {!loading && !loadError && state.files.length > 0 && visibleFiles.length === 0 ? <p className="rounded-xl border border-dashed border-white/15 px-5 py-12 text-center text-sm text-neutral-400">没有符合当前筛选条件的媒体。</p> : null}
-      {!loading && !loadError && visibleFiles.length > 0 ? <div className="grid grid-cols-2 gap-3 sm:gap-4 2xl:grid-cols-4">{visibleFiles.map((file) => <MediaCard key={file.url} file={file} deleting={state.deletingUrl === file.url} onDelete={deleteFile} />)}</div> : null}
+      {!loading && !loadError && visibleFiles.length > 0 ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4">{visibleFiles.map((file) => <MediaCard key={file.url} file={file} deleting={state.deletingUrl === file.url} onDelete={deleteFile} />)}</div> : null}
     </div>
   );
 }

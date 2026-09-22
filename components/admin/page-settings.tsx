@@ -90,7 +90,7 @@ export function PageSettings({ initialHero, initialShowreel }: PageSettingsProps
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-[60rem] space-y-8">
       <AdminPageHeader
         title="页面媒体"
         description="管理首页 Hero 视频、封面和 Works Showreel。选择媒体后，需明确保存才会发布变更。"
@@ -226,12 +226,12 @@ function ShowreelSettingsCard({
 
 function MediaAssetRow({ title, preview, controls }: { title: string; preview: ReactNode; controls: ReactNode }) {
   return (
-    <section className="grid min-w-0 gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(17rem,0.85fr)] lg:gap-6">
-      <div className="min-w-0">
+    <section className="grid min-w-0 gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 lg:grid-cols-[minmax(0,22.5rem)_minmax(0,1fr)] lg:gap-6">
+      <div className="min-w-0 max-w-[22.5rem]">
         <h3 className="mb-2 text-xs font-medium text-neutral-300">{title}</h3>
         {preview}
       </div>
-      <div className="min-w-0 space-y-3">{controls}</div>
+      <div className="min-w-0 space-y-3 lg:self-center">{controls}</div>
     </section>
   );
 }

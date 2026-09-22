@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AdminStatusBadge } from "../components/admin/admin-status-badge";
 import { AdminFormSection } from "../components/admin/admin-form-section";
 import { MediaPicker } from "../components/admin/media-picker";
+import { MediaLibrary } from "../components/admin/media-library";
+import DashboardLoading from "../app/(admin)/dashboard/loading";
 import { ADMIN_NAV_GROUPS } from "../lib/admin-navigation";
 
 test("admin navigation groups content, page media, and library by responsibility", () => {
@@ -99,4 +101,28 @@ test("media library upload actions name the file type and offer a direct file in
   assert.match(markup, />上传图片<\/button>/);
   assert.match(markup, /type="file"/);
   assert.doesNotMatch(markup, /选择媒体/);
+});
+
+test("Dashboard loading mirrors a compact content list rather than oversized generic panels", () => {
+  const markup = renderToStaticMarkup(createElement(DashboardLoading));
+  assert.match(markup, /role="status"/);
+  assert.equal((markup.match(/<li\b/g) ?? []).length, 5);
+  assert.doesNotMatch(markup, /min-h-screen/);
+});
+
+test("media inventory loading reserves card-shaped space before files arrive", () => {
+  const markup = renderToStaticMarkup(createElement(MediaLibrary));
+  assert.match(markup, /role="status"/);
+  assert.ok((markup.match(/<article\b/g) ?? []).length >= 3);
+});
+
+test("media and settings routes provide page-shaped loading states", async () => {
+  for (const [route, expected] of [["media", 3], ["settings", 3]] as const) {
+    const file = new URL(`../app/(admin)/dashboard/${route}/loading.tsx`, import.meta.url);
+    assert.ok(existsSync(file), `${route} route needs its own loading state`);
+    const loadingRoute = await import(file.href) as { default: () => React.ReactNode };
+    const markup = renderToStaticMarkup(createElement(loadingRoute.default));
+    assert.match(markup, /role="status"/);
+    assert.ok((markup.match(/<article\b/g) ?? []).length >= expected, `${route} skeleton should resemble its content`);
+  }
 });
