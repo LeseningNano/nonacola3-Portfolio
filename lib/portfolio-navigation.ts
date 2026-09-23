@@ -23,3 +23,12 @@ export function shouldGateNavbarOnIntro(pathname: string): boolean {
 export function shouldShowServerNotice(pathname: string): boolean {
   return pathname === "/";
 }
+
+function isAdminPath(href: string): boolean {
+  const pathname = href.split(/[?#]/, 1)[0];
+  return pathname === "/dashboard" || pathname.startsWith("/dashboard/") || pathname === "/login";
+}
+
+export function shouldUseBlackTransition(from: string, to: string): boolean {
+  return !isAdminPath(from) && !isAdminPath(to);
+}

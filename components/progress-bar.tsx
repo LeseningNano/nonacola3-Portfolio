@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { shouldUseBlackTransition } from "@/lib/portfolio-navigation";
 
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
@@ -19,8 +20,20 @@ export function PageTransition() {
   // 路由变化完成 → 克隆图飞向播放器 / 黑场淡出
   // useLayoutEffect：在浏览器绘制新页面前就位，保证后退导航也能被黑场覆盖
   useIsomorphicLayoutEffect(() => {
-    if (pathname === prevPathname.current) return;
+    const previousPathname = prevPathname.current;
+    if (pathname === previousPathname) return;
     prevPathname.current = pathname;
+
+    if (!shouldUseBlackTransition(previousPathname, pathname)) {
+      cloneRef.current?.remove();
+      cloneRef.current = null;
+      pendingNavigationRef.current = null;
+      isTransitioning.current = false;
+      setVisible(false);
+      setOpacity(0);
+      setInstant(false);
+      return;
+    }
 
     // 未经拦截的导航（浏览器前进/后退、外部跳转）：
     // 立即盖上黑场（无过渡），再淡出揭示新页面
@@ -172,7 +185,7 @@ export function PageTransition() {
       if (href.includes("#")) return;
 
       if (href.startsWith("/") && !href.startsWith("//")) {
-        if (href.startsWith("/dashboard") || href.startsWith("/login")) return;
+        if (!shouldUseBlackTransition(pathname, href)) return;
         // Don't intercept if already on this page
         if (href === pathname) return;
 

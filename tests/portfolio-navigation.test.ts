@@ -8,6 +8,7 @@ import {
   getPortfolioMenuPrimary,
   shouldGateNavbarOnIntro,
   shouldShowServerNotice,
+  shouldUseBlackTransition,
 } from "../lib/portfolio-navigation";
 import type { VideoRow } from "../lib/types";
 
@@ -107,4 +108,22 @@ test("server notice shows only on the homepage", () => {
   assert.equal(shouldShowServerNotice("/works"), false);
   assert.equal(shouldShowServerNotice("/works/example"), false);
   assert.equal(shouldShowServerNotice("/news/example"), false);
+});
+
+test("Dashboard navigation never uses the global black transition", () => {
+  for (const [from, to] of [
+    ["/dashboard/works", "/dashboard/news"],
+    ["/dashboard/settings", "/"],
+    ["/", "/dashboard/media"],
+    ["/login", "/dashboard"],
+    ["/dashboard", "/works"],
+  ]) {
+    assert.equal(shouldUseBlackTransition(from, to), false, `${from} → ${to}`);
+  }
+});
+
+test("public page navigation still uses the existing black transition", () => {
+  assert.equal(shouldUseBlackTransition("/works", "/news/example"), true);
+  assert.equal(shouldUseBlackTransition("/", "/works"), true);
+  assert.equal(shouldUseBlackTransition("/dashboard-preview", "/works"), true);
 });
