@@ -46,10 +46,15 @@ function AdminNavigationGuardProvider({ children }: { children: ReactNode }) {
   return <AdminNavigationGuardContext.Provider value={value}>{children}</AdminNavigationGuardContext.Provider>;
 }
 
-export function useAdminNavigationGuard(guard: NavigationGuard, isDirty = false): () => void {
+export function useAdminNavigationGuard(guard: NavigationGuard, isDirty = false) {
   const context = useContext(AdminNavigationGuardContext);
   const historyGuardRef = useRef<UnsavedAdminHistoryGuard | null>(null);
   const allowNextHistoryPop = useCallback(() => historyGuardRef.current?.allowNextPop(), []);
+  const navigateAfterRelease = useCallback((navigate: () => void) => {
+    const historyGuard = historyGuardRef.current;
+    if (historyGuard) historyGuard.navigateAfterRelease(navigate);
+    else navigate();
+  }, []);
 
   useEffect(() => context?.registerNavigationGuard(guard), [context, guard]);
 
@@ -77,7 +82,7 @@ export function useAdminNavigationGuard(guard: NavigationGuard, isDirty = false)
     };
   }, [guard, isDirty]);
 
-  return allowNextHistoryPop;
+  return { allowNextHistoryPop, navigateAfterRelease };
 }
 
 function useGuardedNavigation(onNavigate?: () => void) {

@@ -59,7 +59,7 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
   );
   const actions = getPostEditorActions(state.intendedPublished);
 
-  const allowNextHistoryPop = useAdminNavigationGuard(confirmNavigation, isDirty);
+  const { allowNextHistoryPop } = useAdminNavigationGuard(confirmNavigation, isDirty);
 
   function leaveEditor() {
     if (!confirmNavigation()) return;

@@ -13,6 +13,7 @@ type PopstateTarget = {
 
 export type UnsavedAdminHistoryGuard = {
   allowNextPop: () => void;
+  navigateAfterRelease: (navigate: () => void) => void;
   remove: () => void;
 };
 
@@ -37,6 +38,7 @@ export function installUnsavedAdminHistoryGuard({
   const baseState = { ...state, __adminHistoryGuardId: guardId, __adminHistoryGuardPosition: "base" };
   const topState = { ...state, __adminHistoryGuardId: guardId, __adminHistoryGuardPosition: "top" };
   let allowNextPop = false;
+  let navigationAfterRelease: (() => void) | null = null;
 
   history.replaceState(baseState, "", href);
   history.pushState(topState, "", href);
@@ -44,6 +46,13 @@ export function installUnsavedAdminHistoryGuard({
   const handlePopstate = () => {
     const current = history.state as Record<string, unknown> | null;
     if (current?.__adminHistoryGuardId !== guardId || current.__adminHistoryGuardPosition !== "base") return;
+
+    if (navigationAfterRelease) {
+      const navigate = navigationAfterRelease;
+      navigationAfterRelease = null;
+      navigate();
+      return;
+    }
 
     if (allowNextPop || confirmLeave()) {
       allowNextPop = false;
@@ -59,7 +68,21 @@ export function installUnsavedAdminHistoryGuard({
     allowNextPop() {
       allowNextPop = true;
     },
+    navigateAfterRelease(navigate) {
+      const current = history.state as Record<string, unknown> | null;
+      if (
+        current?.__adminHistoryGuardId !== guardId ||
+        current.__adminHistoryGuardPosition !== "top" ||
+        currentHref() !== href
+      ) {
+        navigate();
+        return;
+      }
+      navigationAfterRelease = navigate;
+      history.back();
+    },
     remove() {
+      navigationAfterRelease = null;
       target.removeEventListener("popstate", handlePopstate);
       const current = history.state as Record<string, unknown> | null;
       if (

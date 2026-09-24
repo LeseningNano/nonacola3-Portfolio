@@ -48,7 +48,7 @@ export function WorkEditor({
     [isDirty],
   );
 
-  const allowNextHistoryPop = useAdminNavigationGuard(confirmNavigation, isDirty);
+  const { allowNextHistoryPop, navigateAfterRelease } = useAdminNavigationGuard(confirmNavigation, isDirty);
 
   function setField<Field extends keyof WorkFormState>(field: Field, value: WorkFormState[Field]) {
     dispatch({ type: "field", field, value } as Parameters<typeof reduceWorkEditorState>[1]);
@@ -79,16 +79,20 @@ export function WorkEditor({
 
       const saved = result as Video;
       const savedForm = createWorkFormState(saved);
-      dispatch({ type: "save-success", form: savedForm });
-      setWorkId(saved.id);
-      setAnnouncement("作品已保存");
-      toast.success("作品已保存");
+      const finishSave = () => {
+        dispatch({ type: "save-success", form: savedForm });
+        setWorkId(saved.id);
+        setAnnouncement("作品已保存");
+        toast.success("作品已保存");
 
-      if (returnAfterSave) {
-        router.push("/dashboard/works");
-      } else if (mode === "create" && !workId) {
-        router.replace(`/dashboard/works/${saved.id}/edit`);
-      }
+        if (returnAfterSave) {
+          router.push("/dashboard/works");
+        } else if (mode === "create" && !workId) {
+          router.replace(`/dashboard/works/${saved.id}/edit`);
+        }
+      };
+      if (returnAfterSave) navigateAfterRelease(finishSave);
+      else finishSave();
       return true;
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : "保存失败";

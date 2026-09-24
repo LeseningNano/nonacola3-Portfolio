@@ -397,6 +397,44 @@ test("dirty browser Back proceeds only after one confirmation", () => {
   cleanup.remove();
 });
 
+test("successful save waits for the dirty editor history entry to clear before navigating", () => {
+  const listeners = new Set<() => void>();
+  const calls = { back: 0, navigations: 0, confirmations: 0 };
+  let baseState: unknown;
+  const history = {
+    state: { page: "editor" } as Record<string, unknown>,
+    replaceState(state: unknown) {
+      this.state = state as Record<string, unknown>;
+      baseState = state;
+    },
+    pushState(state: unknown) { this.state = state as Record<string, unknown>; },
+    back() { calls.back += 1; },
+    forward() {},
+  };
+  const target = {
+    addEventListener(_type: "popstate", listener: () => void) { listeners.add(listener); },
+    removeEventListener(_type: "popstate", listener: () => void) { listeners.delete(listener); },
+  };
+  const href = "https://example.com/dashboard/works/example/edit";
+  const guard = installUnsavedAdminHistoryGuard({
+    history,
+    target,
+    href,
+    currentHref: () => href,
+    confirmLeave: () => { calls.confirmations += 1; return false; },
+  });
+
+  guard.navigateAfterRelease(() => { calls.navigations += 1; });
+  assert.deepEqual(calls, { back: 1, navigations: 0, confirmations: 0 });
+
+  history.state = baseState as Record<string, unknown>;
+  listeners.forEach((listener) => listener());
+  assert.deepEqual(calls, { back: 1, navigations: 1, confirmations: 0 });
+
+  guard.remove();
+  assert.equal(calls.back, 1);
+});
+
 test("Next.js route history state does not make editor cleanup undo client navigation", () => {
   const listeners = new Set<() => void>();
   const calls = { back: 0 };

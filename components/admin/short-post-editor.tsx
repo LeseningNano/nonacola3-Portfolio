@@ -56,7 +56,7 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
     [isDirty],
   );
 
-  const allowNextHistoryPop = useAdminNavigationGuard(confirmNavigation, isDirty);
+  const { allowNextHistoryPop } = useAdminNavigationGuard(confirmNavigation, isDirty);
 
   function leaveEditor() {
     if (!confirmNavigation()) return;
