@@ -4,6 +4,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { HeroVideo } from "../components/hero-video";
 import { VideoGrid } from "../components/video-grid";
+import { VideoCard } from "../components/video-card";
 import {
   getPortfolioMenuPrimary,
   shouldGateNavbarOnIntro,
@@ -108,6 +109,15 @@ test("server notice shows only on the homepage", () => {
   assert.equal(shouldShowServerNotice("/works"), false);
   assert.equal(shouldShowServerNotice("/works/example"), false);
   assert.equal(shouldShowServerNotice("/news/example"), false);
+});
+
+test("homepage work cards carry a home return source without changing other work cards", () => {
+  const homeMarkup = renderToStaticMarkup(createElement(VideoGrid, { videos: [sampleVideo] }));
+  const otherMarkup = renderToStaticMarkup(createElement(VideoCard, { video: sampleVideo }));
+
+  assert.match(homeMarkup, /href="\/works\/v1\?from=home"/);
+  assert.match(otherMarkup, /href="\/works\/v1"/);
+  assert.doesNotMatch(otherMarkup, /from=home/);
 });
 
 test("Dashboard navigation never uses the global black transition", () => {

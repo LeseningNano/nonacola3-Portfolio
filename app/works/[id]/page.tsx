@@ -1,10 +1,11 @@
-import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { getVideo, getVideos } from "@/lib/data";
 import { WorkPlayer } from "@/components/work-player";
 import { MarkdownBody } from "@/components/markdown-body";
 import { VideoCard } from "@/components/video-card";
+import { WorkReturnLink } from "@/components/work-return-link";
 import { pickRelatedVideos } from "@/lib/utils";
 import type { VideoRow } from "@/lib/types";
 
@@ -79,13 +80,9 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
             跳转至视频
             <ExternalLink className="w-4 h-4" />
           </a>
-          <Link
-            href="/works"
-            className="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white border border-neutral-400 hover:border-white px-4 py-2 transition-all duration-300"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            返回作品列表
-          </Link>
+          <Suspense fallback={null}>
+            <WorkReturnLink />
+          </Suspense>
         </div>
 
         {related.length > 0 && (

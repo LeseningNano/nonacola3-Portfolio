@@ -3,10 +3,10 @@ import { Play } from "lucide-react";
 import type { VideoRow } from "@/lib/types";
 import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
 
-export function VideoCard({ video }: { video: VideoRow }) {
+export function VideoCard({ video, returnToHome = false }: { video: VideoRow; returnToHome?: boolean }) {
   return (
     <IntentPrefetchLink
-      href={`/works/${video.id}`}
+      href={`/works/${video.id}${returnToHome ? "?from=home" : ""}`}
       aria-label={video.title}
       className="block outline-none focus-visible:ring-1 focus-visible:ring-neutral-400"
     >

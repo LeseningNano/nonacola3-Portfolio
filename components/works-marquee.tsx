@@ -16,7 +16,7 @@ export function WorksMarquee({ videos }: { videos: VideoRow[] }) {
           <div key={half} className="flex gap-1 pr-1" aria-hidden={half === 1}>
             {sets.map((video, i) => (
               <div key={`${video.id}-${i}`} className="w-64 md:w-80 flex-shrink-0">
-                <VideoCard video={video} />
+                <VideoCard video={video} returnToHome />
               </div>
             ))}
           </div>
