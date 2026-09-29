@@ -432,6 +432,34 @@ body::after {
   opacity: 0;
 }
 
+/* Hero 入场：名字逐字从遮罩下升起，副标题与按钮紧随其后（节奏见 lib/hero-intro.ts）。
+   pending 只在首访、加载层遮住页面时由 HeroVideo 设置 */
+.hero-letter {
+  display: inline-block;
+  transition: transform 800ms var(--ease-menu) var(--intro-delay, 0ms);
+}
+[data-hero-intro="pending"] .hero-letter {
+  transform: translateY(110%);
+}
+.hero-sub {
+  transition:
+    opacity 600ms var(--ease-menu) var(--intro-delay, 0ms),
+    transform 600ms var(--ease-menu) var(--intro-delay, 0ms);
+}
+.hero-sub[data-hero-intro="pending"] {
+  opacity: 0;
+  transform: translateY(10px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-letter,
+  .hero-sub {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+/* end Hero 入场 */
+
 /* row-sweep：列表行悬停时底色从左向右铺满（News 列表、全部作品列表共用）。
    isolation + 负 z-index 让底色垫在文字之下，不必改动子元素定位 */
 .row-sweep {

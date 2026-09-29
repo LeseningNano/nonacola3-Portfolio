@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import { DEFAULT_HERO_POSTER_URL } from "@/lib/hero";
+import {
+  HERO_BUTTON_DELAY_MS,
+  HERO_SUBTITLE_DELAY_MS,
+  getHeroLetters,
+} from "@/lib/hero-intro";
 import { LoadingScreen } from "./loading-screen";
 import { SCROLL_CONTAINER_ID } from "./smooth-scroll-container";
 
@@ -14,6 +20,9 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
   const [showLoader, setShowLoader] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [loaderVisible, setLoaderVisible] = useState(false);
+  // 名字逐字入场只在首访（有加载层遮住页面时）播放；刷新 / 回访保持静态，
+  // 避免已经绘制出来的名字先消失再升起。
+  const [introPhase, setIntroPhase] = useState<"static" | "pending" | "play">("static");
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const posterRef = useRef<HTMLDivElement>(null);
@@ -122,7 +131,10 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
     }
     // 首访：淡入加载层（200ms），pre-loader 在淡入完成后才移除，
     // 期间两者同为黑色，pre-loader 兜底盖住内容直到 React 加载层完全显形。
-    requestAnimationFrame(() => setLoaderVisible(true));
+    requestAnimationFrame(() => {
+      setLoaderVisible(true);
+      setIntroPhase("pending");
+    });
     setTimeout(() => {
       const p = document.getElementById("pre-loader");
       if (p) p.remove();
@@ -183,12 +195,12 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
     // 首页开场动画结束：通知导航栏弹出（任务：导航栏动画后显示）
     window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
     if (buttonRef.current) {
-      buttonRef.current.style.transition = "opacity 700ms ease";
+      buttonRef.current.style.transition = `opacity 600ms ease ${HERO_BUTTON_DELAY_MS}ms`;
       buttonRef.current.style.opacity = "1";
       buttonRef.current.style.pointerEvents = "auto";
       setTimeout(() => {
         if (buttonRef.current) buttonRef.current.style.transition = "";
-      }, 720);
+      }, 900);
     }
     if (hintRef.current) {
       hintRef.current.style.transition = "opacity 700ms ease";
@@ -205,6 +217,7 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
       loadTriggered.current = true;
       sessionStorage.setItem("hero-loaded", "1");
       setFadeOut(true);
+      setIntroPhase("play");
       setTimeout(() => {
         setShowLoader(false);
         playNudge();
@@ -290,20 +303,45 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
           data-mobile-hero-primary="true"
           className="absolute bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] left-4 right-4 z-10 text-left md:bottom-28 md:left-20 md:right-auto"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-normal tracking-tight mb-3" style={{ fontFamily: "var(--font-montserrat)" }}>
-            {siteConfig.name}
+          <h1
+            aria-label={siteConfig.name}
+            data-hero-intro={introPhase}
+            className="mb-3 overflow-hidden text-4xl font-normal leading-[1.08] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
+            style={{ fontFamily: "var(--font-montserrat)" }}
+          >
+            {getHeroLetters(siteConfig.name).map(({ char, delayMs }, index) => (
+              <span
+                key={index}
+                aria-hidden="true"
+                className="hero-letter"
+                style={{ "--intro-delay": `${delayMs}ms` } as CSSProperties}
+              >
+                {char}
+              </span>
+            ))}
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-neutral-400 font-light" style={{ fontFamily: "var(--font-montserrat)" }}>
+          <p
+            data-hero-intro={introPhase}
+            className="hero-sub text-lg font-light text-neutral-400 sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl"
+            style={{ fontFamily: "var(--font-montserrat)", "--intro-delay": `${HERO_SUBTITLE_DELAY_MS}ms` } as CSSProperties}
+          >
             {siteConfig.title}
           </p>
-          <Link
-            href="/works"
-            className="group mt-6 inline-flex min-h-11 items-center gap-2 border border-neutral-400 px-4 py-2.5 text-[13px] text-neutral-200 transition-colors duration-300 hover:border-white hover:text-white md:hidden"
-            style={{ fontFamily: "var(--font-bitcount)" }}
+          {/* 外层包一层做入场，避免覆盖 Link 自身的颜色过渡 */}
+          <div
+            data-hero-intro={introPhase}
+            className="hero-sub"
+            style={{ "--intro-delay": `${HERO_BUTTON_DELAY_MS}ms` } as CSSProperties}
           >
-            跳转至 works.
-            <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
-          </Link>
+            <Link
+              href="/works"
+              className="group mt-6 inline-flex min-h-11 items-center gap-2 border border-neutral-400 px-4 py-2.5 text-[13px] text-neutral-200 transition-colors duration-300 hover:border-white hover:text-white md:hidden"
+              style={{ fontFamily: "var(--font-bitcount)" }}
+            >
+              跳转至 works.
+              <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
+          </div>
         </div>
 
         <Link
