@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { HeroVideo } from "../components/hero-video";
 import { VideoGrid } from "../components/video-grid";
 import { VideoCard } from "../components/video-card";
 import {
+  getActiveNavSection,
   getPortfolioMenuPrimary,
+  getScrollProgress,
   shouldGateNavbarOnIntro,
+  shouldShowScrollProgress,
   shouldShowServerNotice,
   shouldUseBlackTransition,
 } from "../lib/portfolio-navigation";
@@ -136,4 +140,52 @@ test("public page navigation still uses the existing black transition", () => {
   assert.equal(shouldUseBlackTransition("/works", "/news/example"), true);
   assert.equal(shouldUseBlackTransition("/", "/works"), true);
   assert.equal(shouldUseBlackTransition("/dashboard-preview", "/works"), true);
+});
+
+test("desktop nav marks Works throughout the Works route tree", () => {
+  assert.equal(getActiveNavSection("/works", {}, 0, 800), "works");
+  assert.equal(getActiveNavSection("/works/abc", {}, 0, 800), "works");
+  assert.equal(getActiveNavSection("/news/abc", { works: 0 }, 5000, 800), null);
+});
+
+test("homepage nav follows the section crossing 40% of the viewport", () => {
+  const tops = { works: 900, news: 2400, about: 3000 };
+  assert.equal(getActiveNavSection("/", tops, 0, 1000), null);
+  assert.equal(getActiveNavSection("/", tops, 600, 1000), "works");
+  assert.equal(getActiveNavSection("/", tops, 2100, 1000), "news");
+  assert.equal(getActiveNavSection("/", tops, 2700, 1000), "about");
+});
+
+test("homepage nav tolerates missing sections", () => {
+  assert.equal(getActiveNavSection("/", { works: 900, about: 3000 }, 2100, 1000), "works");
+  assert.equal(getActiveNavSection("/", {}, 2100, 1000), null);
+});
+
+test("scroll progress is clamped and safe on short pages", () => {
+  assert.equal(getScrollProgress(0, 2000, 1000), 0);
+  assert.equal(getScrollProgress(500, 2000, 1000), 0.5);
+  assert.equal(getScrollProgress(1500, 2000, 1000), 1);
+  assert.equal(getScrollProgress(-20, 2000, 1000), 0);
+  assert.equal(getScrollProgress(0, 800, 1000), 0);
+});
+
+test("scroll progress line only shows on the homepage and works index", () => {
+  assert.equal(shouldShowScrollProgress("/"), true);
+  assert.equal(shouldShowScrollProgress("/works"), true);
+  assert.equal(shouldShowScrollProgress("/works/abc"), false);
+  assert.equal(shouldShowScrollProgress("/news/abc"), false);
+  assert.equal(shouldShowScrollProgress("/dashboard"), false);
+});
+
+test("navbar uses inline desktop links and keeps the mobile menu", () => {
+  const source = readFileSync(new URL("../components/navbar.tsx", import.meta.url), "utf8");
+  assert.match(source, /hidden items-center gap-10 md:flex/);
+  assert.match(source, /md:hidden/);
+  assert.match(source, /getActiveNavSection/);
+  assert.match(source, /getScrollProgress/);
+  assert.match(source, /shouldShowScrollProgress/);
+  assert.match(source, /aria-current/);
+  assert.match(source, /motion-reduce:transition-none/);
+  // 桌面右侧抽屉与遮罩已移除
+  assert.doesNotMatch(source, /w-1\/4 min-w-\[320px\]/);
 });

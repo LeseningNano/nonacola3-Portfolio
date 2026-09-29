@@ -32,3 +32,37 @@ function isAdminPath(href: string): boolean {
 export function shouldUseBlackTransition(from: string, to: string): boolean {
   return !isAdminPath(from) && !isAdminPath(to);
 }
+
+export type NavSectionId = "works" | "news" | "about";
+
+export const NAV_SECTION_IDS: NavSectionId[] = ["works", "news", "about"];
+
+// 桌面导航下划线的目标：/works 路由树固定在 WORKS；
+// 首页取「上沿越过视口 40% 位置」的最后一个板块，仍在 Hero 时为 null（隐藏下划线）。
+export function getActiveNavSection(
+  pathname: string,
+  sectionTops: Partial<Record<NavSectionId, number>>,
+  scrollTop: number,
+  viewportHeight: number
+): NavSectionId | null {
+  if (pathname === "/works" || pathname.startsWith("/works/")) return "works";
+  if (pathname !== "/") return null;
+  const line = scrollTop + viewportHeight * 0.4;
+  let active: NavSectionId | null = null;
+  for (const id of NAV_SECTION_IDS) {
+    const top = sectionTops[id];
+    if (top !== undefined && top <= line) active = id;
+  }
+  return active;
+}
+
+export function getScrollProgress(scrollTop: number, scrollHeight: number, clientHeight: number): number {
+  const max = scrollHeight - clientHeight;
+  if (max <= 0) return 0;
+  return Math.min(1, Math.max(0, scrollTop / max));
+}
+
+// 顶部 1px 滚动进度线只在首页与 works 索引页显示
+export function shouldShowScrollProgress(pathname: string): boolean {
+  return pathname === "/" || pathname === "/works";
+}
