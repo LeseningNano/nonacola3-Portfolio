@@ -576,12 +576,15 @@ test("a deletion conflict restores a newly referenced Hero poster without retry"
   assert.equal(restored.retryFile, null);
 });
 
-test("Media library uses the shared toolbar and responsive four-column grid", () => {
+test("Media library uses the shared toolbar, an auto-filling tile grid, and one upload menu", () => {
   const source = readFileSync(new URL("../components/admin/media-library.tsx", import.meta.url), "utf8");
 
   assert.match(source, /AdminToolbar/);
-  assert.match(source, /grid-cols-2/);
-  assert.match(source, /2xl:grid-cols-4/);
+  assert.match(source, /grid-cols-\[repeat\(auto-fill,minmax\(12\.5rem,1fr\)\)\]/);
+  assert.match(source, /useMediaUpload/);
+  assert.match(source, /openFilePicker/);
+  assert.match(source, /font-admin-mono/);
+  assert.match(source, /aria-label="刷新列表"/);
   assert.match(source, /title=\{file\.pathname\}/);
   assert.match(source, /Hero 视频封面/);
 });
