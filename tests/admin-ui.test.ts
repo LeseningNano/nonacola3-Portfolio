@@ -172,3 +172,10 @@ test("admin surfaces opt into the edit-suite theme and the login page hides publ
   assert.match(login, /role="alert"/);
   assert.match(login, /signIn\("credentials"/);
 });
+
+test("page header descriptions use the body font rather than the mono meta line", () => {
+  const markup = renderToStaticMarkup(createElement(AdminPageHeader, { title: "PAGE MEDIA", subtitle: "页面媒体", description: "保存后才会发布。" }));
+  assert.match(markup, /<p class="(?![^"]*font-admin-mono)[^"]*">保存后才会发布。<\/p>/);
+  const settings = readFileSync(new URL("../components/admin/page-settings.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(settings, /font-sans/);
+});

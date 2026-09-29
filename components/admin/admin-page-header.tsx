@@ -6,11 +6,12 @@ export type AdminPageHeaderProps = {
   title: string;
   subtitle: string;
   meta?: ReactNode;
+  description?: string;
   actions?: ReactNode;
   back?: { href: string; label: string };
 };
 
-export function AdminPageHeader({ title, subtitle, meta, actions, back }: AdminPageHeaderProps) {
+export function AdminPageHeader({ title, subtitle, meta, description, actions, back }: AdminPageHeaderProps) {
   return (
     <header className="flex min-w-0 flex-col gap-4 pb-2 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0 space-y-1.5">
@@ -24,6 +25,7 @@ export function AdminPageHeader({ title, subtitle, meta, actions, back }: AdminP
           <span aria-hidden="true" className="text-sm text-admin-fg-2">{subtitle}</span>
         </div>
         {meta ? <p className="font-admin-mono text-xs text-admin-fg-3">{meta}</p> : null}
+        {description ? <p className="text-xs text-admin-fg-3">{description}</p> : null}
       </div>
       {actions ? <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">{actions}</div> : null}
     </header>

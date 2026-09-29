@@ -94,7 +94,7 @@ export function PageSettings({ initialHero, initialShowreel }: PageSettingsProps
       <AdminPageHeader
         title="PAGE MEDIA"
         subtitle="页面媒体"
-        meta={<span className="font-sans">首页和 Works 页使用的影片素材，保存后才会发布。</span>}
+        description="首页和 Works 页使用的影片素材，保存后才会发布。"
       />
       <HeroSettingsGroup
         state={heroState}
