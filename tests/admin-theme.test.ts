@@ -35,3 +35,9 @@ test("the admin mono font is declared without preloading on public pages", () =>
   assert.match(layout, /preload:\s*false/);
   assert.match(layout, /\$\{jetbrainsMono\.variable\}/);
 });
+
+test("the admin mono stack falls back to a CJK sans before the generic monospace", () => {
+  const stack = css.match(/--font-admin-mono:([^;]+);/)?.[1] ?? "";
+  assert.ok(stack.indexOf("Microsoft YaHei") > 0 && stack.indexOf("Microsoft YaHei") < stack.lastIndexOf("monospace"), stack);
+  assert.ok(stack.indexOf("PingFang SC") > 0 && stack.indexOf("PingFang SC") < stack.lastIndexOf("monospace"), stack);
+});

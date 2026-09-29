@@ -135,7 +135,7 @@
   --color-admin-success-text: var(--admin-success-text);
   --color-admin-danger: var(--admin-danger);
   --font-pixel: var(--font-bitcount), ui-monospace, monospace;
-  --font-admin-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-admin-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Consolas, "PingFang SC", "Microsoft YaHei", monospace;
 }
 
 :root {
