@@ -4,6 +4,8 @@ import { WorkArchive } from "./work-archive";
 import { SelectedWorkCard } from "./selected-work-card";
 import { useWorksLanguage } from "./works-language-provider";
 import { useLocaleFade } from "./use-locale-fade";
+import { SectionHeading } from "@/components/section-heading";
+import { Reveal } from "@/components/viewport-reveal";
 import type { WorkYearGroup } from "@/lib/works-index";
 import type { VideoRow } from "@/lib/types";
 
@@ -22,21 +24,33 @@ export function WorksPageCopy({ selected, groups, email }: WorksPageCopyProps) {
   return (
     <>
       {selected.length > 0 && (
-        <section aria-labelledby="selected-works-heading" className="mt-24 border-t border-white/10 pt-7 md:mt-32">
-          <h2 id="selected-works-heading" ref={fade} className="text-3xl tracking-tight md:text-5xl">{copy.selected.heading}</h2>
+        <section aria-labelledby="selected-works-heading" className="mt-24 md:mt-32">
+          <SectionHeading
+            id="selected-works-heading"
+            title="selected."
+            subtitle={copy.selected.heading}
+            subtitleRef={fade}
+          />
           <p ref={fade} className="mt-3 max-w-xl text-sm leading-6 text-neutral-400 md:text-base">
             {copy.selected.description}
           </p>
-          <div className="mt-10 space-y-20 md:mt-14 md:space-y-28">
+          <div className="mt-10 grid gap-x-4 gap-y-14 md:mt-12 md:grid-cols-2">
             {selected.map((work, index) => (
-              <SelectedWorkCard key={work.id} work={work} index={index} />
+              <Reveal key={work.id} variant="card" delay={(index % 2) * 100}>
+                <SelectedWorkCard work={work} />
+              </Reveal>
             ))}
           </div>
         </section>
       )}
 
-      <section aria-labelledby="all-works-heading" className="mt-24 border-t border-white/10 pt-7 md:mt-32">
-        <h2 id="all-works-heading" ref={fade} className="text-3xl tracking-tight md:text-5xl">{copy.archive.heading}</h2>
+      <section aria-labelledby="all-works-heading" className="mt-24 md:mt-32">
+        <SectionHeading
+          id="all-works-heading"
+          title="archive."
+          subtitle={copy.archive.heading}
+          subtitleRef={fade}
+        />
         <div className="mt-8 md:mt-10">
           {groups.length > 0 ? (
             <WorkArchive groups={groups} />

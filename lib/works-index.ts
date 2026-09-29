@@ -32,12 +32,6 @@ export function getWorksHeadlineTokens(): WorksHeadlineToken[] {
   }));
 }
 
-export function getSelectedWorkOrientation(
-  index: number
-): "media-left" | "media-right" {
-  return index % 2 === 0 ? "media-left" : "media-right";
-}
-
 export interface FilmographyEntry {
   work: VideoRow;
   sequence: number;

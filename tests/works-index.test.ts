@@ -21,7 +21,6 @@ import {
   createThumbnailProxyPath,
   createThumbnailProxyResponse,
   groupWorksByYear,
-  getSelectedWorkOrientation,
   getWorksHeadlineTokens,
   isAllowedThumbnailSource,
   normalizeShowreelType,
@@ -77,20 +76,19 @@ test("works language provider persists only the scoped locale", () => {
 
 test("selected work keeps authored project data while fixed labels default to English", () => {
   const authored = {
-    ...work("localized-boundary", null, true),
+    ...work("localized-boundary", "2026-02-01T00:00:00.000Z", true),
     title: "原文标题",
     category: "自主制作",
     role: "Motion Design",
     tools: "After Effects · Blender",
     summary: "作者填写的摘要",
   };
-  const markup = renderToStaticMarkup(
-    createElement(SelectedWorkCard, { work: authored, index: 0 })
-  );
+  const markup = renderToStaticMarkup(createElement(SelectedWorkCard, { work: authored }));
   assert.match(markup, /原文标题/);
-  assert.match(markup, /自主制作/);
+  assert.match(markup, /自主制作 · 2026/);
   assert.match(markup, /作者填写的摘要/);
-  assert.match(markup, /View Case Study/);
+  assert.match(markup, /Role Motion Design · Tools After Effects · Blender/);
+  assert.match(markup, /aria-label="View case study: 原文标题"/);
 });
 
 test("provider-scoped Chinese localizes fixed labels without touching authored content", () => {
@@ -104,11 +102,11 @@ test("provider-scoped Chinese localizes fixed labels without touching authored c
     createElement(
       WorksLanguageProvider,
       { initialLocale: "zh-CN" },
-      createElement(SelectedWorkCard, { work: authored, index: 0 })
+      createElement(SelectedWorkCard, { work: authored })
     )
   );
   assert.match(markup, /查看项目详情：原文标题/);
-  assert.match(markup, /职责/);
+  assert.match(markup, /职责 Motion Design/);
   assert.match(markup, /Motion Design/);
   assert.match(markup, /lang="zh-CN"/);
 });
@@ -118,6 +116,10 @@ test("works page copy localizes sections while archive data stays authored", () 
   const props = { selected: [work("s1", null, true)], groups, email: "hi@example.com" };
 
   const en = renderToStaticMarkup(createElement(WorksPageCopy, props));
+  assert.match(en, /aria-label="selected\."/);
+  assert.match(en, /aria-label="archive\."/);
+  assert.match(en, /md:grid-cols-2/);
+  assert.match(en, /data-reveal="card"/);
   assert.match(en, /Selected Works/);
   assert.match(en, /All Works/);
   assert.match(en, /work together/);
@@ -130,6 +132,9 @@ test("works page copy localizes sections while archive data stays authored", () 
       createElement(WorksPageCopy, props)
     )
   );
+  // 切换语言只换副标题，章节标题保持不变
+  assert.match(zh, /aria-label="selected\."/);
+  assert.match(zh, /aria-label="archive\."/);
   assert.match(zh, /精选作品/);
   assert.match(zh, /全部作品/);
   assert.match(zh, /期待与你合作。/);
@@ -263,47 +268,13 @@ test("localized headline uses locale-appropriate leading and the original tracki
   assert.match(source, /locale === "en"/);
 });
 
-test("alternates selected work media from left to right", () => {
-  assert.equal(getSelectedWorkOrientation(0), "media-left");
-  assert.equal(getSelectedWorkOrientation(1), "media-right");
-  assert.equal(getSelectedWorkOrientation(2), "media-left");
-});
-
-test("renders selected work media in the large desktop track on either side", () => {
-  const selectedWork = {
-    ...work("selected", null, true),
-    title: "Selected Project",
-    thumbnail: "https://kq4mwotlyfyzycmp.public.blob.vercel-storage.com/selected.jpg",
-  };
-  const mediaLeft = renderToStaticMarkup(
-    createElement(SelectedWorkCard, { work: selectedWork, index: 0 })
+test("keeps selected work media before details in DOM order", () => {
+  const markup = renderToStaticMarkup(
+    createElement(SelectedWorkCard, {
+      work: { ...work("mobile-order", null, true), title: "Mobile Order Project" },
+    })
   );
-  const mediaRight = renderToStaticMarkup(
-    createElement(SelectedWorkCard, { work: selectedWork, index: 1 })
-  );
-
-  assert.match(
-    mediaLeft,
-    /md:grid-cols-\[minmax\(0,1\.55fr\)_minmax\(16rem,0\.85fr\)\]/
-  );
-  assert.match(
-    mediaRight,
-    /md:grid-cols-\[minmax\(16rem,0\.85fr\)_minmax\(0,1\.55fr\)\]/
-  );
-});
-
-test("keeps selected work media before details in mobile DOM order", () => {
-  const selectedWork = {
-    ...work("mobile-order", null, true),
-    title: "Mobile Order Project",
-  };
-
-  for (const index of [0, 1]) {
-    const markup = renderToStaticMarkup(
-      createElement(SelectedWorkCard, { work: selectedWork, index })
-    );
-    assert.ok(markup.indexOf('data-vt-id="mobile-order"') < markup.indexOf("<h3"));
-  }
+  assert.ok(markup.indexOf('data-vt-id="mobile-order"') < markup.indexOf("<h3"));
 });
 
 test("numbers filmography entries continuously across year groups", () => {
@@ -412,4 +383,16 @@ test("thumbnail proxy rejects untrusted sources before fetching", async () => {
 
   assert.equal(response.status, 400);
   assert.equal(called, false);
+});
+
+test("archive rows and the showreel button use the shared motion styles", () => {
+  const groups = [{ label: "2026", works: [work("one", null)] }];
+  const archive = renderToStaticMarkup(createElement(WorkArchive, { groups }));
+  assert.match(archive, /row-sweep/);
+
+  const showreel = renderToStaticMarkup(
+    createElement(ShowreelFeature, { showreelUrl: "https://example.com/watch?v=abc", videoType: "url" })
+  );
+  assert.match(showreel, /pulse-ring/);
+  assert.match(showreel, /md:group-hover:scale-\[1\.08\]/);
 });

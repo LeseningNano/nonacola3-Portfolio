@@ -51,7 +51,7 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
             />
             <span className="absolute inset-0 bg-black/25 transition-colors group-hover:bg-black/15" />
             <span className="absolute inset-0 flex items-center justify-center">
-              <span className="flex h-16 w-16 items-center justify-center rounded-full border border-white/60 bg-black/35 backdrop-blur-sm transition-transform duration-300 motion-reduce:transition-none md:group-hover:scale-105">
+              <span className="pulse-ring relative flex h-16 w-16 items-center justify-center rounded-full border border-white/60 bg-black/35 backdrop-blur-sm transition-transform duration-300 motion-reduce:transition-none md:group-hover:scale-[1.08]">
                 <Play aria-hidden="true" className="ml-1 h-6 w-6 fill-white text-white" />
               </span>
             </span>

@@ -12,7 +12,7 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
     <div className="space-y-16">
       {filmography.map((group) => (
         <section key={group.label} aria-labelledby={`works-year-${group.label}`}>
-          <h3 id={`works-year-${group.label}`} className="mb-5 text-sm tracking-[0.2em] text-neutral-400">
+          <h3 id={`works-year-${group.label}`} className="mb-3 text-[13px] tracking-[0.2em] text-neutral-400">
             {group.label}
           </h3>
           <ol start={group.entries[0]?.sequence}>
@@ -20,7 +20,7 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
               <li key={work.id}>
                 <IntentPrefetchLink
                   href={`/works/${work.id}`}
-                  className="group grid min-h-14 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 border-t border-white/10 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:grid-cols-[3rem_minmax(0,1fr)_minmax(10rem,0.35fr)_auto]"
+                  className="row-sweep group grid min-h-14 grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-3 border-t border-neutral-800 px-2 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white md:grid-cols-[3rem_minmax(0,1fr)_minmax(10rem,0.35fr)_auto]"
                 >
                   <span className="text-xs tabular-nums text-neutral-500">
                     {String(sequence).padStart(2, "0")}
@@ -38,7 +38,7 @@ export function WorkArchive({ groups }: WorkArchiveProps) {
                   </span>
                   <span
                     aria-hidden="true"
-                    className="transition-transform motion-reduce:transition-none group-hover:translate-x-1"
+                    className="text-neutral-500 transition-[transform,color] duration-300 motion-reduce:transition-none group-hover:translate-x-1 group-hover:text-white"
                   >
                     ↗
                   </span>
