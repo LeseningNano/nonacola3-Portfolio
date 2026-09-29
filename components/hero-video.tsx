@@ -13,14 +13,22 @@ import {
   resolvePendingIntroPhase,
   type HeroIntroPhase,
 } from "@/lib/hero-intro";
+import { shouldSkipLoader } from "@/lib/loader-intro";
 import { LoadingScreen } from "./loading-screen";
 import { SCROLL_CONTAINER_ID } from "./smooth-scroll-container";
+
+// 仅在浏览器 effect 中调用：刷新 / 回访，或开启减少动态效果时不播放加载画面
+function readLoaderSkip() {
+  return shouldSkipLoader(
+    Boolean(sessionStorage.getItem("hero-loaded")),
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; posterUrl?: string | null }) {
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
-  const [fadeOut, setFadeOut] = useState(false);
   const [loaderVisible, setLoaderVisible] = useState(false);
   // 名字逐字入场只在首访（有加载层遮住页面时）播放；刷新 / 回访保持静态，
   // 避免已经绘制出来的名字先消失再升起。
@@ -93,8 +101,8 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
     // 移动端可能因 resize 切换滚动主体，兜底监听 window
     if (isContainerScroll) window.addEventListener("scroll", onScroll, { passive: true });
 
-    // 刷新/后续进入：跳过开场动画，按钮直接显示
-    if (sessionStorage.getItem("hero-loaded")) {
+    // 刷新/后续进入（或减少动态效果）：跳过开场动画，按钮直接显示
+    if (readLoaderSkip()) {
       introDoneRef.current = true;
       // 回访没有开场动画，导航栏立即弹出
       window.dispatchEvent(new CustomEvent("portfolio-intro-done"));
@@ -127,7 +135,10 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
   // - 首访：inline <head> 脚本已注入 #pre-loader 在 SSR 绘制期间盖住内容；
   //   此处设 loaderVisible=true（瞬时，无 transition）让 React 接管覆盖，移除 pre-loader。
   useLayoutEffect(() => {
-    if (sessionStorage.getItem("hero-loaded")) {
+    if (readLoaderSkip()) {
+      // 减少动态效果的首访也走这里：记下已加载，并移除 <head> 注入的黑色 pre-loader
+      sessionStorage.setItem("hero-loaded", "1");
+      document.getElementById("pre-loader")?.remove();
       const frame = requestAnimationFrame(() => setShowLoader(false));
       return () => cancelAnimationFrame(frame);
     }
@@ -214,33 +225,33 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
     }
   };
 
-  // After loading screen finishes, fade out + 触发开场轻推
-  const handleLoadReady = () => {
-    if (!loadTriggered.current) {
-      loadTriggered.current = true;
-      sessionStorage.setItem("hero-loaded", "1");
-      setFadeOut(true);
-      setIntroPhase("play");
-      setTimeout(() => {
-        setShowLoader(false);
-        playNudge();
-      }, 450);
-    }
+  // 加载画面黑幕开始拉开：名字随幕布逐字升起
+  const handleLoaderReveal = () => {
+    if (loadTriggered.current) return;
+    loadTriggered.current = true;
+    sessionStorage.setItem("hero-loaded", "1");
+    setIntroPhase("play");
+  };
+
+  // 黑幕完全拉开：卸载加载层，桌面端开始开场轻推
+  const handleLoaderDone = () => {
+    setShowLoader(false);
+    playNudge();
   };
 
   return (
     <>
-      {/* Full-screen loading overlay */}
+      {/* Full-screen loading overlay：黑幕本身由 LoadingScreen 拉开，这里只负责首帧淡入 */}
       {showLoader && (
         <div
           className="fixed inset-0 z-[9999]"
           style={{
-            opacity: fadeOut ? 0 : loaderVisible ? 1 : 0,
+            opacity: loaderVisible ? 1 : 0,
             transition: "opacity 200ms ease",
-            pointerEvents: loaderVisible && !fadeOut ? "auto" : "none",
+            pointerEvents: loaderVisible ? "auto" : "none",
           }}
         >
-          <LoadingScreen onReady={handleLoadReady} />
+          <LoadingScreen onReveal={handleLoaderReveal} onDone={handleLoaderDone} />
         </div>
       )}
 
