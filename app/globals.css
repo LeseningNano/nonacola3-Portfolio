@@ -530,6 +530,38 @@ body::after {
 }
 /* end 首访加载画面 */
 
+/* Works Showreel 开场：中线亮起后上下黑幕拉开（与首页加载画面同款）。
+   时间接在标题对焦点亮之后，与 works-intro.tsx 的 INTRO_TOTAL_MS 对应 */
+.reel-curtain-top {
+  animation: reel-open-top 700ms cubic-bezier(0.7, 0, 0.2, 1) 1620ms both;
+}
+.reel-curtain-bottom {
+  animation: reel-open-bottom 700ms cubic-bezier(0.7, 0, 0.2, 1) 1620ms both;
+}
+.reel-seam {
+  animation: reel-seam 700ms ease 1400ms both;
+}
+@keyframes reel-open-top {
+  from { transform: translateY(0); }
+  to { transform: translateY(-100%); }
+}
+@keyframes reel-open-bottom {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+@keyframes reel-seam {
+  0% { transform: scaleX(0); opacity: 1; }
+  30% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reel-curtain-top,
+  .reel-curtain-bottom,
+  .reel-seam {
+    display: none;
+  }
+}
+
 /* SectionHeading：标题逐字解码由 JS 驱动；副标题只做水平擦出，
    时长与延迟见 lib/scramble-text.ts（SUBTITLE_WIPE_MS / getSubtitleDelayMs） */
 [data-section-heading] .section-heading-sub {

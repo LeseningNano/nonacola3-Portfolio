@@ -178,18 +178,28 @@ test("works intro consumes the shared copy dictionary with locale-aware spacing"
   assert.match(source, /INTRO_TOTAL_MS/);
 });
 
-test("headline words replay the staggered reveal on every mount", () => {
+test("headline words focus from blur and then light up on every mount", () => {
   const css = readFileSync(
     new URL("../components/works-index/works-intro.module.css", import.meta.url),
     "utf8"
   );
-  // 词条用插入即播的 animation（含按词延迟）：切换语言重挂载词条时会重播逐词揭示，
-  // 不依赖 .entered 门控，避免中文词条以终态整句出现
-  assert.match(css, /animation: word-in 360ms ease forwards/);
-  assert.match(css, /@keyframes word-in/);
-  assert.match(css, /animation-delay: calc\(var\(--word-index\) \* 90ms\)/);
+  // 对焦点亮：每个词从模糊深灰对焦（插入即播，切换语言重挂载时同样「模糊切换」），
+  // 随后关键词依次点亮为白色、其余停在灰色
+  assert.match(css, /@keyframes word-focus \{[^}]*filter: blur\(10px\)/);
+  assert.match(css, /calc\(var\(--word-index\) \* 50ms\)/);
+  assert.match(css, /@keyframes word-lit/);
+  assert.match(css, /@keyframes word-dim/);
+  assert.match(css, /calc\(900ms \+ var\(--word-index\) \* 60ms\)/);
   assert.doesNotMatch(css, /\.entered \.word/);
   assert.match(css, /prefers-reduced-motion: reduce/);
+
+  const source = readFileSync(
+    new URL("../components/works-index/works-intro.tsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(source, /styles\.lit/);
+  assert.match(source, /styles\.dim/);
+  assert.match(source, /INTRO_TOTAL_MS = 2320/);
 });
 
 test("works page keeps static data loading and scopes the language provider", () => {
@@ -244,15 +254,27 @@ test("intro side copy replays after the headline during locale switches", () => 
   assert.doesNotMatch(source, /styles\.entered/);
 });
 
-test("supporting copy reveals on a delayed mount animation", () => {
+test("supporting copy slides in after the headline focuses", () => {
   const css = readFileSync(
     new URL("../components/works-index/works-intro.module.css", import.meta.url),
     "utf8"
   );
   assert.match(css, /animation: supporting-in 600ms ease forwards/);
-  assert.match(css, /animation-delay: 1260ms/);
-  assert.match(css, /@keyframes supporting-in/);
+  assert.match(css, /animation-delay: 1100ms/);
+  assert.match(css, /@keyframes supporting-in \{[^}]*translateX\(-12px\)/);
   assert.doesNotMatch(css, /\.entered/);
+});
+
+test("showreel frame opens with the same seam curtain as the home loader", () => {
+  const markup = renderToStaticMarkup(
+    createElement(ShowreelFeature, { showreelUrl: "https://example.com/watch?v=abc", videoType: "url" })
+  );
+  assert.match(markup, /reel-curtain-top/);
+  assert.match(markup, /reel-curtain-bottom/);
+  assert.match(markup, /reel-seam/);
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /\.reel-curtain-top \{[^}]*animation: reel-open-top 700ms/);
+  assert.match(css, /\.reel-curtain-top,\s*\.reel-curtain-bottom,\s*\.reel-seam \{[^}]*display: none/);
 });
 
 test("localized headline uses locale-appropriate leading and the original tracking", () => {

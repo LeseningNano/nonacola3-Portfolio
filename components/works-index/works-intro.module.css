@@ -1,34 +1,86 @@
+/* 对焦点亮（Design 画布「Works 开场 C」）：每个词从模糊深灰对焦（间隔 50ms），
+   900ms 起关键词依次点亮为白色、其余停在灰色（间隔 60ms）。
+   插入即播：切换语言时词条重挂载，同样以「模糊对焦」切换。
+   改时长时同步 works-intro.tsx 的 INTRO_TOTAL_MS。 */
 .word {
-  opacity: 0;
-  /* 插入即播 + forwards：词条每次重挂载（含切换语言）都会重播逐词揭示 */
-  animation: word-in 360ms ease forwards;
-  animation-delay: calc(var(--word-index) * 90ms);
+  animation: word-focus 500ms ease both;
+  animation-delay: calc(var(--word-index) * 50ms);
 }
 
-@keyframes word-in {
+.lit {
+  animation:
+    word-focus 500ms ease both,
+    word-lit 300ms ease both;
+  animation-delay:
+    calc(var(--word-index) * 50ms),
+    calc(900ms + var(--word-index) * 60ms);
+}
+
+.dim {
+  animation:
+    word-focus 500ms ease both,
+    word-dim 300ms ease both;
+  animation-delay:
+    calc(var(--word-index) * 50ms),
+    calc(900ms + var(--word-index) * 60ms);
+}
+
+@keyframes word-focus {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
   to {
     opacity: 1;
+    filter: blur(0);
   }
 }
 
-/* 眉标 / 简介栏 / Showreel 槽位：标题逐词动画期间保持隐藏，
-   1260ms 后一起淡入；重挂载（切语言）时按同样节奏重播 */
+@keyframes word-lit {
+  from {
+    color: #525252;
+  }
+  to {
+    color: #ffffff;
+  }
+}
+
+@keyframes word-dim {
+  from {
+    color: #525252;
+  }
+  to {
+    color: #737373;
+  }
+}
+
+/* 眉标 / 简介栏 / Showreel 槽位：标题对焦完成后从左滑入；
+   重挂载（切语言）时按同样节奏重播 */
 .supporting {
   opacity: 0;
   animation: supporting-in 600ms ease forwards;
-  animation-delay: 1260ms;
+  animation-delay: 1100ms;
 }
 
 @keyframes supporting-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
   to {
     opacity: 1;
+    transform: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .word,
+  .lit,
+  .dim,
   .supporting {
     opacity: 1;
+    filter: none;
+    transform: none;
     animation: none;
     transition: none;
   }

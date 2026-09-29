@@ -57,6 +57,10 @@ export function ShowreelFeature({ showreelUrl, videoType }: ShowreelFeatureProps
             </span>
           </button>
         )}
+        {/* 开场：与首页加载画面同款的中线 + 上下黑幕拉开，只在挂载时播放一次 */}
+        <span aria-hidden="true" className="reel-curtain-top pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-[#0a0a0a]" />
+        <span aria-hidden="true" className="reel-curtain-bottom pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-[#0a0a0a]" />
+        <span aria-hidden="true" className="reel-seam pointer-events-none absolute inset-x-0 top-1/2 h-px bg-white" />
       </div>
 
       <div ref={fade} className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
