@@ -504,3 +504,10 @@ test("media picker excludes non-MP4 library videos when the caller accepts only 
     ["uploads/hero.mp4"],
   );
 });
+
+test("Works row preview icon merges classes so it really hides on phones", () => {
+  const source = readFileSync(resolve(process.cwd(), "components/admin/works-list.tsx"), "utf8");
+  // 共享图标按钮样式自带 inline-flex，必须用 tailwind-merge 覆盖，否则 hidden 无效
+  assert.match(source, /cn\(adminIconActionClass, "hidden sm:inline-flex"\)/);
+  assert.doesNotMatch(source, /`hidden sm:inline-flex \$\{adminIconActionClass\}`/);
+});

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/toast";
 import { formatAdminDate } from "@/lib/admin-navigation";
 import { filterAdminWorks } from "@/lib/admin-works";
+import { cn } from "@/lib/utils";
 import type { Video } from "@/lib/types";
 
 type WorksFilter = "all" | "featured";
@@ -134,7 +135,7 @@ export function WorksList({ initialWorks }: { initialWorks: Video[] }) {
                     target="_blank"
                     aria-label={`预览 ${work.title}`}
                     title="在新窗口预览"
-                    className={`hidden sm:inline-flex ${adminIconActionClass}`}
+                    className={cn(adminIconActionClass, "hidden sm:inline-flex")}
                   >
                     <ExternalLink aria-hidden="true" />
                   </Link>
