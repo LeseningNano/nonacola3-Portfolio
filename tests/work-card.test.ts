@@ -92,6 +92,12 @@ test("card reveal is SSR-visible and has a reduced-motion fallback", () => {
   assert.doesNotMatch(markup, /data-reveal-pending/);
 
   const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /\[data-reveal-pending\]\[data-reveal="card"\] \{[^}]*clip-path: inset\(100% 0 0 0\)/);
-  assert.match(css, /\[data-reveal-pending\] \{[^}]*clip-path: none !important/);
+  // IntersectionObserver 会把目标自身的 clip-path 算进可见面积：完全裁掉的目标永远不会「进入视口」。
+  // 所以被观察的外层绝不能裁切，擦出效果只放在子元素上。
+  const outer = css.match(/\[data-reveal-pending\]\[data-reveal="card"\] \{([^}]*)\}/);
+  assert.ok(outer, "pending card rule exists");
+  assert.doesNotMatch(outer[1], /clip-path/);
+  assert.doesNotMatch(css, /\[data-reveal="card"\] \{[^}]*clip-path/);
+  assert.match(css, /\[data-reveal-pending\]\[data-reveal="card"\] > \* \{[^}]*clip-path: inset\(100% 0 0 0\)/);
+  assert.match(css, /\[data-reveal-pending\]\[data-reveal="card"\] > \* \{[^}]*clip-path: none !important/);
 });

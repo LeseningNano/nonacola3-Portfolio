@@ -406,17 +406,18 @@ body::after {
 }
 
 /* 作品卡片依次揭示：自下而上擦出并上移 24px，同排错峰由 --reveal-delay 控制。
+   IntersectionObserver 会把目标自身的 clip-path 算进可见面积，完全裁掉的目标永远不会
+   「进入视口」，所以被观察的外层只做淡入与位移，擦出放在子元素上。
    可见态留 12px 外扩，避免裁掉链接的 focus ring */
-[data-reveal="card"] {
+[data-reveal="card"] > * {
   clip-path: inset(-12px);
-  transition:
-    opacity 700ms var(--ease-menu) var(--reveal-delay, 0ms),
-    transform 700ms var(--ease-menu) var(--reveal-delay, 0ms),
-    clip-path 700ms var(--ease-menu) var(--reveal-delay, 0ms);
+  transition: clip-path 700ms var(--ease-menu) var(--reveal-delay, 0ms);
 }
 [data-reveal-pending][data-reveal="card"] {
   opacity: 0;
   transform: translateY(24px);
+}
+[data-reveal-pending][data-reveal="card"] > * {
   clip-path: inset(100% 0 0 0);
 }
 
@@ -518,12 +519,15 @@ body::after {
 /* reduced-motion：不播放动画，内容立即可见（JS 早退之外的双保险） */
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
-  [data-reveal] .reveal-inner {
+  [data-reveal] .reveal-inner,
+  [data-reveal="card"] > * {
     transition: none !important;
   }
   [data-reveal-pending] {
     opacity: 1 !important;
     transform: none !important;
+  }
+  [data-reveal-pending][data-reveal="card"] > * {
     clip-path: none !important;
   }
   [data-reveal-pending][data-reveal="heading"] .reveal-inner {
