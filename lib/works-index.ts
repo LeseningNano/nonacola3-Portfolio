@@ -32,12 +32,6 @@ export function getWorksHeadlineTokens(): WorksHeadlineToken[] {
   }));
 }
 
-export function getSelectedWorkOrientation(
-  index: number
-): "media-left" | "media-right" {
-  return index % 2 === 0 ? "media-left" : "media-right";
-}
-
 export interface FilmographyEntry {
   work: VideoRow;
   sequence: number;
@@ -146,4 +140,35 @@ export async function createThumbnailProxyResponse(
   if (etag) headers.set("ETag", etag);
 
   return new Response(upstream.body, { status: 200, headers });
+}
+
+export function getWorkYear(date: string | null): string | null {
+  if (!date) return null;
+  const year = new Date(date).getUTCFullYear();
+  return Number.isNaN(year) ? null : String(year);
+}
+
+export function formatWorkMeta(parts: Array<string | null | undefined>): string {
+  return parts
+    .map((part) => part?.trim())
+    .filter((part): part is string => Boolean(part))
+    .join(" · ");
+}
+
+// 首页作品区：按后台顺序取前 6 个；手机端只显示前 3 个（由组件用 CSS 隐藏）
+export const HOME_WORKS_LIMIT = 6;
+
+export function selectHomeWorks(videos: VideoRow[]): VideoRow[] {
+  return videos.slice(0, HOME_WORKS_LIMIT);
+}
+
+// /works 精选横向胶片：按滚动位置取最近的卡片序号，并限制在有效范围内
+export function getReelIndex(scrollLeft: number, step: number, count: number): number {
+  if (count <= 0 || step <= 0) return 0;
+  return Math.min(count - 1, Math.max(0, Math.round(scrollLeft / step)));
+}
+
+export function formatReelCounter(index: number, count: number): { current: string; total: string } {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return { current: pad(index + 1), total: pad(count) };
 }

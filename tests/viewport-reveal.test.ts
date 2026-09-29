@@ -78,16 +78,17 @@ test("works section stages the title reveal before staggered content", () => {
     createElement(VideoGrid, { videos: [sampleVideo] })
   );
 
-  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-section-heading="static"/);
   assert.match(markup, /data-reveal="content"/);
+  assert.match(markup, /data-reveal="card"/);
   // 错峰：内容相对标题的延迟存在
   assert.match(markup, /--reveal-delay:(1[5-9]\d|[2-9]\d\d)ms/);
   // 无 JS 安全：SSR 不带隐藏态
   assert.ok(!markup.includes("data-reveal-pending"));
-  // 现有结构与文案不受影响
   assert.match(markup, /ALL WORKS/);
   assert.match(markup, /href="\/works"/);
   assert.match(markup, /works\./);
+  assert.match(markup, /精选视频作品与创作项目/);
 });
 
 test("news section stages title and content the same way", () => {
@@ -95,7 +96,7 @@ test("news section stages title and content the same way", () => {
     createElement(NewsSection, { posts: [samplePost] })
   );
 
-  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-section-heading="static"/);
   assert.match(markup, /data-reveal="content"/);
   assert.ok(!markup.includes("data-reveal-pending"));
   assert.match(markup, /news\./);
@@ -105,10 +106,11 @@ test("news section stages title and content the same way", () => {
 test("about section stages title and content the same way", () => {
   const markup = renderToStaticMarkup(createElement(AboutSection));
 
-  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-section-heading="static"/);
   assert.match(markup, /data-reveal="content"/);
   assert.ok(!markup.includes("data-reveal-pending"));
   assert.match(markup, /about\./);
+  assert.match(markup, /了解更多 &amp; 合作洽谈/);
 });
 
 test("homepage sections get a non-blocking dim transition layer", () => {

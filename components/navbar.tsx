@@ -6,12 +6,17 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/config";
 import {
+  NAV_SECTION_IDS,
+  getActiveNavSection,
   getPortfolioMenuPrimary,
+  getScrollProgress,
   shouldGateNavbarOnIntro,
+  shouldShowScrollProgress,
+  type NavSectionId,
 } from "@/lib/portfolio-navigation";
 import { isAdminPath } from "@/lib/admin-navigation";
 
-const SECTIONS = [
+const SECTIONS: Array<{ id: NavSectionId; label: string }> = [
   { id: "works", label: "WORKS" },
   { id: "news", label: "NEWS" },
   { id: "about", label: "ABOUT" },
@@ -28,6 +33,32 @@ export function Navbar() {
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openRafRef = useRef(0);
   const primaryItem = getPortfolioMenuPrimary(pathname);
+  const [activeSection, setActiveSection] = useState<NavSectionId | null>(null);
+  const [hoveredSection, setHoveredSection] = useState<NavSectionId | null>(null);
+  const linkRefs = useRef<Partial<Record<NavSectionId, HTMLAnchorElement | null>>>({});
+  const underlineRef = useRef<HTMLSpanElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const showProgress = shouldShowScrollProgress(pathname);
+  const underlineTarget = hoveredSection ?? activeSection;
+
+  // 下划线直接写 DOM 样式（不走 state），悬停预览优先于滚动位置
+  useLayoutEffect(() => {
+    function place() {
+      const underline = underlineRef.current;
+      if (!underline) return;
+      const link = underlineTarget ? linkRefs.current[underlineTarget] : null;
+      if (!link) {
+        underline.style.opacity = "0";
+        return;
+      }
+      underline.style.opacity = "1";
+      underline.style.width = `${link.offsetWidth}px`;
+      underline.style.transform = `translateX(${link.offsetLeft}px)`;
+    }
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [underlineTarget]);
   // 首页 / works 索引页有开场动画：导航栏等 portfolio-intro-done 再弹出，
   // 其他路由直接显示。reduced-motion 下不做隐藏。
   const [revealed, setRevealed] = useState(() => !shouldGateNavbarOnIntro(pathname));
@@ -128,6 +159,25 @@ export function Navbar() {
       const y = container ? container.scrollTop : window.scrollY;
       const winY = window.scrollY;
       setScrolled(y > SCROLL_THRESHOLD || winY > SCROLL_THRESHOLD);
+
+      // 容器只在桌面滚动；手机以 window 为准（与 HeroVideo 相同的判断）
+      const containerScrolls = container !== null && container.scrollHeight > container.clientHeight;
+      const scrollTop = containerScrolls ? container.scrollTop : window.scrollY;
+      const viewport = containerScrolls ? container.clientHeight : window.innerHeight;
+      const scrollHeight = containerScrolls
+        ? container.scrollHeight
+        : document.documentElement.scrollHeight;
+
+      const tops: Partial<Record<NavSectionId, number>> = {};
+      for (const id of NAV_SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (el) tops[id] = el.offsetTop;
+      }
+      setActiveSection(getActiveNavSection(pathname, tops, scrollTop, viewport, scrollHeight));
+
+      if (progressRef.current) {
+        progressRef.current.style.transform = `scaleX(${getScrollProgress(scrollTop, scrollHeight, viewport)})`;
+      }
     }
 
     // 用 document capture 兜住所有滚动（桌面 #main-scroll、移动端 window），
@@ -171,6 +221,14 @@ export function Navbar() {
       }`}
       style={{ transitionTimingFunction: "var(--ease-menu)" }}
     >
+      {showProgress && (
+        <div
+          ref={progressRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px origin-left bg-white"
+          style={{ transform: "scaleX(0)" }}
+        />
+      )}
       <div
         className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
           noticeOpen
@@ -184,9 +242,63 @@ export function Navbar() {
           {siteConfig.name}
         </Link>
 
+        <div
+          className="relative hidden items-center gap-10 md:flex"
+          onMouseLeave={() => setHoveredSection(null)}
+        >
+          {SECTIONS.map((s) => {
+            const className = `py-2 text-[13px] tracking-[0.2em] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+              activeSection === s.id ? "text-white" : "text-neutral-300 hover:text-white"
+            }`;
+            const hoverProps = {
+              onMouseEnter: () => setHoveredSection(s.id),
+              onFocus: () => setHoveredSection(s.id),
+              onBlur: () => setHoveredSection(null),
+            };
+
+            if (s.id === "works") {
+              return (
+                <Link
+                  key={s.id}
+                  ref={(el) => {
+                    linkRefs.current.works = el;
+                  }}
+                  href="/works"
+                  aria-current={pathname === "/works" ? "page" : undefined}
+                  className={className}
+                  {...hoverProps}
+                >
+                  {s.label}
+                </Link>
+              );
+            }
+
+            return (
+              <a
+                key={s.id}
+                ref={(el) => {
+                  linkRefs.current[s.id] = el;
+                }}
+                href={`/#${s.id}`}
+                onClick={(event) => handleSectionClick(event, s.id)}
+                className={className}
+                {...hoverProps}
+              >
+                {s.label}
+              </a>
+            );
+          })}
+          <span
+            ref={underlineRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-0 left-0 h-px bg-white opacity-0 transition-[transform,width,opacity] duration-[400ms] motion-reduce:transition-none"
+            style={{ transitionTimingFunction: "var(--ease-menu)" }}
+          />
+        </div>
+
         <button
           aria-label="菜单"
-          className="text-neutral-300 hover:text-white transition-colors p-2 -mr-2"
+          className="text-neutral-300 hover:text-white transition-colors p-2 -mr-2 md:hidden"
           onClick={() => (open ? closeMenu() : openMenu())}
         >
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -215,59 +327,6 @@ export function Navbar() {
                     {primaryItem.direction === "back" && <ArrowLeft aria-hidden="true" className="h-6 w-6" />}
                     <span>{primaryItem.label}</span>
                     {primaryItem.direction === "forward" && <ArrowRight aria-hidden="true" className="h-6 w-6" />}
-                  </Link>
-                );
-              }
-
-              return (
-                <a
-                  key={s.id}
-                  href={`/#${s.id}`}
-                  onClick={(event) => handleSectionClick(event, s.id)}
-                  className={className}
-                  style={style}
-                >
-                  {s.label}
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* 桌面端：遮罩压黑 */}
-      {mounted && (
-        <div
-          className={`hidden md:block fixed inset-0 top-16 z-20 bg-black/60 transition-opacity duration-300 ${
-            open ? "opacity-100" : "opacity-0"
-          }`}
-          style={{ transitionTimingFunction: "var(--ease-menu)" }}
-          onClick={closeMenu}
-        />
-      )}
-
-      {/* 桌面端：右侧 1/4 宽面板 */}
-      {mounted && (
-        <div
-          className={`hidden md:block fixed top-16 right-0 bottom-0 w-1/4 min-w-[320px] z-30 bg-[#0a0a0a]/95 backdrop-blur-sm border-l border-white/5 transition-transform duration-300 ${
-            open ? "translate-x-0" : "translate-x-full"
-          }`}
-          style={{ transitionTimingFunction: "var(--ease-menu)" }}
-        >
-          <div className="flex flex-col justify-center h-full px-8 lg:px-10 gap-2">
-            {SECTIONS.map((s, i) => {
-              const className = "text-3xl lg:text-4xl py-2 text-neutral-300 hover:text-white transition-colors animate-fade-in opacity-0";
-              const style = {
-                fontFamily: "var(--font-bitcount)",
-                animationDelay: `${i * 60}ms`,
-              };
-
-              if (s.id === "works") {
-                return (
-                  <Link key={s.id} href={primaryItem.href} onClick={closeMenu} className={`${className} inline-flex items-center gap-3`} style={style}>
-                    {primaryItem.direction === "back" && <ArrowLeft aria-hidden="true" className="h-7 w-7" />}
-                    <span>{primaryItem.label}</span>
-                    {primaryItem.direction === "forward" && <ArrowRight aria-hidden="true" className="h-7 w-7" />}
                   </Link>
                 );
               }

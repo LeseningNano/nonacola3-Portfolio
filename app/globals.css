@@ -345,33 +345,30 @@ body::after {
   animation: fade-slide-in 300ms ease-out;
 }
 
-/* 展开全部作品：网格从上方落入并轻微放大，表「展开」的垂落感 */
-@keyframes works-expand {
-  from { opacity: 0; transform: translateY(-24px) scale(0.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+/* 播放按钮呼吸环：两圈细环缓慢扩散，提示可播放（Works Showreel、首页 REEL 条） */
+.pulse-ring::before,
+.pulse-ring::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  animation: pulse-ring 2.4s ease-out infinite;
 }
-.animate-works-expand {
-  animation: works-expand 400ms cubic-bezier(0.22, 1, 0.36, 1);
+.pulse-ring::after {
+  animation-delay: 1.2s;
 }
-
-/* 收起回到 marquee：从下方升起复位，表「回到轨道」的回升感 */
-@keyframes works-collapse {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(1.8); opacity: 0; }
 }
-.animate-works-collapse {
-  animation: works-collapse 400ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.animate-marquee {
-  animation: marquee 45s linear infinite;
-}
-.marquee-container:hover .animate-marquee {
-  animation-play-state: paused;
+@media (prefers-reduced-motion: reduce) {
+  .pulse-ring::before,
+  .pulse-ring::after {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 /* ============================================================
@@ -408,6 +405,22 @@ body::after {
   }
 }
 
+/* 作品卡片依次揭示：自下而上擦出并上移 24px，同排错峰由 --reveal-delay 控制。
+   IntersectionObserver 会把目标自身的 clip-path 算进可见面积，完全裁掉的目标永远不会
+   「进入视口」，所以被观察的外层只做淡入与位移，擦出放在子元素上。
+   可见态留 12px 外扩，避免裁掉链接的 focus ring */
+[data-reveal="card"] > * {
+  clip-path: inset(-12px);
+  transition: clip-path 700ms var(--ease-menu) var(--reveal-delay, 0ms);
+}
+[data-reveal-pending][data-reveal="card"] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+[data-reveal-pending][data-reveal="card"] > * {
+  clip-path: inset(100% 0 0 0);
+}
+
 /* 区块遮光层：进入视口前压暗，进入后淡出，模拟镜头换段；JS 关闭时默认透明 */
 [data-reveal="dim"] {
   opacity: 0;
@@ -420,15 +433,107 @@ body::after {
   opacity: 0;
 }
 
+/* Hero 入场：名字逐字从遮罩下升起，副标题与按钮紧随其后（节奏见 lib/hero-intro.ts）。
+   pending 只在首访、加载层遮住页面时由 HeroVideo 设置 */
+.hero-letter {
+  display: inline-block;
+  transition: transform 800ms var(--ease-menu) var(--intro-delay, 0ms);
+}
+[data-hero-intro="pending"] .hero-letter {
+  transform: translateY(110%);
+}
+.hero-sub {
+  transition:
+    opacity 600ms var(--ease-menu) var(--intro-delay, 0ms),
+    transform 600ms var(--ease-menu) var(--intro-delay, 0ms);
+}
+.hero-sub[data-hero-intro="pending"] {
+  opacity: 0;
+  transform: translateY(10px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-letter,
+  .hero-sub {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+/* end Hero 入场 */
+
+/* row-sweep：列表行悬停时底色从左向右铺满（News 列表、全部作品列表共用）。
+   isolation + 负 z-index 让底色垫在文字之下，不必改动子元素定位 */
+.row-sweep {
+  position: relative;
+  isolation: isolate;
+}
+.row-sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #1f1f1f;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 450ms var(--ease-menu);
+}
+.row-sweep:hover::before,
+.row-sweep:focus-visible::before {
+  transform: scaleX(1);
+}
+@media (hover: none) {
+  .row-sweep::before {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .row-sweep::before {
+    transition: none;
+  }
+}
+/* end row-sweep */
+
+/* SectionHeading：标题逐字解码由 JS 驱动；副标题只做水平擦出，
+   时长与延迟见 lib/scramble-text.ts（SUBTITLE_WIPE_MS / getSubtitleDelayMs） */
+[data-section-heading] .section-heading-sub {
+  transition:
+    opacity 480ms var(--ease-menu) var(--sub-delay, 0ms),
+    transform 480ms var(--ease-menu) var(--sub-delay, 0ms),
+    clip-path 480ms var(--ease-menu) var(--sub-delay, 0ms);
+}
+/* 播放态也用 inset()：clip-path 从 inset() 到 none 无法插值，只会瞬间跳变。
+   四周外扩一点，避免裁到字形 */
+[data-section-heading="play"] .section-heading-sub {
+  clip-path: inset(-0.3em -0.5em -0.3em 0);
+}
+[data-section-heading="pending"] .section-heading-sub {
+  opacity: 0;
+  transform: translateX(-16px);
+  clip-path: inset(0 100% 0 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-section-heading] .section-heading-sub {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+/* end SectionHeading */
+
 /* reduced-motion：不播放动画，内容立即可见（JS 早退之外的双保险） */
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
-  [data-reveal] .reveal-inner {
+  [data-reveal] .reveal-inner,
+  [data-reveal="card"] > * {
     transition: none !important;
   }
   [data-reveal-pending] {
     opacity: 1 !important;
     transform: none !important;
+  }
+  [data-reveal-pending][data-reveal="card"] > * {
+    clip-path: none !important;
   }
   [data-reveal-pending][data-reveal="heading"] .reveal-inner {
     transform: none !important;

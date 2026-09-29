@@ -21,6 +21,15 @@ export function shouldIgnoreScrollKey(
   );
 }
 
+// 横向胶片（data-horizontal-scroll）里以横向为主的触控板手势交给浏览器原生横向滚动
+export function shouldPassWheelToHorizontalScroller(
+  deltaX: number,
+  deltaY: number,
+  insideHorizontalScroller: boolean
+) {
+  return insideHorizontalScroller && Math.abs(deltaX) > Math.abs(deltaY);
+}
+
 export function SmoothScrollContainer({
   children,
   className = "",
@@ -84,6 +93,15 @@ export function SmoothScrollContainer({
 
     function handleWheel(event: WheelEvent) {
       if ((event.target as HTMLElement).closest("[data-modal]")) return;
+      if (
+        shouldPassWheelToHorizontalScroller(
+          event.deltaX,
+          event.deltaY,
+          Boolean((event.target as HTMLElement).closest("[data-horizontal-scroll]"))
+        )
+      ) {
+        return;
+      }
       event.preventDefault();
       scrollEasing.current = 10;
       clampTarget(targetScroll.current + event.deltaY * 1.5);

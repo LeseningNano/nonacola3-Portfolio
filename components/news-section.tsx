@@ -1,6 +1,7 @@
 import type { PostItem } from "@/lib/types";
 import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
 import { Reveal, SectionDim } from "@/components/viewport-reveal";
+import { SectionHeading } from "@/components/section-heading";
 
 export type { PostItem };
 
@@ -14,17 +15,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
   return (
     <section id="news" className="relative w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
       <SectionDim />
-      <Reveal
-        as="h2"
-        variant="heading"
-        className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight"
-        style={{ fontFamily: "var(--font-bitcount)" }}
-      >
-        news.
-      </Reveal>
-      <Reveal as="p" variant="content" delay={180} className="text-base md:text-lg text-neutral-400 font-light mt-1">
-        最新动态
-      </Reveal>
+      <SectionHeading title="news." subtitle="最新动态" />
 
       {recent.length === 0 ? (
         <p className="text-neutral-600 text-sm mt-8">暂无动态。</p>
@@ -56,7 +47,7 @@ export function NewsSection({ posts }: { posts: PostItem[] }) {
               </>
             );
             const rowClass =
-              "group relative flex items-start md:items-center gap-3 md:gap-4 px-3 md:px-4 py-3.5 border-b border-neutral-900 hover:bg-white/5 transition-colors duration-200 before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-white before:scale-y-0 hover:before:scale-y-100 before:transition-transform before:duration-200 before:origin-center";
+              "row-sweep group flex items-start md:items-center gap-3 md:gap-4 px-3 md:px-4 py-3.5 border-b border-neutral-900";
             return isArticle ? (
               <IntentPrefetchLink key={post.id} href={`/news/${post.id}`} className={rowClass}>
                 {inner}
