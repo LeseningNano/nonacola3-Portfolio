@@ -179,3 +179,11 @@ test("page header descriptions use the body font rather than the mono meta line"
   const settings = readFileSync(new URL("../components/admin/page-settings.tsx", import.meta.url), "utf8");
   assert.doesNotMatch(settings, /font-sans/);
 });
+
+test("the mobile navigation drawer stacks its content from the top", () => {
+  const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
+  const drawer = shell.match(/<DialogContent showCloseButton=\{false\} className="([^"]+)"/)?.[1] ?? "";
+  // Dialog 基础样式是 grid；满屏高度下不加 content-start 会把行拉伸、内容下沉
+  assert.match(drawer, /\bcontent-start\b/);
+  assert.match(drawer, /\bh-dvh\b/);
+});

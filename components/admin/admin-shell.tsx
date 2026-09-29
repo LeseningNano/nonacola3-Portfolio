@@ -194,7 +194,7 @@ export function AdminShell({ children, userName }: AdminShellProps) {
           >
             <Menu aria-hidden="true" className="size-5" />
           </DialogTrigger>
-          <DialogContent showCloseButton={false} className="inset-y-0 left-0 h-dvh w-[min(20rem,calc(100%-3rem))] max-w-none translate-x-0 translate-y-0 rounded-none border-r border-admin-line bg-admin-panel px-2.5 py-4 text-admin-fg ring-0 sm:max-w-none">
+          <DialogContent showCloseButton={false} className="inset-y-0 left-0 h-dvh content-start w-[min(20rem,calc(100%-3rem))] max-w-none translate-x-0 translate-y-0 rounded-none border-r border-admin-line bg-admin-panel px-2.5 py-4 text-admin-fg ring-0 sm:max-w-none">
             <div className="mb-7 flex items-center justify-between px-2.5">
               <DialogTitle className="font-pixel text-[1.2rem] leading-none text-white">nonacola3</DialogTitle>
               <DialogClose aria-label="关闭管理员导航" className={`grid size-10 place-items-center rounded-sm text-admin-fg-2 transition-colors hover:bg-admin-raised hover:text-admin-fg ${focusRing}`}>
