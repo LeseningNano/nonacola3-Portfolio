@@ -408,6 +408,21 @@ body::after {
   }
 }
 
+/* 作品卡片依次揭示：自下而上擦出并上移 24px，同排错峰由 --reveal-delay 控制。
+   可见态留 12px 外扩，避免裁掉链接的 focus ring */
+[data-reveal="card"] {
+  clip-path: inset(-12px);
+  transition:
+    opacity 700ms var(--ease-menu) var(--reveal-delay, 0ms),
+    transform 700ms var(--ease-menu) var(--reveal-delay, 0ms),
+    clip-path 700ms var(--ease-menu) var(--reveal-delay, 0ms);
+}
+[data-reveal-pending][data-reveal="card"] {
+  opacity: 0;
+  transform: translateY(24px);
+  clip-path: inset(100% 0 0 0);
+}
+
 /* 区块遮光层：进入视口前压暗，进入后淡出，模拟镜头换段；JS 关闭时默认透明 */
 [data-reveal="dim"] {
   opacity: 0;
@@ -452,6 +467,7 @@ body::after {
   [data-reveal-pending] {
     opacity: 1 !important;
     transform: none !important;
+    clip-path: none !important;
   }
   [data-reveal-pending][data-reveal="heading"] .reveal-inner {
     transform: none !important;

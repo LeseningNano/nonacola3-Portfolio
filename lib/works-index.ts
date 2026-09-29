@@ -147,3 +147,16 @@ export async function createThumbnailProxyResponse(
 
   return new Response(upstream.body, { status: 200, headers });
 }
+
+export function getWorkYear(date: string | null): string | null {
+  if (!date) return null;
+  const year = new Date(date).getUTCFullYear();
+  return Number.isNaN(year) ? null : String(year);
+}
+
+export function formatWorkMeta(parts: Array<string | null | undefined>): string {
+  return parts
+    .map((part) => part?.trim())
+    .filter((part): part is string => Boolean(part))
+    .join(" · ");
+}
