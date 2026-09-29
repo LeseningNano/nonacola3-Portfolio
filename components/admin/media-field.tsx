@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 
 type MediaKind = "image" | "video";
 
+const VIDEO_FILE = /\.(mp4|webm|mov|m4v|ogv)$/i;
+
 export type MediaFieldProps = {
   id: string;
   label: string;
@@ -140,8 +142,10 @@ function MediaPreview({ source, url, kind, poster, large }: { source: MediaSourc
     );
   }
 
-  const isVideoFile = source.kind === "library-video" || (source.kind === "local" && kind === "video");
-  const isImageFile = source.kind === "library-image" || (source.kind === "local" && kind === "image");
+  // 外部主机上的图片也按图片预览；外部视频只有直链文件才能用 <video> 播放
+  const isExternalVideoFile = source.kind === "external" && VIDEO_FILE.test(url.split(/[?#]/, 1)[0] ?? "");
+  const isVideoFile = source.kind === "library-video" || isExternalVideoFile || (source.kind === "local" && kind === "video");
+  const isImageFile = source.kind === "library-image" || ((source.kind === "local" || source.kind === "external") && kind === "image");
 
   if (isImageFile) {
     return <div className={frame}><img src={url} alt="" className="size-full object-cover" /></div>;

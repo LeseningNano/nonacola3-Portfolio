@@ -187,3 +187,12 @@ test("the mobile navigation drawer stacks its content from the top", () => {
   assert.match(drawer, /\bcontent-start\b/);
   assert.match(drawer, /\bh-dvh\b/);
 });
+
+test("media fields preview images and video files hosted outside the media library", () => {
+  const image = renderToStaticMarkup(createElement(MediaField, { id: "e", label: "缩略图", kind: "image", value: "https://i0.hdslb.com/bfs/archive/cover.jpg", onChange: () => {}, optional: true }));
+  assert.match(image, /<img[^>]*src="https:\/\/i0\.hdslb\.com\/bfs\/archive\/cover\.jpg"/);
+  const video = renderToStaticMarkup(createElement(MediaField, { id: "f", label: "视频", kind: "video", value: "https://cdn.example.com/clip.mp4", onChange: () => {} }));
+  assert.match(video, /<video[^>]*src="https:\/\/cdn\.example\.com\/clip\.mp4"/);
+  const page = renderToStaticMarkup(createElement(MediaField, { id: "g", label: "视频", kind: "video", value: "https://vimeo.com/123", onChange: () => {}, allowEmbed: true }));
+  assert.doesNotMatch(page, /<video/);
+});
