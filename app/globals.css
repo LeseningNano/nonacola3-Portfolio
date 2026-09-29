@@ -117,6 +117,68 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ===== 后台「剪辑台」主题：仅 /login 与 /dashboard 使用 ===== */
+@theme inline {
+  --color-admin-canvas: var(--admin-canvas);
+  --color-admin-panel: var(--admin-panel);
+  --color-admin-raised: var(--admin-raised);
+  --color-admin-selected: var(--admin-selected);
+  --color-admin-line: var(--admin-line);
+  --color-admin-line-strong: var(--admin-line-strong);
+  --color-admin-fg: var(--admin-fg);
+  --color-admin-fg-2: var(--admin-fg-2);
+  --color-admin-fg-3: var(--admin-fg-3);
+  --color-admin-accent: var(--admin-accent);
+  --color-admin-accent-fg: var(--admin-accent-fg);
+  --color-admin-accent-text: var(--admin-accent-text);
+  --color-admin-success: var(--admin-success);
+  --color-admin-success-text: var(--admin-success-text);
+  --color-admin-danger: var(--admin-danger);
+  --font-pixel: var(--font-bitcount), ui-monospace, monospace;
+  --font-admin-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+:root {
+  --admin-canvas: #0b0b0c;
+  --admin-panel: #111113;
+  --admin-raised: #16161a;
+  --admin-selected: #1c1c21;
+  --admin-line: #222227;
+  --admin-line-strong: #2e2e35;
+  --admin-fg: #ededee;
+  --admin-fg-2: #a1a1a8;
+  --admin-fg-3: #7a7a83;
+  --admin-accent: #ff5a1f;
+  --admin-accent-fg: #1a0800;
+  --admin-accent-text: #ff8a5c;
+  --admin-success: #3ecf8e;
+  --admin-success-text: #5fd49a;
+  --admin-danger: #f2555a;
+}
+
+/* Portal 渲染在 body 下，所以覆盖写在 :root 上，只在后台界面挂载时生效 */
+:root:has([data-admin-theme]) {
+  --background: #0b0b0c;
+  --foreground: #ededee;
+  --card: #111113;
+  --card-foreground: #ededee;
+  --popover: #16161a;
+  --popover-foreground: #ededee;
+  --primary: #ff5a1f;
+  --primary-foreground: #1a0800;
+  --secondary: #1c1c21;
+  --secondary-foreground: #ededee;
+  --muted: #1c1c21;
+  --muted-foreground: #a1a1a8;
+  --accent: #1c1c21;
+  --accent-foreground: #ededee;
+  --destructive: #f2555a;
+  --border: #222227;
+  --input: #2e2e35;
+  --ring: #ff5a1f;
+  --radius: 0.25rem;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
