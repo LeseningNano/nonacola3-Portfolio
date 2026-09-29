@@ -511,3 +511,9 @@ test("Works row preview icon merges classes so it really hides on phones", () =>
   assert.match(source, /cn\(adminIconActionClass, "hidden sm:inline-flex"\)/);
   assert.doesNotMatch(source, /`hidden sm:inline-flex \$\{adminIconActionClass\}`/);
 });
+
+test("Works ordering announces the same position number it displays", () => {
+  const source = readFileSync(resolve(process.cwd(), "components/admin/work-order-editor.tsx"), "utf8");
+  assert.match(source, /aria-label=\{`当前排序 \$\{index \+ 1\}`\}/);
+  assert.match(source, /String\(index \+ 1\)\.padStart\(2, "0"\)/);
+});

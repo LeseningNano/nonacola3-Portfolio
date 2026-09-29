@@ -142,7 +142,7 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
                   <GripVertical className="size-4" />
                 </button>
 
-                <span className="w-7 text-center font-admin-mono text-xs text-admin-fg-3" aria-label={`当前排序 ${item.order}`}>
+                <span className="w-7 text-center font-admin-mono text-xs text-admin-fg-3" aria-label={`当前排序 ${index + 1}`}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
 
