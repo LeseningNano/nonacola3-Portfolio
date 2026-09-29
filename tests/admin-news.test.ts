@@ -60,11 +60,15 @@ test("News editor actions reflect current publication state", () => {
   });
 });
 
-test("News list uses direct type destinations and shared row status", () => {
+test("News list uses direct type destinations, type icons, and status dots", () => {
   const source = readFileSync(new URL("../components/admin/news-list.tsx", import.meta.url), "utf8");
-  assert.match(source, /AdminStatusBadge/);
+  assert.match(source, /AdminStatus\b/);
   assert.match(source, /\/dashboard\/news\/new\?type=short/);
   assert.match(source, /\/dashboard\/news\/new\?type=article/);
+  assert.match(source, /FileText/);
+  assert.match(source, /MessageCircle/);
+  assert.match(source, /sr-only">\{kind === "article" \? "文章" : "短动态"\}/);
+  assert.doesNotMatch(source, />\{kind === "article" \? "文章" : "短动态"\}<\/AdminStatus/);
   assert.doesNotMatch(source, /min-w-\[880px\]/);
 });
 
@@ -274,7 +278,8 @@ test("News routes await route props and dispatch by exact type and title nullabi
   assert.match(newPage, /await searchParams/);
   assert.match(newPage, /type === "short"\)\s*\{\s*return <ShortPostEditor \/>;/);
   assert.match(newPage, /type === "article"\)\s*\{\s*return <ArticleEditor \/>;/);
-  assert.match(newPage, /title="新建内容"/);
+  assert.match(newPage, /title="NEW"/);
+  assert.match(newPage, /subtitle="新建内容"/);
   assert.match(newPage, /\/dashboard\/news\/new\?type=short/);
   assert.match(newPage, /\/dashboard\/news\/new\?type=article/);
   assert.match(editPage, /await params/);
