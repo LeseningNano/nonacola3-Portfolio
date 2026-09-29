@@ -43,7 +43,7 @@ test("page header pairs an English pixel title with a Chinese subtitle", () => {
 });
 
 test("form sections use a mono index instead of a side description column", () => {
-  const markup = renderToStaticMarkup(createElement(AdminFormSection, { index: "01", title: "基本信息", children: createElement("div", null, "字段") }));
+  const markup = renderToStaticMarkup(AdminFormSection({ index: "01", title: "基本信息", children: createElement("div", null, "字段") }));
   assert.match(markup, /font-admin-mono[^>]*>01</);
   assert.match(markup, /<h2[^>]*>基本信息<\/h2>/);
   assert.doesNotMatch(markup, /lg:grid-cols-/);
