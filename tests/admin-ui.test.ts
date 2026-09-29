@@ -3,12 +3,16 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { AdminStatusBadge } from "../components/admin/admin-status-badge";
+import { Film } from "lucide-react";
+import { AdminStatus } from "../components/admin/admin-status";
+import { AdminPageHeader } from "../components/admin/admin-page-header";
 import { AdminFormSection } from "../components/admin/admin-form-section";
-import { MediaPicker } from "../components/admin/media-picker";
+import { AdminEmptyState } from "../components/admin/admin-empty-state";
+import { MediaUploadButton } from "../components/admin/media-picker";
+import { MediaField } from "../components/admin/media-field";
 import { MediaLibrary } from "../components/admin/media-library";
 import DashboardLoading from "../app/(admin)/dashboard/loading";
-import { ADMIN_NAV_GROUPS } from "../lib/admin-navigation";
+import { ADMIN_NAV_GROUPS, formatAdminDate } from "../lib/admin-navigation";
 
 test("admin navigation groups content, page media, and library by responsibility", () => {
   assert.deepEqual(
@@ -17,13 +21,44 @@ test("admin navigation groups content, page media, and library by responsibility
   );
 });
 
-test("ordinary and featured states share the same badge structure", () => {
-  const ordinary = renderToStaticMarkup(createElement(AdminStatusBadge, { tone: "neutral" }, "普通"));
-  const featured = renderToStaticMarkup(createElement(AdminStatusBadge, { tone: "featured" }, "精选"));
-  assert.match(ordinary, /data-admin-status="neutral"/);
-  assert.match(featured, /data-admin-status="featured"/);
-  assert.match(ordinary, /rounded-full/);
-  assert.match(featured, /rounded-full/);
+test("status tones render a dot plus visible text with a stable data attribute", () => {
+  for (const tone of ["featured", "ordinary", "published", "draft", "dirty", "saved", "error"] as const) {
+    const markup = renderToStaticMarkup(createElement(AdminStatus, { tone }, "状态"));
+    assert.match(markup, new RegExp(`data-admin-status="${tone}"`));
+    assert.match(markup, /aria-hidden="true"/);
+    assert.match(markup, />状态</);
+  }
+  assert.match(renderToStaticMarkup(createElement(AdminStatus, { tone: "featured" }, "精选")), /bg-admin-accent/);
+  assert.match(renderToStaticMarkup(createElement(AdminStatus, { tone: "draft" }, "草稿")), /border-admin-fg-3/);
+});
+
+test("page header pairs an English pixel title with a Chinese subtitle", () => {
+  const markup = renderToStaticMarkup(createElement(AdminPageHeader, {
+    title: "WORKS", subtitle: "作品", meta: "7 个作品", actions: createElement("button", null, "新建作品"),
+  }));
+  assert.match(markup, /<h1[^>]*aria-label="作品"[^>]*>WORKS<\/h1>/);
+  assert.match(markup, /font-pixel/);
+  assert.match(markup, />7 个作品</);
+  assert.match(markup, />新建作品</);
+});
+
+test("form sections use a mono index instead of a side description column", () => {
+  const markup = renderToStaticMarkup(AdminFormSection({ index: "01", title: "基本信息", children: createElement("div", null, "字段") }));
+  assert.match(markup, /font-admin-mono[^>]*>01</);
+  assert.match(markup, /<h2[^>]*>基本信息<\/h2>/);
+  assert.doesNotMatch(markup, /lg:grid-cols-/);
+});
+
+test("empty states name the space and offer an action", () => {
+  const markup = renderToStaticMarkup(createElement(AdminEmptyState, { icon: Film, title: "还没有作品", action: createElement("a", { href: "/x" }, "新建作品") }));
+  assert.match(markup, />还没有作品</);
+  assert.match(markup, /href="\/x"/);
+});
+
+test("admin dates use dotted mono format and tolerate missing values", () => {
+  assert.equal(formatAdminDate("2026-09-24T12:00:00.000Z"), "2026.09.24");
+  assert.equal(formatAdminDate(null), "—");
+  assert.equal(formatAdminDate("not a date"), "—");
 });
 
 test("admin editors retain visible focus and mobile sticky offsets", () => {
@@ -78,29 +113,26 @@ test("Dashboard content keeps equal desktop gutters beside the sidebar", () => {
   assert.doesNotMatch(mainClasses, /md:pl-\[var\(--admin-sidebar-width\)\]/);
 });
 
-test("page media sections can use the full content width without a second narrow form column", () => {
-  const markup = renderToStaticMarkup(AdminFormSection({
-    title: "页面媒体",
-    description: "预览与操作",
-    layout: "stacked",
-    children: createElement("div", null, "媒体预览"),
-  }));
-  assert.match(markup, /页面媒体/);
-  assert.match(markup, /媒体预览/);
-  assert.doesNotMatch(markup, /lg:grid-cols-/);
+test("media upload buttons name the file type and offer a direct file input", () => {
+  const markup = renderToStaticMarkup(createElement(MediaUploadButton, { kind: "image", label: "上传图片", onUploaded: () => {} }));
+  assert.match(markup, />上传图片</);
+  assert.match(markup, /type="file"/);
 });
 
-test("media library upload actions name the file type and offer a direct file input", () => {
-  const markup = renderToStaticMarkup(createElement(MediaPicker, {
-    kind: "image",
-    value: "",
-    onSelect: () => {},
-    label: "上传图片",
-    uploadOnly: true,
-  }));
-  assert.match(markup, />上传图片<\/button>/);
-  assert.match(markup, /type="file"/);
-  assert.doesNotMatch(markup, /选择媒体/);
+test("media fields show one slot per value with the raw address hidden until requested", () => {
+  const empty = renderToStaticMarkup(createElement(MediaField, { id: "t", label: "缩略图", kind: "image", value: "", onChange: () => {}, optional: true }));
+  assert.match(empty, /未设置/);
+  assert.match(empty, /从媒体库选择/);
+  assert.match(empty, /编辑地址/);
+  assert.doesNotMatch(empty, /<input[^>]*type="url"/);
+
+  const embed = renderToStaticMarkup(createElement(MediaField, { id: "v", label: "作品视频", kind: "video", value: "https://www.bilibili.com/video/BV1Vz8E6WEd6/", onChange: () => {}, allowEmbed: true }));
+  assert.match(embed, /Bilibili · BV1Vz8E6WEd6/);
+  assert.equal((embed.match(/BV1Vz8E6WEd6/g) ?? []).length, 1);
+
+  const library = renderToStaticMarkup(createElement(MediaField, { id: "i", label: "缩略图", kind: "image", value: "https://x.public.blob.vercel-storage.com/a.webp", onChange: () => {}, optional: true }));
+  assert.match(library, /<img[^>]*src="https:\/\/x\.public\.blob\.vercel-storage\.com\/a\.webp"/);
+  assert.match(library, />清除</);
 });
 
 test("Dashboard loading mirrors a compact content list rather than oversized generic panels", () => {
@@ -125,4 +157,33 @@ test("media and settings routes provide page-shaped loading states", async () =>
     assert.match(markup, /role="status"/);
     assert.ok((markup.match(/<article\b/g) ?? []).length >= expected, `${route} skeleton should resemble its content`);
   }
+});
+
+test("admin surfaces opt into the edit-suite theme and the login page hides public chrome", () => {
+  const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
+  const login = readFileSync(new URL("../app/(admin)/login/page.tsx", import.meta.url), "utf8");
+  assert.match(shell, /data-admin-theme/);
+  assert.match(shell, /font-pixel/);
+  assert.match(shell, /aria-label="查看网站"/);
+  assert.match(shell, /aria-label="退出登录"/);
+  assert.match(login, /data-admin-theme/);
+  assert.match(login, /autoComplete="username"/);
+  assert.match(login, /autoComplete="current-password"/);
+  assert.match(login, /role="alert"/);
+  assert.match(login, /signIn\("credentials"/);
+});
+
+test("page header descriptions use the body font rather than the mono meta line", () => {
+  const markup = renderToStaticMarkup(createElement(AdminPageHeader, { title: "PAGE MEDIA", subtitle: "页面媒体", description: "保存后才会发布。" }));
+  assert.match(markup, /<p class="(?![^"]*font-admin-mono)[^"]*">保存后才会发布。<\/p>/);
+  const settings = readFileSync(new URL("../components/admin/page-settings.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(settings, /font-sans/);
+});
+
+test("the mobile navigation drawer stacks its content from the top", () => {
+  const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
+  const drawer = shell.match(/<DialogContent showCloseButton=\{false\} className="([^"]+)"/)?.[1] ?? "";
+  // Dialog 基础样式是 grid；满屏高度下不加 content-start 会把行拉伸、内容下沉
+  assert.match(drawer, /\bcontent-start\b/);
+  assert.match(drawer, /\bh-dvh\b/);
 });

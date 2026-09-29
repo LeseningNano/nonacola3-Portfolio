@@ -10,8 +10,8 @@ export default async function WorkOrderPage() {
   const initialWorks = works.map(serializeAdminWork);
 
   return (
-    <div className="space-y-6">
-      <AdminPageHeader title="作品排序" status={<span className="text-sm text-neutral-400">{initialWorks.length} 个作品</span>} />
+    <div className="mx-auto max-w-[60rem] space-y-4">
+      <AdminPageHeader title="ORDER" subtitle="调整顺序" meta={`${initialWorks.length} 个作品`} back={{ href: "/dashboard/works", label: "返回作品" }} />
       <WorkOrderEditor initialWorks={initialWorks} />
     </div>
   );

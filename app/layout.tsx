@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat, Bitcount_Grid_Single } from "next/font/google";
+import { Inter, Montserrat, Bitcount_Grid_Single, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { PageTransition } from "@/components/progress-bar";
 
@@ -14,6 +14,12 @@ const bitcount = Bitcount_Grid_Single({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-bitcount",
+});
+// 后台等宽字；前台不使用，关闭预加载避免前台下载
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -46,7 +52,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} ${montserrat.variable} ${bitcount.variable} bg-[#0a0a0a] text-white antialiased`}>
+      <body className={`${inter.className} ${montserrat.variable} ${bitcount.variable} ${jetbrainsMono.variable} bg-[#0a0a0a] text-white antialiased`}>
         <ToastProvider>
           <ChunkRecovery />
           <PageTransition />

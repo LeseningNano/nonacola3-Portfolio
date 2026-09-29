@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useMemo, useReducer, useState } from "react";
-import { ArrowLeft, ExternalLink, Save } from "lucide-react";
+import { ExternalLink, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
-import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminEditorHeader, getEditorStatus } from "@/components/admin/admin-editor-header";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
-import { MediaPicker } from "@/components/admin/media-picker";
+import { MediaField } from "@/components/admin/media-field";
 import { WorkCardPreview } from "@/components/admin/work-card-preview";
 import { MarkdownEditor } from "@/components/markdown-editor";
 import { Button } from "@/components/ui/button";
@@ -115,21 +115,19 @@ export function WorkEditor({
           : "所有更改已保存";
 
   return (
-    <div className="min-w-0">
+    <div className="mx-auto min-w-0 max-w-[75rem]">
       <AdminEditorHeader
+        section="WORKS"
         title={mode === "create" && !workId ? "新建作品" : state.form.title.trim() || "未命名作品"}
-        status={statusText}
-        backAction={(
-          <Button type="button" variant="ghost" onClick={leaveEditor} className="shrink-0">
-            <ArrowLeft aria-hidden="true" /> 返回
-          </Button>
-        )}
+        status={getEditorStatus(state.status, isDirty)}
+        onBack={leaveEditor}
       >
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           disabled={!workId}
           onClick={() => workId && window.open(`/works/${workId}`, "_blank", "noopener,noreferrer")}
+          className="text-admin-fg-2"
         >
           <ExternalLink aria-hidden="true" /> 查看公开页面
         </Button>
@@ -141,62 +139,62 @@ export function WorkEditor({
         </Button>
       </AdminEditorHeader>
 
-      <div className="space-y-5 pt-5">
-        <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
-        {state.error ? <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{state.error}</p> : null}
+      <div className="space-y-5 pt-6">
+        <p className="sr-only" role="status" aria-live="polite">{announcement || statusText}</p>
+        {state.error ? <p role="alert" className="rounded-sm border border-admin-danger/30 bg-admin-danger/10 px-4 py-3 text-sm text-admin-danger">{state.error}</p> : null}
 
-        <div className="grid min-w-0 items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.8fr)]">
-          <fieldset disabled={saving} className="min-w-0 space-y-8">
-            <AdminFormSection title="基本信息" description="作品名称、类型、日期与精选状态。">
+        <div className="grid min-w-0 items-start gap-8 xl:grid-cols-[minmax(0,45rem)_minmax(20rem,23.75rem)] xl:justify-between">
+          <fieldset disabled={saving} className="min-w-0 space-y-6">
+            <AdminFormSection index="01" title="基本信息">
               <Field label="标题" htmlFor="work-title">
-                <Input id="work-title" required value={state.form.title} onChange={(event) => setField("title", event.target.value)} />
+                <Input id="work-title" required value={state.form.title} onChange={(event) => setField("title", event.target.value)} className="h-9" />
               </Field>
-              <Field label="分类" htmlFor="work-category">
-                <Input id="work-category" required value={state.form.category} onChange={(event) => setField("category", event.target.value)} />
-              </Field>
-              <Field label="日期" htmlFor="work-date">
-                <Input id="work-date" type="date" value={state.form.date} onChange={(event) => setField("date", event.target.value)} />
-              </Field>
-              <div className="flex min-h-10 items-center justify-between gap-4">
-                <Label htmlFor="work-featured">精选作品</Label>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="分类" htmlFor="work-category">
+                  <Input id="work-category" required value={state.form.category} onChange={(event) => setField("category", event.target.value)} className="h-9" />
+                </Field>
+                <Field label="日期" htmlFor="work-date">
+                  <Input id="work-date" type="date" value={state.form.date} onChange={(event) => setField("date", event.target.value)} className="h-9 font-admin-mono" />
+                </Field>
+              </div>
+              <div className="flex h-10 items-center justify-between gap-4 rounded-sm bg-admin-panel px-3">
+                <Label htmlFor="work-featured" className="text-[13px] text-admin-fg">精选作品</Label>
                 <Switch id="work-featured" checked={state.form.featured} onCheckedChange={(checked) => setField("featured", checked)} />
               </div>
             </AdminFormSection>
 
-            <AdminFormSection title="媒体" description="公开页面使用的视频与封面。">
-              <Field label="视频或嵌入地址" htmlFor="work-embed-url">
-                <Input id="work-embed-url" type="url" required value={state.form.embedUrl} onChange={(event) => setField("embedUrl", event.target.value)} />
-              </Field>
-              <MediaPicker kind="video" value={state.form.embedUrl} onSelect={(url) => setField("embedUrl", url)} label="从媒体库选择视频" />
-              <Field label="缩略图地址" htmlFor="work-thumbnail">
-                <Input id="work-thumbnail" type="url" value={state.form.thumbnail} onChange={(event) => setField("thumbnail", event.target.value)} />
-              </Field>
-              <MediaPicker kind="image" value={state.form.thumbnail} onSelect={(url) => setField("thumbnail", url)} label="从媒体库选择缩略图" />
+            <AdminFormSection index="02" title="媒体" description="公开页面使用的视频与封面">
+              <MediaField id="work-video" label="作品视频" kind="video" allowEmbed value={state.form.embedUrl} onChange={(url) => setField("embedUrl", url)} />
+              <MediaField id="work-thumbnail-field" label="缩略图" kind="image" optional value={state.form.thumbnail} onChange={(url) => setField("thumbnail", url)} />
             </AdminFormSection>
 
-            <AdminFormSection title="卡片信息" description="用于 Works 页面和快速浏览。">
-              <Field label="卡片摘要" htmlFor="work-summary">
+            <AdminFormSection index="03" title="卡片信息" description="用于 Works 页面和快速浏览">
+              <Field label="卡片摘要" htmlFor="work-summary" hint={`${state.form.summary.length} 字`}>
                 <textarea id="work-summary" rows={3} value={state.form.summary} onChange={(event) => setField("summary", event.target.value)} className={textareaClassName} />
               </Field>
-              <Field label="职责" htmlFor="work-role">
-                <Input id="work-role" value={state.form.role} onChange={(event) => setField("role", event.target.value)} />
-              </Field>
-              <Field label="工具" htmlFor="work-tools">
-                <Input id="work-tools" value={state.form.tools} onChange={(event) => setField("tools", event.target.value)} />
-              </Field>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="职责" htmlFor="work-role">
+                  <Input id="work-role" value={state.form.role} onChange={(event) => setField("role", event.target.value)} className="h-9" />
+                </Field>
+                <Field label="工具" htmlFor="work-tools">
+                  <Input id="work-tools" value={state.form.tools} onChange={(event) => setField("tools", event.target.value)} className="h-9" />
+                </Field>
+              </div>
             </AdminFormSection>
 
-            <AdminFormSection title="Case Study" description="作品详情页的 Markdown 内容。">
+            <AdminFormSection index="04" title="Case Study" description="作品详情页的 Markdown 内容">
               <Field label="详细说明" htmlFor="work-description">
-                <MarkdownEditor value={state.form.description} onChange={(value) => setField("description", value)} textareaProps={{ id: "work-description", rows: 12 }} />
+                <MarkdownEditor value={state.form.description} onChange={(value) => setField("description", value)} textareaProps={{ id: "work-description", rows: 14 }} />
               </Field>
             </AdminFormSection>
           </fieldset>
 
           <div className="min-w-0 xl:sticky xl:top-24">
-            <details open className="min-w-0 space-y-3">
-              <summary className="cursor-pointer text-sm font-medium text-white">作品卡片预览</summary>
-              <WorkCardPreview value={state.form} />
+            <details open className="min-w-0 rounded-lg bg-admin-panel p-3">
+              <summary className="cursor-pointer text-sm text-admin-fg">卡片预览</summary>
+              <div className="pt-3">
+                <WorkCardPreview value={state.form} />
+              </div>
             </details>
           </div>
         </div>
@@ -210,14 +208,17 @@ function createInitialState(work?: Video) {
   return { form, baseline: { ...form }, status: "clean" as const, error: null };
 }
 
-function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
+function Field({ label, htmlFor, hint, children }: { label: string; htmlFor: string; hint?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-2">
-      <Label htmlFor={htmlFor}>{label}</Label>
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <Label htmlFor={htmlFor} className="text-xs text-admin-fg-2">{label}</Label>
+        {hint ? <span className="font-admin-mono text-xs text-admin-fg-3">{hint}</span> : null}
+      </div>
       {children}
     </div>
   );
 }
 
 const textareaClassName =
-  "w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
+  "w-full rounded-sm border border-input bg-admin-raised px-2.5 py-2 text-sm text-admin-fg outline-none transition-colors placeholder:text-admin-fg-3 focus-visible:border-admin-accent";

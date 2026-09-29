@@ -10,7 +10,7 @@ function MenuTrigger({ className, ...props }: MenuPrimitive.Trigger.Props) {
   return (
     <MenuPrimitive.Trigger
       data-slot="menu-trigger"
-      className={cn("focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50", className)}
+      className={cn("focus:outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
       {...props}
     />
   );
@@ -22,7 +22,7 @@ function MenuContent({ className, ...props }: MenuPrimitive.Popup.Props) {
       <MenuPrimitive.Positioner sideOffset={6} align="end" className="z-50">
         <MenuPrimitive.Popup
           data-slot="menu-content"
-          className={cn("min-w-40 rounded-lg bg-neutral-900 p-1 text-white shadow-xl ring-1 ring-white/10 outline-none", className)}
+          className={cn("min-w-40 rounded-lg bg-popover p-1 text-popover-foreground shadow-xl ring-1 ring-border outline-none", className)}
           {...props}
         />
       </MenuPrimitive.Positioner>
@@ -30,7 +30,7 @@ function MenuContent({ className, ...props }: MenuPrimitive.Popup.Props) {
   );
 }
 
-const menuItemClassName = "flex w-full cursor-default items-center rounded-md px-2.5 py-2 text-left text-sm text-neutral-200 outline-none data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
+const menuItemClassName = "flex w-full cursor-default items-center gap-2 rounded-sm px-2.5 py-2 text-left text-[13px] text-admin-fg outline-none data-[highlighted]:bg-admin-selected data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
 
 function MenuItem({ className, ...props }: MenuPrimitive.Item.Props) {
   return <MenuPrimitive.Item data-slot="menu-item" className={cn(menuItemClassName, className)} {...props} />;
@@ -41,7 +41,7 @@ function MenuLinkItem({ className, ...props }: MenuPrimitive.LinkItem.Props) {
 }
 
 function MenuSeparator({ className, ...props }: MenuPrimitive.Separator.Props) {
-  return <MenuPrimitive.Separator data-slot="menu-separator" className={cn("-mx-1 my-1 h-px bg-white/10", className)} {...props} />;
+  return <MenuPrimitive.Separator data-slot="menu-separator" className={cn("-mx-1 my-1 h-px bg-border", className)} {...props} />;
 }
 
 export { Menu, MenuContent, MenuItem, MenuLinkItem, MenuSeparator, MenuTrigger };

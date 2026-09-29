@@ -1,23 +1,22 @@
 "use client";
 
-import Image from "next/image";
 import type { ReactNode } from "react";
-import { useCallback, useReducer } from "react";
-import { Loader2, Save } from "lucide-react";
+import { useCallback, useReducer, useState } from "react";
+import { Loader2, Save, Undo2 } from "lucide-react";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
-import { AdminFormSection } from "@/components/admin/admin-form-section";
+import { AdminFilterGroup } from "@/components/admin/admin-filter-group";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
-import { MediaPicker } from "@/components/admin/media-picker";
+import { AdminStatus } from "@/components/admin/admin-status";
+import { MediaField } from "@/components/admin/media-field";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   createSaveableSettingState,
   isSaveableSettingDirty,
   reduceSaveableSettingState,
   type SaveableSettingState,
 } from "@/lib/admin-settings";
+import { describeMediaSource } from "@/lib/admin-media-source";
+import { DEFAULT_HERO_POSTER_URL } from "@/lib/hero";
 import { getEmbedUrl } from "@/lib/utils";
 
 export type HeroSettingsValue = { videoUrl: string; posterUrl: string };
@@ -89,213 +88,230 @@ export function PageSettings({ initialHero, initialShowreel }: PageSettingsProps
     }
   }
 
+
   return (
-    <div className="mx-auto max-w-[60rem] space-y-8">
+    <div className="mx-auto max-w-[60rem] space-y-5">
       <AdminPageHeader
-        title="页面媒体"
-        description="管理首页 Hero 视频、封面和 Works Showreel。选择媒体后，需明确保存才会发布变更。"
+        title="PAGE MEDIA"
+        subtitle="页面媒体"
+        description="首页和 Works 页使用的影片素材，保存后才会发布。"
       />
-      <HeroSettingsCard state={heroState} onChange={changeHero} onSave={saveHero} />
-      <ShowreelSettingsCard state={showreelState} onChange={changeShowreel} onSave={saveShowreel} />
+      <HeroSettingsGroup
+        state={heroState}
+        onChange={changeHero}
+        onRevert={(field) => heroDispatch({ type: "revert-field", field })}
+        onSave={saveHero}
+      />
+      <ShowreelSettingsGroup
+        state={showreelState}
+        onChange={changeShowreel}
+        onRevert={(field) => showreelDispatch({ type: "revert-field", field })}
+        onSave={saveShowreel}
+      />
     </div>
   );
 }
 
-function HeroSettingsCard({
+function mediaName(url: string) {
+  if (!url) return "未设置";
+  return url === DEFAULT_HERO_POSTER_URL ? "默认封面" : describeMediaSource(url).name;
+}
+
+function countPending<T extends Record<string, unknown>>(state: SaveableSettingState<T>) {
+  return (Object.keys(state.draft) as Array<keyof T>).filter((key) => state.draft[key] !== state.saved[key]).length;
+}
+
+// 草稿与已保存值不同时，为素材槽提供「待保存」标记、对比说明和撤销按钮
+function getPendingSlot({ saved, draft, onRevert, disabled }: { saved: string; draft: string; onRevert: () => void; disabled: boolean }) {
+  if (saved === draft) return null;
+  return {
+    badge: <span className="rounded-[3px] bg-admin-accent px-1.5 text-xs font-medium text-admin-accent-fg">待保存</span>,
+    description: (
+      <p className="truncate font-admin-mono text-xs text-admin-fg-3" title={`当前 ${saved || "未设置"} → 待保存 ${draft || "未设置"}`}>
+        当前 {mediaName(saved)} → 待保存 {mediaName(draft)}
+      </p>
+    ),
+    action: (
+      <Button type="button" size="sm" variant="ghost" disabled={disabled} onClick={onRevert}>
+        <Undo2 aria-hidden="true" />撤销
+      </Button>
+    ),
+  };
+}
+
+function HeroSettingsGroup({
   state,
   onChange,
+  onRevert,
   onSave,
 }: {
   state: SaveableSettingState<HeroSettingsValue>;
   onChange: (value: Partial<HeroSettingsValue>) => void;
+  onRevert: (field: keyof HeroSettingsValue) => void;
   onSave: () => void;
 }) {
   const disabled = state.status === "saving";
+  const video = getPendingSlot({ saved: state.saved.videoUrl, draft: state.draft.videoUrl, onRevert: () => onRevert("videoUrl"), disabled });
+  const poster = getPendingSlot({ saved: state.saved.posterUrl, draft: state.draft.posterUrl, onRevert: () => onRevert("posterUrl"), disabled });
+  const isDefaultPoster = state.draft.posterUrl === DEFAULT_HERO_POSTER_URL;
+
   return (
-    <AdminFormSection title="Hero 背景" description="视频与封面分开选择，通过同一个保存操作一起更新首页。" layout="stacked">
-      <div className="space-y-6">
-        <MediaAssetRow
-          title="背景视频"
-          preview={<MediaAssetPreview kind="video" url={state.saved.videoUrl} label="当前已保存的 Hero 视频" />}
-          controls={<div className="min-w-0 space-y-3">
-            <MediaPicker
-              kind="video"
-              accept="video/mp4"
-              value={state.draft.videoUrl}
-              onSelect={(videoUrl) => onChange({ videoUrl })}
-              label="更换 Hero 视频"
-              disabled={disabled}
-            />
-            {state.draft.videoUrl !== state.saved.videoUrl ? (
-              <MediaAssetPreview kind="video" url={state.draft.videoUrl} label="待保存的视频预览" />
-            ) : null}
-          </div>}
-        />
-        <MediaAssetRow
-          title="封面图片"
-          preview={<MediaAssetPreview kind="image" url={state.saved.posterUrl} label="当前已保存的 Hero 封面" />}
-          controls={<div className="min-w-0 space-y-3">
-            <MediaPicker
-              kind="image"
-              value={state.draft.posterUrl}
-              onSelect={(posterUrl) => onChange({ posterUrl })}
-              label="替换封面"
-              disabled={disabled}
-            />
-            {state.draft.posterUrl !== state.saved.posterUrl ? (
-              <MediaAssetPreview kind="image" url={state.draft.posterUrl} label="待保存的封面预览" />
-            ) : null}
-          </div>}
-        />
-        <SettingsSaveAction state={state} onSave={onSave} />
-      </div>
-    </AdminFormSection>
+    <MediaGroup
+      title="首页 Hero"
+      hint="视频和封面一起保存"
+      footer={<SaveBar state={state} pending={countPending(state)} label="保存 Hero" onSave={onSave} />}
+    >
+      <MediaField
+        id="hero-video"
+        label="背景视频"
+        kind="video"
+        accept="video/mp4"
+        size="large"
+        value={state.draft.videoUrl}
+        previewPoster={state.draft.posterUrl}
+        onChange={(videoUrl) => onChange({ videoUrl })}
+        disabled={disabled}
+        badge={video?.badge}
+        description={video?.description}
+        actions={video?.action}
+      />
+      <MediaField
+        id="hero-poster"
+        label="封面图片"
+        kind="image"
+        size="large"
+        value={state.draft.posterUrl}
+        onChange={(posterUrl) => onChange({ posterUrl })}
+        disabled={disabled}
+        badge={<>{isDefaultPoster ? <span className="text-xs text-admin-fg-3">默认封面</span> : null}{poster?.badge}</>}
+        description={poster?.description ?? (isDefaultPoster ? <p className="text-xs text-admin-fg-3">视频加载前和自动播放失败时显示</p> : undefined)}
+        actions={poster?.action}
+      />
+    </MediaGroup>
   );
 }
 
-function ShowreelSettingsCard({
+function ShowreelSettingsGroup({
   state,
   onChange,
+  onRevert,
   onSave,
 }: {
   state: SaveableSettingState<ShowreelValue>;
   onChange: (value: Partial<ShowreelValue>) => void;
+  onRevert: (field: keyof ShowreelValue) => void;
   onSave: () => void;
 }) {
+  const [previewing, setPreviewing] = useState(false);
   const value = state.draft;
   const disabled = state.status === "saving";
-  return (
-    <AdminFormSection title="Works Showreel" description="设置 Works 页面展示的影片来源，保存后才会更新公开页面。" layout="stacked">
-      <div className="space-y-4">
-        <div className="flex flex-wrap gap-2" aria-label="Showreel 来源类型">
-          {(["url", "upload"] as const).map((type) => (
-            <Button
-              key={type}
-              type="button"
-              size="sm"
-              variant={value.videoType === type ? "secondary" : "outline"}
-              disabled={disabled}
-              onClick={() => onChange({ videoType: type })}
-              aria-pressed={value.videoType === type}
-            >
-              {type === "url" ? "嵌入链接" : "上传视频"}
-            </Button>
-          ))}
-        </div>
+  const pending = getPendingSlot({ saved: state.saved.url, draft: value.url, onRevert: () => onRevert("url"), disabled });
 
-        {value.videoType === "url" ? (
-          <MediaAssetRow
-            title="嵌入预览"
-            preview={<EmbedPreview url={value.url} />}
-            controls={<div className="space-y-2">
-              <Label htmlFor="showreel-url">Showreel 嵌入链接</Label>
-              <Input
-                id="showreel-url"
-                type="url"
-                value={value.url}
-                onChange={(event) => onChange({ url: event.target.value })}
-                disabled={disabled}
-                placeholder="粘贴 YouTube 或 Bilibili 链接"
-              />
-            </div>}
+  return (
+    <MediaGroup
+      title="Works Showreel"
+      headerAction={(
+        <AdminFilterGroup<ShowreelValue["videoType"]>
+          label="Showreel 来源类型"
+          value={value.videoType}
+          disabled={disabled}
+          options={[{ value: "url", label: "嵌入链接" }, { value: "upload", label: "上传视频" }]}
+          onChange={(videoType) => onChange({ videoType })}
+        />
+      )}
+      footer={<SaveBar state={state} pending={countPending(state)} label="保存 Showreel" onSave={onSave} />}
+    >
+      {value.videoType === "url" ? (
+        <>
+          <MediaField
+            id="showreel-url"
+            label="Showreel 影片"
+            kind="video"
+            allowEmbed
+            size="large"
+            value={value.url}
+            onChange={(url) => onChange({ url })}
+            disabled={disabled}
+            badge={pending?.badge}
+            description={pending?.description}
+            actions={(
+              <>
+                {value.url ? (
+                  <Button type="button" size="sm" variant="ghost" aria-expanded={previewing} onClick={() => setPreviewing((current) => !current)}>
+                    {previewing ? "收起预览" : "预览播放"}
+                  </Button>
+                ) : null}
+                {pending?.action}
+              </>
+            )}
           />
-        ) : (
-          <MediaAssetRow
-            title="Showreel 视频"
-            preview={
-              <MediaAssetPreview
-                kind="video"
-                url={state.saved.videoType === "upload" ? state.saved.url : ""}
-                label="当前已保存的 Showreel 视频"
-              />
-            }
-            controls={<div className="min-w-0 space-y-3">
-              <MediaPicker kind="video" value={value.url} onSelect={(url) => onChange({ url })} label="更换 Showreel 视频" disabled={disabled} />
-              {value.url && value.url !== state.saved.url ? (
-                <MediaAssetPreview kind="video" url={value.url} label="待保存的视频预览" />
-              ) : null}
-            </div>}
-          />
-        )}
-        <SourceDetails saved={state.saved.url} draft={value.url} source={value.videoType === "url" ? "嵌入链接" : "上传视频"} />
-        <SettingsSaveAction state={state} onSave={onSave} />
-      </div>
-    </AdminFormSection>
+          {previewing && value.url ? <EmbedPreview url={value.url} /> : null}
+        </>
+      ) : (
+        <MediaField
+          id="showreel-video"
+          label="Showreel 视频"
+          kind="video"
+          size="large"
+          value={value.url}
+          onChange={(url) => onChange({ url })}
+          disabled={disabled}
+          badge={pending?.badge}
+          description={pending?.description}
+          actions={pending?.action}
+        />
+      )}
+    </MediaGroup>
   );
 }
 
-function MediaAssetRow({ title, preview, controls }: { title: string; preview: ReactNode; controls: ReactNode }) {
+function MediaGroup({ title, hint, headerAction, footer, children }: { title: string; hint?: string; headerAction?: ReactNode; footer: ReactNode; children: ReactNode }) {
   return (
-    <section className="grid min-w-0 gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 lg:grid-cols-[minmax(0,22.5rem)_minmax(0,1fr)] lg:gap-6">
-      <div className="min-w-0 max-w-[22.5rem]">
-        <h3 className="mb-2 text-xs font-medium text-neutral-300">{title}</h3>
-        {preview}
+    <section aria-label={title} className="overflow-hidden rounded-lg bg-admin-panel">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-3.5">
+        <h2 className="text-sm font-medium text-admin-fg">{title}</h2>
+        {headerAction ?? (hint ? <p className="text-xs text-admin-fg-3">{hint}</p> : null)}
       </div>
-      <div className="min-w-0 space-y-3 lg:self-center">{controls}</div>
+      <div className="space-y-4 px-2 pt-2 pb-3">{children}</div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-admin-line px-4 py-3">{footer}</div>
     </section>
   );
 }
 
-function MediaAssetPreview({ kind, url, label }: { kind: "image" | "video"; url: string; label: string }) {
-  if (!url) {
-    return <p className="rounded-md border border-dashed border-white/15 px-3 py-5 text-xs text-neutral-500">{label}：尚未设置。</p>;
-  }
-
-  return (
-    <div className="min-w-0 space-y-2">
-      <p className="text-xs text-neutral-400">{label}</p>
-      <div className="relative aspect-video overflow-hidden rounded-md border border-white/10 bg-black">
-        {kind === "video" ? (
-          <video src={url} controls muted playsInline className="size-full object-contain" />
-        ) : (
-          <Image src={url} alt={label} fill unoptimized sizes="(max-width: 1280px) 100vw, 50vw" className="object-contain" />
-        )}
-      </div>
-      <p className="break-all text-xs text-neutral-500" title={url}>{url}</p>
-    </div>
-  );
-}
-
-function SettingsSaveAction<T>({ state, onSave }: { state: SaveableSettingState<T>; onSave: () => void }) {
+function SaveBar<T>({ state, pending, label, onSave }: { state: SaveableSettingState<T>; pending: number; label: string; onSave: () => void }) {
   const saving = state.status === "saving";
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
-      <div className="min-w-0 space-y-1">
-        <SettingStatus status={state.status} />
-        {state.status === "saved" ? <p role="status" aria-live="polite" className="text-xs text-emerald-200">设置已保存。</p> : null}
-        {state.error ? <p role="alert" className="text-xs text-red-200">{state.error}</p> : null}
-      </div>
-      <Button type="button" onClick={onSave} disabled={saving}>
-        {saving ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />}
-        {saving ? "保存中" : "保存更改"}
-      </Button>
-    </div>
-  );
-}
+  const dirty = isSaveableSettingDirty(state);
+  const status = saving
+    ? <AdminStatus tone="saving">保存中…</AdminStatus>
+    : state.status === "error"
+      ? <p role="alert"><AdminStatus tone="error">保存失败：{state.error}</AdminStatus></p>
+      : state.status === "saved"
+        ? <p role="status"><AdminStatus tone="saved">设置已保存</AdminStatus></p>
+        : dirty
+          ? <AdminStatus tone="dirty">{pending} 项待保存</AdminStatus>
+          : <AdminStatus tone="ordinary">已保存</AdminStatus>;
 
-function SettingStatus({ status }: { status: SaveableSettingState<unknown>["status"] }) {
-  const content = {
-    clean: { label: "已保存", tone: "neutral" as const },
-    dirty: { label: "有未保存变更", tone: "featured" as const },
-    saving: { label: "正在保存", tone: "neutral" as const },
-    saved: { label: "已保存", tone: "success" as const },
-    error: { label: "保存失败", tone: "danger" as const },
-  }[status];
-  return <AdminStatusBadge tone={content.tone}>{content.label}</AdminStatusBadge>;
+  return (
+    <>
+      <div className="min-w-0" aria-live="polite">{status}</div>
+      <Button type="button" variant={dirty ? "default" : "outline"} onClick={onSave} disabled={saving}>
+        {saving ? <Loader2 className="animate-spin" aria-hidden="true" /> : <Save aria-hidden="true" />}
+        {saving ? "保存中" : label}
+      </Button>
+    </>
+  );
 }
 
 function EmbedPreview({ url }: { url: string }) {
-  if (!url) return <p className="rounded-md border border-dashed border-white/15 px-3 py-5 text-sm text-neutral-500">输入链接后将在此处预览。</p>;
-  const embedUrl = getEmbedUrl(url);
-  return <div className="overflow-hidden rounded-md border border-white/10 bg-black"><iframe src={embedUrl} title="Showreel 预览" className="aspect-video w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen /></div>;
-}
-
-function SourceDetails({ saved, draft, source }: { saved: string; draft: string; source?: string }) {
   return (
-    <div className="min-w-0 space-y-1 bg-white/[0.03] px-3 py-2 text-xs text-neutral-400">
-      <p className="break-all">已保存来源：{saved || "尚未设置"}</p>
-      {draft !== saved ? <p className="break-all text-amber-200">待保存来源：{draft || "尚未设置"}</p> : null}
-      {source ? <p>当前来源类型：{source}</p> : null}
+    <div className="mx-2 overflow-hidden rounded-md bg-black">
+      <iframe
+        src={getEmbedUrl(url)}
+        title="Showreel 预览"
+        className="aspect-video w-full"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
     </div>
   );
 }

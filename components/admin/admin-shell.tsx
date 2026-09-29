@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { FormEvent, MouseEvent, ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { FolderKanban, Images, LogOut, Menu, Newspaper, PanelsTopLeft, X } from "lucide-react";
+import { Clapperboard, ExternalLink, Images, LogOut, Menu, Newspaper, PanelsTopLeft, X } from "lucide-react";
 import { logoutAdmin } from "@/app/(admin)/dashboard/actions";
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { installUnsavedAdminHistoryGuard, type UnsavedAdminHistoryGuard } from "@/lib/admin-history-guard";
@@ -18,7 +18,7 @@ type AdminShellProps = {
 type NavigationGuard = () => boolean;
 
 const adminNavigationIcons = {
-  works: FolderKanban,
+  works: Clapperboard,
   news: Newspaper,
   settings: PanelsTopLeft,
   media: Images,
@@ -98,15 +98,18 @@ function useGuardedNavigation(onNavigate?: () => void) {
   }, [context, onNavigate]);
 }
 
+const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-admin-accent";
+const iconButtonClass = `grid size-8 shrink-0 place-items-center rounded-sm text-admin-fg-3 transition-colors hover:bg-admin-raised hover:text-admin-fg ${focusRing}`;
+
 function AdminNavigation({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const activeItem = getActiveAdminItem(pathname);
   const handleNavigation = useGuardedNavigation(onNavigate);
   return (
-    <nav aria-label="管理员导航" className="flex flex-col gap-5">
+    <nav aria-label="管理员导航" className="flex flex-col gap-4">
       {ADMIN_NAV_GROUPS.map((group) => (
-        <section key={group.label} aria-label={group.label} className="flex flex-col gap-1">
-          <h2 className="px-3 text-[10px] font-medium tracking-[0.14em] text-neutral-500">{group.label}</h2>
+        <section key={group.label} aria-label={group.label} className="flex flex-col gap-0.5">
+          <h2 className="mb-1 px-2.5 text-xs text-admin-fg-3">{group.label}</h2>
           {group.items.map((item) => {
             const Icon = adminNavigationIcons[item.id];
             const isActive = activeItem === item.id;
@@ -117,13 +120,13 @@ function AdminNavigation({ onNavigate }: { onNavigate?: () => void }) {
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 onClick={handleNavigation}
-                className={`flex min-h-10 items-center gap-2.5 rounded-md px-3 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+                className={`flex h-[34px] items-center gap-2.5 rounded-sm px-2.5 text-[13px] transition-colors ${focusRing} ${
                   isActive
-                    ? "bg-white/[0.08] text-white"
-                    : "text-neutral-400 hover:bg-white/[0.05] hover:text-white"
+                    ? "bg-admin-selected text-white shadow-[inset_2px_0_0_var(--admin-accent)]"
+                    : "text-admin-fg-2 hover:bg-admin-raised hover:text-admin-fg"
                 }`}
               >
-                <Icon aria-hidden="true" className={`size-4 ${isActive ? "text-neutral-200" : "text-neutral-500"}`} />
+                <Icon aria-hidden="true" className={`size-4 ${isActive ? "text-admin-fg" : "text-admin-fg-3"}`} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -140,17 +143,18 @@ function AdminAccount({ userName }: { userName?: string | null }) {
   const handleSignOut = useCallback((event: FormEvent<HTMLFormElement>) => {
     guardAdminAction(event, context?.confirmNavigation);
   }, [context]);
+  const name = userName?.trim() || "Admin";
 
   return (
-    <div className="border-t border-white/10 pt-4">
-      {userName ? <p className="mb-3 truncate px-3 text-sm text-neutral-400">{userName}</p> : null}
-      <Link href="/" onClick={handleNavigation} className="flex min-h-10 items-center rounded-md px-3 py-2 text-sm text-neutral-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-        查看网站
+    <div className="flex items-center gap-2 border-t border-admin-line px-1 pt-3">
+      <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-sm bg-admin-selected text-xs text-admin-fg">{name[0]?.toUpperCase()}</span>
+      <span className="min-w-0 flex-1 truncate text-[13px] text-admin-fg">{name}</span>
+      <Link href="/" onClick={handleNavigation} aria-label="查看网站" title="查看网站" className={iconButtonClass}>
+        <ExternalLink aria-hidden="true" className="size-4" />
       </Link>
       <form action={logoutAdmin} onSubmit={handleSignOut}>
-        <button type="submit" className="flex min-h-10 w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-neutral-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+        <button type="submit" aria-label="退出登录" title="退出登录" className={iconButtonClass}>
           <LogOut aria-hidden="true" className="size-4" />
-          退出登录
         </button>
       </form>
     </div>
@@ -173,32 +177,32 @@ export function AdminShell({ children, userName }: AdminShellProps) {
   }
 
   return <AdminNavigationGuardProvider>
-    <div className="min-h-screen bg-[#0a0a0a] text-white [--admin-sidebar-width:12rem]">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[var(--admin-sidebar-width)] flex-col border-r border-white/10 bg-[#0a0a0a] p-4 md:flex">
-        <AdminBrand className="mb-8 px-2" />
+    <div data-admin-theme className="min-h-screen bg-admin-canvas text-admin-fg [--admin-sidebar-width:12.5rem]">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[var(--admin-sidebar-width)] flex-col border-r border-admin-line bg-admin-panel px-2.5 py-4 md:flex">
+        <AdminBrand className="mb-7 px-2.5" />
         <AdminNavigation />
         <div className="mt-auto"><AdminAccount userName={userName} /></div>
       </aside>
 
-      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-white/10 bg-[#0a0a0a]/95 px-4 backdrop-blur md:hidden">
+      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-admin-line bg-admin-panel/95 px-4 backdrop-blur md:hidden">
         <AdminBrand />
         <Dialog open={mobileNavigationOpen} onOpenChange={handleMobileNavigationChange}>
           <DialogTrigger
             ref={triggerRef}
             aria-label="打开管理员导航"
-            className="min-h-10 min-w-10 rounded-md p-2 text-neutral-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className={`grid size-10 place-items-center rounded-sm text-admin-fg-2 transition-colors hover:bg-admin-raised hover:text-admin-fg ${focusRing}`}
           >
             <Menu aria-hidden="true" className="size-5" />
           </DialogTrigger>
-          <DialogContent showCloseButton={false} className="inset-y-0 left-0 h-dvh w-[min(20rem,calc(100%-3rem))] max-w-none translate-x-0 translate-y-0 rounded-none border-r border-white/10 bg-[#0a0a0a] p-4 text-white sm:max-w-none">
-            <div className="mb-8 flex items-center justify-between">
-              <DialogTitle className="text-sm font-medium tracking-wide text-white">管理菜单</DialogTitle>
-              <DialogClose aria-label="关闭管理员导航" className="min-h-10 min-w-10 rounded-md p-2 text-neutral-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+          <DialogContent showCloseButton={false} className="inset-y-0 left-0 h-dvh content-start w-[min(20rem,calc(100%-3rem))] max-w-none translate-x-0 translate-y-0 rounded-none border-r border-admin-line bg-admin-panel px-2.5 py-4 text-admin-fg ring-0 sm:max-w-none">
+            <div className="mb-7 flex items-center justify-between px-2.5">
+              <DialogTitle className="font-pixel text-[1.2rem] leading-none text-white">nonacola3</DialogTitle>
+              <DialogClose aria-label="关闭管理员导航" className={`grid size-10 place-items-center rounded-sm text-admin-fg-2 transition-colors hover:bg-admin-raised hover:text-admin-fg ${focusRing}`}>
                 <X aria-hidden="true" className="size-5" />
               </DialogClose>
             </div>
             <AdminNavigation onNavigate={() => setMobileNavigationOpen(false)} />
-            <div className="absolute right-4 bottom-4 left-4"><AdminAccount userName={userName} /></div>
+            <div className="absolute right-2.5 bottom-4 left-2.5"><AdminAccount userName={userName} /></div>
           </DialogContent>
         </Dialog>
       </header>
@@ -217,14 +221,11 @@ function AdminBrand({ className = "" }: { className?: string }) {
     <Link
       href="/dashboard"
       onClick={handleNavigation}
-      aria-label="N3 Portfolio 管理首页"
-      className={`inline-flex min-h-10 items-center gap-2.5 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${className}`}
+      aria-label="nonacola3 管理后台首页"
+      className={`inline-flex min-h-10 flex-col justify-center rounded-sm ${focusRing} ${className}`}
     >
-      <span className="grid size-8 shrink-0 place-items-center rounded-md border border-white/15 bg-white/[0.04] text-xs font-semibold tracking-tight">N3</span>
-      <span className="min-w-0">
-        <span className="block text-sm font-medium tracking-wide">Portfolio</span>
-        <span className="block text-[10px] tracking-[0.12em] text-neutral-500">管理后台</span>
-      </span>
+      <span className="block font-pixel text-[1.2rem] leading-none text-white">nonacola3</span>
+      <span className="mt-1 block text-xs text-admin-fg-3">管理后台</span>
     </Link>
   );
 }

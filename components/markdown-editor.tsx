@@ -138,9 +138,9 @@ export function MarkdownEditor({
   }
 
   return (
-    <div className="border border-neutral-700 rounded-md overflow-hidden bg-neutral-900">
+    <div className="border border-admin-line-strong rounded-sm overflow-hidden bg-admin-raised">
       {/* 工具栏 */}
-      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-neutral-700 bg-neutral-900/80 flex-wrap">
+      <div className="flex items-center gap-1 px-2 py-1.5 border-b border-admin-line bg-admin-panel flex-wrap">
         <ToolbarBtn icon={Heading2} title="二级标题" onClick={() => insertLine("## ")} />
         <ToolbarBtn icon={Bold} title="加粗 **文字**" onClick={() => apply(["**", "**"], "加粗文字")} />
         <ToolbarBtn icon={Italic} title="斜体 *文字*" onClick={() => apply(["*", "*"], "斜体文字")} />
@@ -155,7 +155,7 @@ export function MarkdownEditor({
           type="button"
           title="预览"
           onClick={() => setShowPreview((v) => !v)}
-          className="flex items-center gap-1 px-2 h-7 text-xs text-neutral-300 hover:text-white hover:bg-neutral-700/60 rounded transition-colors"
+          className="flex items-center gap-1 px-2 h-7 text-xs text-admin-fg-2 hover:text-white hover:bg-admin-selected rounded transition-colors"
         >
           {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
           {showPreview ? "编辑" : "预览"}
@@ -164,7 +164,7 @@ export function MarkdownEditor({
           type="button"
           title="语法速查"
           onClick={() => setShowHelp((v) => !v)}
-          className="flex items-center justify-center w-7 h-7 text-neutral-400 hover:text-white hover:bg-neutral-700/60 rounded transition-colors"
+          className="flex items-center justify-center w-7 h-7 text-admin-fg-2 hover:text-white hover:bg-admin-selected rounded transition-colors"
         >
           <HelpCircle className="w-3.5 h-3.5" />
         </button>
@@ -172,9 +172,9 @@ export function MarkdownEditor({
 
       {/* 插入面板：链接/图片/视频 */}
       {insertKind && (
-        <div className="border-b border-neutral-700 px-3 py-2.5 bg-neutral-800/60 space-y-2">
+        <div className="border-b border-admin-line px-3 py-2.5 bg-admin-panel space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-neutral-400">
+            <span className="text-xs text-admin-fg-2">
               {insertKind === "link" && "插入链接"}
               {insertKind === "image" && "插入图片"}
               {insertKind === "video" && "插入视频"}
@@ -182,7 +182,7 @@ export function MarkdownEditor({
             <button
               type="button"
               onClick={() => setInsertKind(null)}
-              className="text-neutral-500 hover:text-white"
+              className="text-admin-fg-3 hover:text-white"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -193,7 +193,7 @@ export function MarkdownEditor({
               value={insertText}
               onChange={(e) => setInsertText(e.target.value)}
               placeholder={insertKind === "link" ? "链接文字（可留空，用选中文本）" : "图片描述（可留空）"}
-              className="w-full bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 text-sm text-neutral-200 focus:outline-none focus:border-neutral-500"
+              className="w-full bg-admin-raised border border-admin-line-strong rounded-sm px-2 py-1.5 text-sm text-admin-fg focus:outline-none focus:border-admin-accent"
             />
           )}
           <div className="flex gap-2">
@@ -202,7 +202,7 @@ export function MarkdownEditor({
               value={insertUrl}
               onChange={(e) => setInsertUrl(e.target.value)}
               placeholder="粘贴 URL…"
-              className="flex-1 bg-neutral-900 border border-neutral-700 rounded px-2 py-1.5 text-sm text-neutral-200 focus:outline-none focus:border-neutral-500"
+              className="flex-1 bg-admin-raised border border-admin-line-strong rounded-sm px-2 py-1.5 text-sm text-admin-fg focus:outline-none focus:border-admin-accent"
             />
             {(insertKind === "image" || insertKind === "video") && (
               <>
@@ -217,7 +217,7 @@ export function MarkdownEditor({
                   type="button"
                   disabled={uploading}
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs border border-neutral-600 hover:border-white text-neutral-300 hover:text-white rounded transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs border border-admin-line-strong hover:border-admin-fg-2 text-admin-fg-2 hover:text-white rounded-sm transition-colors disabled:opacity-50"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   {uploading ? `${uploadProgress}%` : "上传文件"}
@@ -228,15 +228,15 @@ export function MarkdownEditor({
               type="button"
               onClick={confirmInsert}
               disabled={!insertUrl.trim() || uploading}
-              className="px-3 py-1.5 text-xs bg-white text-black hover:bg-neutral-200 rounded transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 text-xs bg-admin-accent text-admin-accent-fg hover:brightness-110 rounded-sm transition-colors disabled:opacity-50"
             >
               插入
             </button>
           </div>
           {uploading && (
-            <div className="w-full h-1 bg-neutral-700 rounded-full overflow-hidden">
+            <div className="w-full h-1 bg-admin-selected rounded-full overflow-hidden">
               <div
-                className="h-full bg-white transition-all duration-200"
+                className="h-full bg-admin-accent transition-all duration-200"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
@@ -250,7 +250,7 @@ export function MarkdownEditor({
           {value.trim() ? (
             <MarkdownBody content={value} />
           ) : (
-            <p className="text-neutral-500">尚无内容可预览。</p>
+            <p className="text-admin-fg-3">尚无内容可预览。</p>
           )}
         </div>
       ) : (
@@ -259,7 +259,7 @@ export function MarkdownEditor({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           {...textareaProps}
-          className={`w-full bg-neutral-900 px-3 py-2 text-sm font-mono text-neutral-200 focus:outline-none focus:border-neutral-500 resize-y ${
+          className={`w-full bg-admin-raised px-3 py-2 text-sm font-admin-mono text-admin-fg focus:outline-none resize-y ${
             textareaProps?.className ?? ""
           }`}
         />
@@ -267,16 +267,16 @@ export function MarkdownEditor({
 
       {/* 语法速查 */}
       {showHelp && (
-        <div className="border-t border-neutral-700 px-3 py-2 text-xs text-neutral-400 space-y-1 font-mono bg-neutral-900/60">
-          <div><span className="text-neutral-500">标题：</span>## 小标题 / ### 小节标题</div>
-          <div><span className="text-neutral-500">强调：</span><b>**加粗**</b> / <i>*斜体*</i> / `行内代码`</div>
-          <div><span className="text-neutral-500">列表：</span>- 项目一 / 1. 有序项</div>
-          <div><span className="text-neutral-500">链接：</span>[文字](https://链接URL)</div>
-          <div><span className="text-neutral-500">图片：</span>![描述](https://图片URL)</div>
-          <div><span className="text-neutral-500">视频：</span>&lt;video controls src=&quot;https://视频URL.mp4&quot;&gt;&lt;/video&gt;</div>
-          <div><span className="text-neutral-500">代码块：</span>``` 包裹多行代码</div>
-          <div><span className="text-neutral-500">引用：</span>&gt; 引用文字</div>
-          <div><span className="text-neutral-500">分隔线：</span>---</div>
+        <div className="border-t border-admin-line px-3 py-2 text-xs text-admin-fg-2 space-y-1 font-admin-mono bg-admin-panel">
+          <div><span className="text-admin-fg-3">标题：</span>## 小标题 / ### 小节标题</div>
+          <div><span className="text-admin-fg-3">强调：</span><b>**加粗**</b> / <i>*斜体*</i> / `行内代码`</div>
+          <div><span className="text-admin-fg-3">列表：</span>- 项目一 / 1. 有序项</div>
+          <div><span className="text-admin-fg-3">链接：</span>[文字](https://链接URL)</div>
+          <div><span className="text-admin-fg-3">图片：</span>![描述](https://图片URL)</div>
+          <div><span className="text-admin-fg-3">视频：</span>&lt;video controls src=&quot;https://视频URL.mp4&quot;&gt;&lt;/video&gt;</div>
+          <div><span className="text-admin-fg-3">代码块：</span>``` 包裹多行代码</div>
+          <div><span className="text-admin-fg-3">引用：</span>&gt; 引用文字</div>
+          <div><span className="text-admin-fg-3">分隔线：</span>---</div>
         </div>
       )}
     </div>
@@ -297,7 +297,7 @@ function ToolbarBtn({
       type="button"
       title={title}
       onClick={onClick}
-      className="flex items-center justify-center w-7 h-7 text-neutral-300 hover:text-white hover:bg-neutral-700/60 rounded transition-colors"
+      className="flex items-center justify-center w-7 h-7 text-admin-fg-2 hover:text-white hover:bg-admin-selected rounded transition-colors"
     >
       <Icon className="w-3.5 h-3.5" />
     </button>

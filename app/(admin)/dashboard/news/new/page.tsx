@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, MessageSquareText } from "lucide-react";
+import { FileText, MessageCircle } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { ArticleEditor } from "@/components/admin/article-editor";
 import { ShortPostEditor } from "@/components/admin/short-post-editor";
@@ -20,18 +20,18 @@ export default async function NewNewsPage({
   }
 
   return (
-    <div className="space-y-6">
-      <AdminPageHeader title="新建内容" description="选择要发布的内容类型。" />
-      <div className="grid gap-4 sm:grid-cols-2">
+    <div className="mx-auto max-w-[48rem] space-y-4">
+      <AdminPageHeader title="NEW" subtitle="新建内容" back={{ href: "/dashboard/news", label: "返回 News" }} />
+      <div className="grid gap-3 sm:grid-cols-2">
         <Link href="/dashboard/news/new?type=short" className={choiceClassName}>
-          <MessageSquareText className="size-5" aria-hidden="true" />
-          <span className="font-medium text-white">短动态</span>
-          <span className="text-sm text-neutral-400">快速发布一段简短内容。</span>
+          <MessageCircle className="size-5 text-admin-accent" aria-hidden="true" />
+          <span className="text-sm font-medium text-admin-fg">短动态</span>
+          <span className="text-xs leading-5 text-admin-fg-3">快速发布一段简短内容。</span>
         </Link>
         <Link href="/dashboard/news/new?type=article" className={choiceClassName}>
-          <FileText className="size-5" aria-hidden="true" />
-          <span className="font-medium text-white">Markdown 文章</span>
-          <span className="text-sm text-neutral-400">撰写带标题和实时预览的长文。</span>
+          <FileText className="size-5 text-admin-accent" aria-hidden="true" />
+          <span className="text-sm font-medium text-admin-fg">Markdown 文章</span>
+          <span className="text-xs leading-5 text-admin-fg-3">撰写带标题和实时预览的长文。</span>
         </Link>
       </div>
     </div>
@@ -39,4 +39,4 @@ export default async function NewNewsPage({
 }
 
 const choiceClassName =
-  "flex min-h-36 flex-col gap-2 rounded-xl border border-white/10 bg-neutral-950/40 p-5 outline-none transition-colors hover:border-white/25 hover:bg-white/5 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
+  "flex min-h-32 flex-col gap-2 rounded-lg bg-admin-panel p-5 outline-none transition-colors hover:bg-admin-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-admin-accent";

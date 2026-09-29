@@ -25,16 +25,21 @@ test("Hero mutation allows poster changes while preserving legacy omissions", ()
   assert.deepEqual(createHeroPosterUpdate("   "), { posterUrl: null });
 });
 
-test("page settings reuse the shared Media picker for Hero and uploaded Showreel", () => {
+test("page settings reuse the shared media field for Hero and uploaded Showreel", () => {
   const source = readFileSync(new URL("../components/admin/page-settings.tsx", import.meta.url), "utf8");
   const route = readFileSync(new URL("../app/(admin)/dashboard/settings/page.tsx", import.meta.url), "utf8");
 
-  assert.match(source, /MediaPicker/);
+  assert.match(source, /MediaField/);
   assert.match(source, /kind="video"/);
   assert.match(source, /accept="video\/mp4"/);
   assert.match(source, /kind="image"/);
-  assert.match(source, /替换封面/);
+  assert.match(source, /封面图片/);
   assert.match(source, /页面媒体/);
+  assert.match(source, /PAGE MEDIA/);
+  assert.match(source, /revert-field/);
+  assert.match(source, /待保存/);
+  assert.match(source, /默认封面/);
+  assert.doesNotMatch(source, /SourceDetails/);
   assert.match(source, /posterUrl/);
   assert.match(source, /value: \{ \.\.\.heroState\.draft, \.\.\.value \}/);
   assert.match(source, /\/api\/hero/);
@@ -84,4 +89,31 @@ test("successful settings save adopts the current draft as saved", () => {
   assert.equal(saved.saved, "selected.mp4");
   assert.equal(saved.draft, "selected.mp4");
   assert.equal(saved.status, "saved");
+});
+
+test("reverting one slot restores only that field and returns to clean when nothing else changed", () => {
+  const initial = createSaveableSettingState({ videoUrl: "old.mp4", posterUrl: "old.webp" });
+  const both = reduceSaveableSettingState(initial, { type: "change", value: { videoUrl: "new.mp4", posterUrl: "new.webp" } });
+  const posterReverted = reduceSaveableSettingState(both, { type: "revert-field", field: "posterUrl" });
+  assert.deepEqual(posterReverted.draft, { videoUrl: "new.mp4", posterUrl: "old.webp" });
+  assert.equal(posterReverted.status, "dirty");
+  const allReverted = reduceSaveableSettingState(posterReverted, { type: "revert-field", field: "videoUrl" });
+  assert.deepEqual(allReverted.draft, allReverted.saved);
+  assert.equal(allReverted.status, "clean");
+});
+
+test("choosing the saved value again is not a pending change", () => {
+  const initial = createSaveableSettingState({ videoUrl: "old.mp4", posterUrl: "old.webp" });
+  const changed = reduceSaveableSettingState(initial, { type: "change", value: { videoUrl: "new.mp4", posterUrl: "old.webp" } });
+  const back = reduceSaveableSettingState(changed, { type: "change", value: { videoUrl: "old.mp4", posterUrl: "old.webp" } });
+  assert.equal(back.status, "clean");
+  assert.equal(isSaveableSettingDirty(back), false);
+});
+
+test("revert is ignored while saving", () => {
+  const saving = reduceSaveableSettingState(
+    reduceSaveableSettingState(createSaveableSettingState({ videoUrl: "a", posterUrl: "b" }), { type: "change", value: { videoUrl: "c", posterUrl: "b" } }),
+    { type: "save-start" },
+  );
+  assert.equal(reduceSaveableSettingState(saving, { type: "revert-field", field: "videoUrl" }), saving);
 });

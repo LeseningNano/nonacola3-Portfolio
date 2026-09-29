@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
@@ -35,41 +35,48 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-[400px] bg-neutral-900 border-neutral-800">
-        <CardHeader>
-          <CardTitle className="text-center">管理员登录</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="username">用户名</Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-neutral-800 border-neutral-700"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">密码</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-neutral-800 border-neutral-700"
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "登录中..." : "登录"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <main data-admin-theme className="grid min-h-screen place-items-center bg-admin-canvas px-4 text-admin-fg">
+      <form
+        onSubmit={handleSubmit}
+        aria-labelledby="login-title"
+        className="w-full max-w-[22.5rem] space-y-4 rounded-lg border border-admin-line bg-admin-panel p-6"
+      >
+        <div className="space-y-1.5 pb-2">
+          <p className="font-pixel text-2xl leading-none text-white">nonacola3</p>
+          <h1 id="login-title" className="text-xs text-admin-fg-3">管理后台登录</h1>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="username" className="text-xs text-admin-fg-2">用户名</Label>
+          <Input
+            id="username"
+            autoFocus
+            autoComplete="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="h-9"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="password" className="text-xs text-admin-fg-2">密码</Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="h-9"
+          />
+        </div>
+        {error ? (
+          <p role="alert" className="flex items-center gap-1.5 text-xs text-admin-danger">
+            <CircleAlert aria-hidden="true" className="size-3.5" />
+            {error}
+          </p>
+        ) : null}
+        <Button type="submit" className="h-9 w-full" disabled={loading}>
+          {loading ? "登录中…" : "登录"}
+        </Button>
+      </form>
+    </main>
   );
 }

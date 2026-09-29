@@ -25,10 +25,18 @@ export function guardAdminAction(
 }
 
 export function isAdminPath(pathname: string) {
-  return pathname === "/dashboard" || pathname.startsWith("/dashboard/") ||
+  return pathname === "/dashboard" || pathname.startsWith("/dashboard/") || pathname === "/login" ||
     pathname === "/videos/new" || /^\/videos\/[^/]+\/edit$/.test(pathname);
 }
 
 export function getActiveAdminItem(pathname: string): AdminNavItem["id"] | null {
   return ADMIN_NAV_ITEMS.find(({ href }) => pathname === href || pathname.startsWith(`${href}/`))?.id ?? null;
+}
+
+export function formatAdminDate(iso: string | null): string {
+  if (!iso) return "—";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
 }

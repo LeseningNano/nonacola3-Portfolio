@@ -2,21 +2,15 @@ import { AdminMediaSkeleton } from "@/components/admin/admin-media-skeleton";
 
 export default function Loading() {
   return (
-    <div className="space-y-6">
-      <div aria-hidden="true" className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-5">
+    <div className="mx-auto max-w-[75rem] space-y-4">
+      <div aria-hidden="true" className="flex flex-wrap items-end justify-between gap-3 pb-2">
         <div className="space-y-2">
-          <div className="h-6 w-24 rounded bg-white/[0.08]" />
-          <div className="h-3 w-48 rounded bg-white/[0.05]" />
+          <div className="h-7 w-32 rounded-sm bg-admin-raised" />
+          <div className="h-3 w-40 rounded-sm bg-admin-raised/70" />
         </div>
-        <div className="flex gap-2">
-          <div className="h-8 w-20 rounded-lg bg-white/[0.06]" />
-          <div className="h-8 w-20 rounded-lg bg-white/[0.06]" />
-        </div>
+        <div className="h-8 w-20 rounded-sm bg-admin-raised" />
       </div>
-      <div aria-hidden="true" className="flex flex-wrap items-center justify-between gap-3">
-        <div className="h-8 w-48 rounded-lg bg-white/[0.06]" />
-        <div className="h-8 w-full rounded-lg bg-white/[0.06] sm:w-48" />
-      </div>
+      <div aria-hidden="true" className="h-11 rounded-lg bg-admin-panel" />
       <AdminMediaSkeleton />
     </div>
   );

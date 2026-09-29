@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { WorkEditor } from "@/components/admin/work-editor";
 import { serializeAdminWork } from "@/lib/admin-works";
 import { db } from "@/lib/db";
@@ -12,10 +11,5 @@ export default async function EditWorkPage({ params }: { params: Promise<{ id: s
   if (!work) notFound();
 
   const initialWork = serializeAdminWork(work);
-  return (
-    <div className="space-y-6">
-      <AdminPageHeader title={`编辑：${initialWork.title}`} />
-      <WorkEditor mode="edit" initialWork={initialWork} />
-    </div>
-  );
+  return <WorkEditor mode="edit" initialWork={initialWork} />;
 }
