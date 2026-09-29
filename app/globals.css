@@ -501,6 +501,11 @@ body::after {
     transform 480ms var(--ease-menu) var(--sub-delay, 0ms),
     clip-path 480ms var(--ease-menu) var(--sub-delay, 0ms);
 }
+/* 播放态也用 inset()：clip-path 从 inset() 到 none 无法插值，只会瞬间跳变。
+   四周外扩一点，避免裁到字形 */
+[data-section-heading="play"] .section-heading-sub {
+  clip-path: inset(-0.3em -0.5em -0.3em 0);
+}
 [data-section-heading="pending"] .section-heading-sub {
   opacity: 0;
   transform: translateX(-16px);

@@ -42,3 +42,9 @@ test("CSS wipes the subtitle horizontally only and respects reduced motion", () 
   assert.match(block, /480ms/);
   assert.match(block, /prefers-reduced-motion: reduce/);
 });
+
+test("subtitle wipe interpolates between two inset() clips while playing", () => {
+  // clip-path 从 inset() 到 none 无法插值，只会瞬间跳变；播放态必须同样是 inset()
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /\[data-section-heading="play"\] \.section-heading-sub \{[^}]*clip-path: inset\(/);
+});

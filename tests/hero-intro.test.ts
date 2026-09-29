@@ -8,6 +8,7 @@ import { siteConfig } from "../lib/config";
 import {
   HERO_BUTTON_DELAY_MS,
   HERO_SUBTITLE_DELAY_MS,
+  resolvePendingIntroPhase,
   getHeroLetters,
 } from "../lib/hero-intro";
 
@@ -48,4 +49,15 @@ test("hero intro CSS masks letters and has a reduced-motion fallback", () => {
   assert.match(block, /\[data-hero-intro="pending"\] \.hero-letter \{[^}]*translateY\(110%\)/);
   assert.match(block, /prefers-reduced-motion: reduce/);
   assert.match(block, /\.hero-letter,\s*\.hero-sub \{[^}]*transition: none !important/);
+});
+
+test("the intro only enters pending before the loader has finished", () => {
+  // 后台标签页里 rAF 被推迟，加载层可能先完成；迟到的 pending 不能把已经升起的名字再藏起来
+  assert.equal(resolvePendingIntroPhase("static", false), "pending");
+  assert.equal(resolvePendingIntroPhase("static", true), "static");
+  assert.equal(resolvePendingIntroPhase("play", false), "play");
+  assert.equal(resolvePendingIntroPhase("play", true), "play");
+  const source = readFileSync(new URL("../components/hero-video.tsx", import.meta.url), "utf8");
+  assert.match(source, /resolvePendingIntroPhase\(/);
+  assert.match(source, /cancelAnimationFrame\(introFrame\)/);
 });

@@ -42,7 +42,7 @@ export function WorkCard({
         {thumbnail ? (
           <Image
             src={thumbnail}
-            alt={work.title}
+            alt=""
             fill
             unoptimized={thumbnail.startsWith("/media/thumbnail")}
             sizes={sizes}

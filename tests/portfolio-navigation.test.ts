@@ -189,3 +189,13 @@ test("navbar uses inline desktop links and keeps the mobile menu", () => {
   // 桌面右侧抽屉与遮罩已移除
   assert.doesNotMatch(source, /w-1\/4 min-w-\[320px\]/);
 });
+
+test("homepage nav marks the last section once the page bottom is reached", () => {
+  const tops = { works: 900, news: 2400, about: 3000 };
+  // 视口较高时 about 上沿到不了 40% 线，但滚到底时应高亮 ABOUT
+  assert.equal(getActiveNavSection("/", tops, 2400, 1100, 3500), "about");
+  assert.equal(getActiveNavSection("/", tops, 2300, 1100, 3500), "news");
+  assert.equal(getActiveNavSection("/", { works: 900, news: 2400 }, 2400, 1100, 3500), "news");
+  // 页面比视口还短时不算「到底」，仍停在 Hero
+  assert.equal(getActiveNavSection("/", tops, 0, 1000, 900), null);
+});

@@ -10,6 +10,8 @@ import {
   HERO_BUTTON_DELAY_MS,
   HERO_SUBTITLE_DELAY_MS,
   getHeroLetters,
+  resolvePendingIntroPhase,
+  type HeroIntroPhase,
 } from "@/lib/hero-intro";
 import { LoadingScreen } from "./loading-screen";
 import { SCROLL_CONTAINER_ID } from "./smooth-scroll-container";
@@ -22,7 +24,7 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
   const [loaderVisible, setLoaderVisible] = useState(false);
   // 名字逐字入场只在首访（有加载层遮住页面时）播放；刷新 / 回访保持静态，
   // 避免已经绘制出来的名字先消失再升起。
-  const [introPhase, setIntroPhase] = useState<"static" | "pending" | "play">("static");
+  const [introPhase, setIntroPhase] = useState<HeroIntroPhase>("static");
   const videoWrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const posterRef = useRef<HTMLDivElement>(null);
@@ -131,14 +133,15 @@ export function HeroVideo({ videoUrl, posterUrl }: { videoUrl: string | null; po
     }
     // 首访：淡入加载层（200ms），pre-loader 在淡入完成后才移除，
     // 期间两者同为黑色，pre-loader 兜底盖住内容直到 React 加载层完全显形。
-    requestAnimationFrame(() => {
+    const introFrame = requestAnimationFrame(() => {
       setLoaderVisible(true);
-      setIntroPhase("pending");
+      setIntroPhase((phase) => resolvePendingIntroPhase(phase, loadTriggered.current));
     });
     setTimeout(() => {
       const p = document.getElementById("pre-loader");
       if (p) p.remove();
     }, 260);
+    return () => cancelAnimationFrame(introFrame);
   }, []);
 
   // 开场轻推：复用滚轮的指数追逐动画通道，轻推一下示意可滑动，随后按钮淡入。

@@ -101,3 +101,16 @@ test("card reveal is SSR-visible and has a reduced-motion fallback", () => {
   assert.match(css, /\[data-reveal-pending\]\[data-reveal="card"\] > \* \{[^}]*clip-path: inset\(100% 0 0 0\)/);
   assert.match(css, /\[data-reveal-pending\]\[data-reveal="card"\] > \* \{[^}]*clip-path: none !important/);
 });
+
+test("thumbnail is decorative so the link name does not repeat the title", () => {
+  const markup = renderToStaticMarkup(
+    createElement(WorkCard, {
+      work: { ...base, thumbnail: "https://kq4mwotlyfyzycmp.public.blob.vercel-storage.com/a.jpg" },
+      href: "/works/w1",
+      meta: "PV · 2026",
+      sizes: "100vw",
+    })
+  );
+  assert.match(markup, /<img[^>]*alt=""/);
+  assert.doesNotMatch(markup, /alt="Night Drive"/);
+});

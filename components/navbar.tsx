@@ -173,7 +173,7 @@ export function Navbar() {
         const el = document.getElementById(id);
         if (el) tops[id] = el.offsetTop;
       }
-      setActiveSection(getActiveNavSection(pathname, tops, scrollTop, viewport));
+      setActiveSection(getActiveNavSection(pathname, tops, scrollTop, viewport, scrollHeight));
 
       if (progressRef.current) {
         progressRef.current.style.transform = `scaleX(${getScrollProgress(scrollTop, scrollHeight, viewport)})`;
