@@ -420,6 +420,29 @@ body::after {
   opacity: 0;
 }
 
+/* SectionHeading：标题逐字解码由 JS 驱动；副标题只做水平擦出，
+   时长与延迟见 lib/scramble-text.ts（SUBTITLE_WIPE_MS / getSubtitleDelayMs） */
+[data-section-heading] .section-heading-sub {
+  transition:
+    opacity 480ms var(--ease-menu) var(--sub-delay, 0ms),
+    transform 480ms var(--ease-menu) var(--sub-delay, 0ms),
+    clip-path 480ms var(--ease-menu) var(--sub-delay, 0ms);
+}
+[data-section-heading="pending"] .section-heading-sub {
+  opacity: 0;
+  transform: translateX(-16px);
+  clip-path: inset(0 100% 0 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-section-heading] .section-heading-sub {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+/* end SectionHeading */
+
 /* reduced-motion：不播放动画，内容立即可见（JS 早退之外的双保险） */
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],
