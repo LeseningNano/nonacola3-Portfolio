@@ -25,7 +25,7 @@ export function guardAdminAction(
 }
 
 export function isAdminPath(pathname: string) {
-  return pathname === "/dashboard" || pathname.startsWith("/dashboard/") ||
+  return pathname === "/dashboard" || pathname.startsWith("/dashboard/") || pathname === "/login" ||
     pathname === "/videos/new" || /^\/videos\/[^/]+\/edit$/.test(pathname);
 }
 

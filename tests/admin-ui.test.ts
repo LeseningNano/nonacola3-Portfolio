@@ -148,3 +148,17 @@ test("media and settings routes provide page-shaped loading states", async () =>
     assert.ok((markup.match(/<article\b/g) ?? []).length >= expected, `${route} skeleton should resemble its content`);
   }
 });
+
+test("admin surfaces opt into the edit-suite theme and the login page hides public chrome", () => {
+  const shell = readFileSync(new URL("../components/admin/admin-shell.tsx", import.meta.url), "utf8");
+  const login = readFileSync(new URL("../app/(admin)/login/page.tsx", import.meta.url), "utf8");
+  assert.match(shell, /data-admin-theme/);
+  assert.match(shell, /font-pixel/);
+  assert.match(shell, /aria-label="查看网站"/);
+  assert.match(shell, /aria-label="退出登录"/);
+  assert.match(login, /data-admin-theme/);
+  assert.match(login, /autoComplete="username"/);
+  assert.match(login, /autoComplete="current-password"/);
+  assert.match(login, /role="alert"/);
+  assert.match(login, /signIn\("credentials"/);
+});

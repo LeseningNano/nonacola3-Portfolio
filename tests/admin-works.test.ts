@@ -55,14 +55,14 @@ function adminWork(
   };
 }
 
-test("administrator route detection includes dashboard and legacy video editors only", () => {
+test("administrator route detection includes dashboard, login, and legacy video editors only", () => {
   assert.equal(isAdminPath("/dashboard"), true);
   assert.equal(isAdminPath("/dashboard/works/example/edit"), true);
   assert.equal(isAdminPath("/videos/new"), true);
   assert.equal(isAdminPath("/videos/example/edit"), true);
   assert.equal(isAdminPath("/works/example"), false);
   assert.equal(isAdminPath("/news/example"), false);
-  assert.equal(isAdminPath("/login"), false);
+  assert.equal(isAdminPath("/login"), true);
 });
 
 test("administrator navigation resolves nested modules", () => {
