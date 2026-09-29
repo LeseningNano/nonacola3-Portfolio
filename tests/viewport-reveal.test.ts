@@ -96,7 +96,7 @@ test("news section stages title and content the same way", () => {
     createElement(NewsSection, { posts: [samplePost] })
   );
 
-  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-section-heading="static"/);
   assert.match(markup, /data-reveal="content"/);
   assert.ok(!markup.includes("data-reveal-pending"));
   assert.match(markup, /news\./);
@@ -106,10 +106,11 @@ test("news section stages title and content the same way", () => {
 test("about section stages title and content the same way", () => {
   const markup = renderToStaticMarkup(createElement(AboutSection));
 
-  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-section-heading="static"/);
   assert.match(markup, /data-reveal="content"/);
   assert.ok(!markup.includes("data-reveal-pending"));
   assert.match(markup, /about\./);
+  assert.match(markup, /了解更多 &amp; 合作洽谈/);
 });
 
 test("homepage sections get a non-blocking dim transition layer", () => {

@@ -432,6 +432,38 @@ body::after {
   opacity: 0;
 }
 
+/* row-sweep：列表行悬停时底色从左向右铺满（News 列表、全部作品列表共用）。
+   isolation + 负 z-index 让底色垫在文字之下，不必改动子元素定位 */
+.row-sweep {
+  position: relative;
+  isolation: isolate;
+}
+.row-sweep::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #1f1f1f;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 450ms var(--ease-menu);
+}
+.row-sweep:hover::before,
+.row-sweep:focus-visible::before {
+  transform: scaleX(1);
+}
+@media (hover: none) {
+  .row-sweep::before {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .row-sweep::before {
+    transition: none;
+  }
+}
+/* end row-sweep */
+
 /* SectionHeading：标题逐字解码由 JS 驱动；副标题只做水平擦出，
    时长与延迟见 lib/scramble-text.ts（SUBTITLE_WIPE_MS / getSubtitleDelayMs） */
 [data-section-heading] .section-heading-sub {

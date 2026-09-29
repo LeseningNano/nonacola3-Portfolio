@@ -1,21 +1,12 @@
 import { siteConfig, socialLinks } from "@/lib/config";
 import { Reveal, SectionDim } from "@/components/viewport-reveal";
+import { SectionHeading } from "@/components/section-heading";
 
 export function AboutSection() {
   return (
     <section id="about" className="relative w-full bg-[#0a0a0a] px-6 md:px-12 lg:px-16 pt-16 pb-8">
       <SectionDim />
-      <Reveal
-        as="h2"
-        variant="heading"
-        className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight"
-        style={{ fontFamily: "var(--font-bitcount)" }}
-      >
-        about.
-      </Reveal>
-      <Reveal as="p" variant="content" delay={180} className="text-base md:text-lg text-neutral-400 font-light mt-1">
-        了解更多 & 合作洽谈
-      </Reveal>
+      <SectionHeading title="about." subtitle="了解更多 & 合作洽谈" />
 
       <Reveal variant="content" delay={320} className="mt-10 flex flex-col md:flex-row gap-12 md:gap-16">
         <p className="text-base md:text-lg text-neutral-300 leading-relaxed max-w-2xl flex-1">
