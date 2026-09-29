@@ -4,7 +4,7 @@ import { WorkEditor } from "@/components/admin/work-editor";
 export default function NewWorkPage() {
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="新建作品" />
+      <AdminPageHeader title="WORKS" subtitle="新建作品" />
       <WorkEditor mode="create" />
     </div>
   );

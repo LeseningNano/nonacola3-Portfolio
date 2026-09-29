@@ -14,7 +14,7 @@ export default async function EditWorkPage({ params }: { params: Promise<{ id: s
   const initialWork = serializeAdminWork(work);
   return (
     <div className="space-y-6">
-      <AdminPageHeader title={`编辑：${initialWork.title}`} />
+      <AdminPageHeader title="WORKS" subtitle={`编辑：${initialWork.title}`} />
       <WorkEditor mode="edit" initialWork={initialWork} />
     </div>
   );

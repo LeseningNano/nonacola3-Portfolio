@@ -129,7 +129,7 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
       {state.error ? <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{state.error}</p> : null}
 
       <fieldset disabled={saving} className="min-w-0 space-y-8">
-        <AdminFormSection title="正文" description="简短记录创作进展、想法或动态。">
+        <AdminFormSection index="01" title="正文" description="简短记录创作进展、想法或动态。">
           <div className="min-w-0 space-y-2">
             <div className="flex items-center justify-between gap-4">
               <Label htmlFor="short-post-body">短动态</Label>
@@ -146,7 +146,7 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
             />
           </div>
         </AdminFormSection>
-        <AdminFormSection title="标签" description="可选，用于归类这条动态。">
+        <AdminFormSection index="02" title="标签" description="可选，用于归类这条动态。">
           <div className="space-y-2">
             <Label htmlFor="short-post-tag">标签（可选）</Label>
             <input

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ExternalLink, MoreHorizontal, SlidersHorizontal, Trash2 } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { AdminStatus } from "@/components/admin/admin-status";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@/components/ui/menu";
 import { Button } from "@/components/ui/button";
@@ -42,8 +42,9 @@ export function WorksList({ initialWorks }: { initialWorks: Video[] }) {
   return (
     <div className="space-y-5">
       <AdminPageHeader
-        title="作品"
-        status={<span className="text-sm text-neutral-400">{works.length} 个作品</span>}
+        title="WORKS"
+        subtitle="作品"
+        meta={`${works.length} 个作品`}
         actions={<Link href="/dashboard/works/new" className="inline-flex h-8 items-center rounded-lg bg-white px-3 text-sm font-medium text-black transition-colors hover:bg-neutral-200">新建作品</Link>}
       />
       <AdminToolbar
@@ -90,7 +91,7 @@ export function WorksList({ initialWorks }: { initialWorks: Video[] }) {
                 </Link>
                 <span className="hidden min-w-0 truncate text-sm text-neutral-300 lg:block">{work.category}</span>
                 <div className="col-start-2 row-start-2 lg:col-auto lg:row-auto">
-                  <AdminStatusBadge tone={work.featured ? "featured" : "neutral"}>{work.featured ? "精选" : "普通"}</AdminStatusBadge>
+                  <AdminStatus tone={work.featured ? "featured" : "ordinary"}>{work.featured ? "精选" : "普通"}</AdminStatus>
                 </div>
                 <time className="hidden text-sm tabular-nums text-neutral-400 lg:block" dateTime={work.updatedAt}>{new Date(work.updatedAt).toLocaleDateString("zh-CN")}</time>
                 <div className="col-start-3 row-span-2 row-start-1 flex items-center justify-end gap-1 lg:col-auto lg:row-span-1 lg:row-auto">

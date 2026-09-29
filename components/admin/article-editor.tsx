@@ -144,7 +144,7 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
       ) : null}
 
       <fieldset disabled={saving} className="min-w-0 space-y-8">
-        <AdminFormSection title="基本信息" description="文章标题和可选分类标签。">
+        <AdminFormSection index="01" title="基本信息" description="文章标题和可选分类标签。">
           <div className="space-y-2">
             <Label htmlFor="article-title">标题</Label>
             <input
@@ -168,7 +168,7 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
           </div>
         </AdminFormSection>
 
-        <AdminFormSection title="正文与预览" description="使用 Markdown 撰写文章，预览沿用公开内容渲染方式。">
+        <AdminFormSection index="02" title="正文与预览" description="使用 Markdown 撰写文章，预览沿用公开内容渲染方式。">
           <div className="grid min-w-0 gap-5 lg:grid-cols-2">
             <section className="min-w-0 space-y-2" aria-labelledby="article-editor-label">
               <Label id="article-editor-label" htmlFor="article-body">正文</Label>

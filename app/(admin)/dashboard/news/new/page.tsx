@@ -21,7 +21,7 @@ export default async function NewNewsPage({
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="新建内容" description="选择要发布的内容类型。" />
+      <AdminPageHeader title="NEW" subtitle="新建内容" back={{ href: "/dashboard/news", label: "返回 News" }} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Link href="/dashboard/news/new?type=short" className={choiceClassName}>
           <MessageSquareText className="size-5" aria-hidden="true" />

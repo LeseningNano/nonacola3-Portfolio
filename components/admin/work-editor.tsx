@@ -147,7 +147,7 @@ export function WorkEditor({
 
         <div className="grid min-w-0 items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,0.8fr)]">
           <fieldset disabled={saving} className="min-w-0 space-y-8">
-            <AdminFormSection title="基本信息" description="作品名称、类型、日期与精选状态。">
+            <AdminFormSection index="01" title="基本信息" description="作品名称、类型、日期与精选状态。">
               <Field label="标题" htmlFor="work-title">
                 <Input id="work-title" required value={state.form.title} onChange={(event) => setField("title", event.target.value)} />
               </Field>
@@ -163,7 +163,7 @@ export function WorkEditor({
               </div>
             </AdminFormSection>
 
-            <AdminFormSection title="媒体" description="公开页面使用的视频与封面。">
+            <AdminFormSection index="02" title="媒体" description="公开页面使用的视频与封面。">
               <Field label="视频或嵌入地址" htmlFor="work-embed-url">
                 <Input id="work-embed-url" type="url" required value={state.form.embedUrl} onChange={(event) => setField("embedUrl", event.target.value)} />
               </Field>
@@ -174,7 +174,7 @@ export function WorkEditor({
               <MediaPicker kind="image" value={state.form.thumbnail} onSelect={(url) => setField("thumbnail", url)} label="从媒体库选择缩略图" />
             </AdminFormSection>
 
-            <AdminFormSection title="卡片信息" description="用于 Works 页面和快速浏览。">
+            <AdminFormSection index="03" title="卡片信息" description="用于 Works 页面和快速浏览。">
               <Field label="卡片摘要" htmlFor="work-summary">
                 <textarea id="work-summary" rows={3} value={state.form.summary} onChange={(event) => setField("summary", event.target.value)} className={textareaClassName} />
               </Field>
@@ -186,7 +186,7 @@ export function WorkEditor({
               </Field>
             </AdminFormSection>
 
-            <AdminFormSection title="Case Study" description="作品详情页的 Markdown 内容。">
+            <AdminFormSection index="04" title="Case Study" description="作品详情页的 Markdown 内容。">
               <Field label="详细说明" htmlFor="work-description">
                 <MarkdownEditor value={state.form.description} onChange={(value) => setField("description", value)} textareaProps={{ id: "work-description", rows: 12 }} />
               </Field>

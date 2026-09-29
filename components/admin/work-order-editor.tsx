@@ -3,7 +3,7 @@
 import { useCallback, useMemo, useReducer, useState } from "react";
 import { ArrowDown, ArrowUp, GripVertical, Save } from "lucide-react";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
-import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { AdminStatus } from "@/components/admin/admin-status";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/toast";
 import {
@@ -159,7 +159,7 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
                     onChange={(event) => dispatch({ type: "featured", index, featured: event.target.checked })}
                     className="size-4 accent-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   />
-                  <AdminStatusBadge tone={item.featured ? "featured" : "neutral"}>{item.featured ? "精选" : "普通"}</AdminStatusBadge>
+                  <AdminStatus tone={item.featured ? "featured" : "ordinary"}>{item.featured ? "精选" : "普通"}</AdminStatus>
                 </label>
 
                 <div className="col-span-4 flex justify-end gap-1 sm:col-span-1">

@@ -7,7 +7,7 @@ import { Loader2, Save } from "lucide-react";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { AdminStatus } from "@/components/admin/admin-status";
 import { MediaPicker } from "@/components/admin/media-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,8 +92,9 @@ export function PageSettings({ initialHero, initialShowreel }: PageSettingsProps
   return (
     <div className="mx-auto max-w-[60rem] space-y-8">
       <AdminPageHeader
-        title="页面媒体"
-        description="管理首页 Hero 视频、封面和 Works Showreel。选择媒体后，需明确保存才会发布变更。"
+        title="PAGE MEDIA"
+        subtitle="页面媒体"
+        meta="首页和 Works 页使用的影片素材，保存后才会发布。"
       />
       <HeroSettingsCard state={heroState} onChange={changeHero} onSave={saveHero} />
       <ShowreelSettingsCard state={showreelState} onChange={changeShowreel} onSave={saveShowreel} />
@@ -112,7 +113,7 @@ function HeroSettingsCard({
 }) {
   const disabled = state.status === "saving";
   return (
-    <AdminFormSection title="Hero 背景" description="视频与封面分开选择，通过同一个保存操作一起更新首页。" layout="stacked">
+    <AdminFormSection index="01" title="Hero 背景" description="视频与封面分开选择，通过同一个保存操作一起更新首页。">
       <div className="space-y-6">
         <MediaAssetRow
           title="背景视频"
@@ -165,7 +166,7 @@ function ShowreelSettingsCard({
   const value = state.draft;
   const disabled = state.status === "saving";
   return (
-    <AdminFormSection title="Works Showreel" description="设置 Works 页面展示的影片来源，保存后才会更新公开页面。" layout="stacked">
+    <AdminFormSection index="02" title="Works Showreel" description="设置 Works 页面展示的影片来源，保存后才会更新公开页面。">
       <div className="space-y-4">
         <div className="flex flex-wrap gap-2" aria-label="Showreel 来源类型">
           {(["url", "upload"] as const).map((type) => (
@@ -275,13 +276,13 @@ function SettingsSaveAction<T>({ state, onSave }: { state: SaveableSettingState<
 
 function SettingStatus({ status }: { status: SaveableSettingState<unknown>["status"] }) {
   const content = {
-    clean: { label: "已保存", tone: "neutral" as const },
-    dirty: { label: "有未保存变更", tone: "featured" as const },
-    saving: { label: "正在保存", tone: "neutral" as const },
-    saved: { label: "已保存", tone: "success" as const },
-    error: { label: "保存失败", tone: "danger" as const },
+    clean: { label: "已保存", tone: "ordinary" as const },
+    dirty: { label: "有未保存变更", tone: "dirty" as const },
+    saving: { label: "正在保存", tone: "ordinary" as const },
+    saved: { label: "已保存", tone: "saved" as const },
+    error: { label: "保存失败", tone: "error" as const },
   }[status];
-  return <AdminStatusBadge tone={content.tone}>{content.label}</AdminStatusBadge>;
+  return <AdminStatus tone={content.tone}>{content.label}</AdminStatus>;
 }
 
 function EmbedPreview({ url }: { url: string }) {

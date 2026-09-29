@@ -21,7 +21,7 @@ export default async function EditNewsPage({
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title={isShortUpdate ? "编辑短动态" : "编辑文章"} />
+      <AdminPageHeader title="NEWS" subtitle={isShortUpdate ? "编辑短动态" : "编辑文章"} />
       {isShortUpdate ? <ShortPostEditor initialPost={initialPost} /> : <ArticleEditor initialPost={initialPost} />}
     </div>
   );

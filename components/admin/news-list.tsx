@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useReducer, useState } from "react";
 import { ChevronDown, ExternalLink, Eye, EyeOff, MoreHorizontal, Plus, Trash2 } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
-import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { AdminStatus } from "@/components/admin/admin-status";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { Menu, MenuContent, MenuItem, MenuLinkItem, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { Button } from "@/components/ui/button";
@@ -76,8 +76,9 @@ export function NewsList({ initialPosts }: { initialPosts: PostItem[] }) {
   return (
     <div className="space-y-5">
       <AdminPageHeader
-        title="内容"
-        status={<span className="text-sm text-neutral-400">{state.posts.length} 条内容</span>}
+        title="NEWS"
+        subtitle="动态与文章"
+        meta={`${state.posts.length} 条内容`}
         actions={(
           <Menu>
             <MenuTrigger className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white px-3 text-sm font-medium text-black transition-colors hover:bg-neutral-200">
@@ -131,8 +132,8 @@ export function NewsList({ initialPosts }: { initialPosts: PostItem[] }) {
                 <span className="hidden min-w-0 truncate text-sm text-neutral-400 lg:block">{post.tag ?? "—"}</span>
                 <time className="hidden whitespace-nowrap text-sm tabular-nums text-neutral-400 lg:block" dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString("zh-CN")}</time>
                 <div className="col-start-1 row-start-2 flex items-center gap-2 lg:contents">
-                  <span className="lg:col-auto lg:row-auto"><AdminStatusBadge tone="neutral">{kind === "article" ? "文章" : "短动态"}</AdminStatusBadge></span>
-                  <span className="lg:col-auto lg:row-auto"><AdminStatusBadge tone={post.published ? "published" : "draft"}>{post.published ? "已发布" : "草稿"}</AdminStatusBadge></span>
+                  <span className="lg:col-auto lg:row-auto"><AdminStatus tone="ordinary">{kind === "article" ? "文章" : "短动态"}</AdminStatus></span>
+                  <span className="lg:col-auto lg:row-auto"><AdminStatus tone={post.published ? "published" : "draft"}>{post.published ? "已发布" : "草稿"}</AdminStatus></span>
                 </div>
                 <div className="col-start-2 row-span-2 row-start-1 flex items-center justify-end gap-1 lg:col-auto lg:row-span-1 lg:row-auto">
                   {post.published ? (

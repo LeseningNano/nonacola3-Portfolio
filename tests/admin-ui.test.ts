@@ -3,12 +3,15 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { AdminStatusBadge } from "../components/admin/admin-status-badge";
+import { Film } from "lucide-react";
+import { AdminStatus } from "../components/admin/admin-status";
+import { AdminPageHeader } from "../components/admin/admin-page-header";
 import { AdminFormSection } from "../components/admin/admin-form-section";
+import { AdminEmptyState } from "../components/admin/admin-empty-state";
 import { MediaPicker } from "../components/admin/media-picker";
 import { MediaLibrary } from "../components/admin/media-library";
 import DashboardLoading from "../app/(admin)/dashboard/loading";
-import { ADMIN_NAV_GROUPS } from "../lib/admin-navigation";
+import { ADMIN_NAV_GROUPS, formatAdminDate } from "../lib/admin-navigation";
 
 test("admin navigation groups content, page media, and library by responsibility", () => {
   assert.deepEqual(
@@ -17,13 +20,44 @@ test("admin navigation groups content, page media, and library by responsibility
   );
 });
 
-test("ordinary and featured states share the same badge structure", () => {
-  const ordinary = renderToStaticMarkup(createElement(AdminStatusBadge, { tone: "neutral" }, "普通"));
-  const featured = renderToStaticMarkup(createElement(AdminStatusBadge, { tone: "featured" }, "精选"));
-  assert.match(ordinary, /data-admin-status="neutral"/);
-  assert.match(featured, /data-admin-status="featured"/);
-  assert.match(ordinary, /rounded-full/);
-  assert.match(featured, /rounded-full/);
+test("status tones render a dot plus visible text with a stable data attribute", () => {
+  for (const tone of ["featured", "ordinary", "published", "draft", "dirty", "saved", "error"] as const) {
+    const markup = renderToStaticMarkup(createElement(AdminStatus, { tone }, "状态"));
+    assert.match(markup, new RegExp(`data-admin-status="${tone}"`));
+    assert.match(markup, /aria-hidden="true"/);
+    assert.match(markup, />状态</);
+  }
+  assert.match(renderToStaticMarkup(createElement(AdminStatus, { tone: "featured" }, "精选")), /bg-admin-accent/);
+  assert.match(renderToStaticMarkup(createElement(AdminStatus, { tone: "draft" }, "草稿")), /border-admin-fg-3/);
+});
+
+test("page header pairs an English pixel title with a Chinese subtitle", () => {
+  const markup = renderToStaticMarkup(createElement(AdminPageHeader, {
+    title: "WORKS", subtitle: "作品", meta: "7 个作品", actions: createElement("button", null, "新建作品"),
+  }));
+  assert.match(markup, /<h1[^>]*aria-label="作品"[^>]*>WORKS<\/h1>/);
+  assert.match(markup, /font-pixel/);
+  assert.match(markup, />7 个作品</);
+  assert.match(markup, />新建作品</);
+});
+
+test("form sections use a mono index instead of a side description column", () => {
+  const markup = renderToStaticMarkup(createElement(AdminFormSection, { index: "01", title: "基本信息", children: createElement("div", null, "字段") }));
+  assert.match(markup, /font-admin-mono[^>]*>01</);
+  assert.match(markup, /<h2[^>]*>基本信息<\/h2>/);
+  assert.doesNotMatch(markup, /lg:grid-cols-/);
+});
+
+test("empty states name the space and offer an action", () => {
+  const markup = renderToStaticMarkup(createElement(AdminEmptyState, { icon: Film, title: "还没有作品", action: createElement("a", { href: "/x" }, "新建作品") }));
+  assert.match(markup, />还没有作品</);
+  assert.match(markup, /href="\/x"/);
+});
+
+test("admin dates use dotted mono format and tolerate missing values", () => {
+  assert.equal(formatAdminDate("2026-09-24T12:00:00.000Z"), "2026.09.24");
+  assert.equal(formatAdminDate(null), "—");
+  assert.equal(formatAdminDate("not a date"), "—");
 });
 
 test("admin editors retain visible focus and mobile sticky offsets", () => {
@@ -76,18 +110,6 @@ test("Dashboard content keeps equal desktop gutters beside the sidebar", () => {
   assert.match(mainClasses, /md:px-6/);
   assert.match(mainClasses, /lg:px-8/);
   assert.doesNotMatch(mainClasses, /md:pl-\[var\(--admin-sidebar-width\)\]/);
-});
-
-test("page media sections can use the full content width without a second narrow form column", () => {
-  const markup = renderToStaticMarkup(AdminFormSection({
-    title: "页面媒体",
-    description: "预览与操作",
-    layout: "stacked",
-    children: createElement("div", null, "媒体预览"),
-  }));
-  assert.match(markup, /页面媒体/);
-  assert.match(markup, /媒体预览/);
-  assert.doesNotMatch(markup, /lg:grid-cols-/);
 });
 
 test("media library upload actions name the file type and offer a direct file input", () => {

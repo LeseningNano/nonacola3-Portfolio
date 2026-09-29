@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import { ImageIcon, Loader2, Trash2, Video } from "lucide-react";
-import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
+import { AdminStatus } from "@/components/admin/admin-status";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { AdminMediaSkeleton } from "@/components/admin/admin-media-skeleton";
@@ -125,9 +125,9 @@ export function MediaLibrary() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="媒体库"
-        description="管理已上传媒体；仅未被引用的文件可以删除。"
-        status={<span className="text-xs text-neutral-500">{inventory ? `${inventory.count} 个文件 · ${inventory.totalSizeMB} MB` : "正在读取存储信息…"}</span>}
+        title="LIBRARY"
+        subtitle="媒体库"
+        meta={<span>{inventory ? `${inventory.count} 个文件 · ${inventory.totalSizeMB} MB` : "正在读取存储信息…"}</span>}
         actions={<>
           <Button type="button" size="sm" variant="outline" onClick={() => void loadInventory()} disabled={Boolean(state.deletingUrl) || loading}>刷新列表</Button>
           <MediaPicker kind="image" value="" onSelect={onMediaSelected} label="上传图片" uploadOnly disabled={Boolean(state.deletingUrl)} />
@@ -176,10 +176,10 @@ function MediaCard({ file, deleting, onDelete }: { file: MediaFile; deleting: bo
           )
           : <video src={file.url} className="h-full w-full object-cover" muted preload="metadata" />}
         <span className="absolute left-2 top-2">
-          <AdminStatusBadge tone="neutral">
+          <AdminStatus tone="ordinary">
             {isImage ? <ImageIcon aria-hidden="true" className="mr-1 inline size-3" /> : <Video aria-hidden="true" className="mr-1 inline size-3" />}
             {isImage ? "图片" : "视频"}
-          </AdminStatusBadge>
+          </AdminStatus>
         </span>
       </div>
       <div className="min-w-0 space-y-3 p-3 sm:p-4">
@@ -200,7 +200,7 @@ function MediaCard({ file, deleting, onDelete }: { file: MediaFile; deleting: bo
           </div>
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <AdminStatusBadge tone="success">未使用</AdminStatusBadge>
+            <AdminStatus tone="saved">未使用</AdminStatus>
             <Button
               type="button"
               size="sm"
