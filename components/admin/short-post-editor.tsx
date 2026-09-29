@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useReducer, useRef, useState } from "react";
-import { ArrowLeft, EyeOff, Save, Send } from "lucide-react";
+import { EyeOff, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
-import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminEditorHeader, getEditorStatus } from "@/components/admin/admin-editor-header";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -105,15 +105,12 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5">
+    <div className="mx-auto min-w-0 max-w-[40rem] space-y-5">
       <AdminEditorHeader
+        section="NEWS"
         title={initialPost ? "编辑短动态" : "新建短动态"}
-        status={statusText}
-        backAction={(
-          <Button type="button" variant="ghost" onClick={leaveEditor} className="shrink-0">
-            <ArrowLeft aria-hidden="true" /> 返回
-          </Button>
-        )}
+        status={getEditorStatus(state.status, isDirty)}
+        onBack={leaveEditor}
       >
         <Button type="button" variant="outline" disabled={saving} onClick={() => void save(actions.secondary.published)}>
           {state.intendedPublished ? <EyeOff aria-hidden="true" /> : <Save aria-hidden="true" />}
@@ -126,14 +123,14 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
       </AdminEditorHeader>
 
       <p className="sr-only" role="status" aria-live="polite">{announcement || statusText}</p>
-      {state.error ? <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{state.error}</p> : null}
+      {state.error ? <p role="alert" className="rounded-sm border border-admin-danger/30 bg-admin-danger/10 px-4 py-3 text-sm text-admin-danger">{state.error}</p> : null}
 
-      <fieldset disabled={saving} className="min-w-0 space-y-8">
-        <AdminFormSection index="01" title="正文" description="简短记录创作进展、想法或动态。">
-          <div className="min-w-0 space-y-2">
+      <fieldset disabled={saving} className="min-w-0 space-y-6">
+        <AdminFormSection index="01" title="正文" description="简短记录创作进展、想法或动态">
+          <div className="min-w-0 space-y-1.5">
             <div className="flex items-center justify-between gap-4">
-              <Label htmlFor="short-post-body">短动态</Label>
-              <span className="text-xs text-neutral-500" aria-live="polite">{state.body.length} 字</span>
+              <Label htmlFor="short-post-body" className="text-xs text-admin-fg-2">短动态</Label>
+              <span className="font-admin-mono text-xs text-admin-fg-3" aria-live="polite">{state.body.length} 字</span>
             </div>
             <textarea
               ref={bodyRef}
@@ -141,19 +138,19 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
               rows={9}
               value={state.body}
               onChange={(event) => dispatch({ type: "field", field: "body", value: event.target.value })}
-              className={textareaClassName}
+              className="min-h-56 w-full rounded-sm border border-input bg-admin-raised px-3 py-2.5 text-base leading-7 text-admin-fg outline-none transition-colors placeholder:text-admin-fg-3 focus-visible:border-admin-accent"
               placeholder="写下此刻的动态…"
             />
           </div>
         </AdminFormSection>
-        <AdminFormSection index="02" title="标签" description="可选，用于归类这条动态。">
-          <div className="space-y-2">
-            <Label htmlFor="short-post-tag">标签（可选）</Label>
+        <AdminFormSection index="02" title="标签" description="可选，用于归类这条动态">
+          <div className="max-w-xs space-y-1.5">
+            <Label htmlFor="short-post-tag" className="text-xs text-admin-fg-2">标签（可选）</Label>
             <input
               id="short-post-tag"
               value={state.tag}
               onChange={(event) => dispatch({ type: "field", field: "tag", value: event.target.value })}
-              className="h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+              className="h-8 w-full rounded-sm border border-input bg-admin-raised px-2.5 text-[13px] text-admin-fg outline-none transition-colors placeholder:text-admin-fg-3 focus-visible:border-admin-accent"
               placeholder="例如：日常"
             />
           </div>
@@ -162,6 +159,3 @@ export function ShortPostEditor({ initialPost }: { initialPost?: PostItem }) {
     </div>
   );
 }
-
-const textareaClassName =
-  "w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";

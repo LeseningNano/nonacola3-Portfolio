@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useReducer, useRef, useState } from "react";
-import { ArrowLeft, EyeOff, Save, Send } from "lucide-react";
+import { EyeOff, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
-import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
+import { AdminEditorHeader, getEditorStatus } from "@/components/admin/admin-editor-header";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { MarkdownBody } from "@/components/markdown-body";
 import { MarkdownEditor } from "@/components/markdown-editor";
@@ -116,15 +116,12 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
   }
 
   return (
-    <div className="min-w-0 space-y-5">
+    <div className="mx-auto min-w-0 max-w-[75rem] space-y-5">
       <AdminEditorHeader
+        section="NEWS"
         title={initialPost ? initialPost.title?.trim() || "未命名文章" : "新建文章"}
-        status={statusText}
-        backAction={(
-          <Button type="button" variant="ghost" onClick={leaveEditor} className="shrink-0">
-            <ArrowLeft aria-hidden="true" /> 返回
-          </Button>
-        )}
+        status={getEditorStatus(state.status, isDirty)}
+        onBack={leaveEditor}
       >
         <Button type="button" variant="outline" disabled={saving} onClick={() => void save(actions.secondary.published)}>
           {state.intendedPublished ? <EyeOff aria-hidden="true" /> : <Save aria-hidden="true" />}
@@ -138,46 +135,44 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
 
       <p className="sr-only" role="status" aria-live="polite">{announcement || statusText}</p>
       {state.error ? (
-        <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <p role="alert" className="rounded-sm border border-admin-danger/30 bg-admin-danger/10 px-4 py-3 text-sm text-admin-danger">
           {state.error}
         </p>
       ) : null}
 
-      <fieldset disabled={saving} className="min-w-0 space-y-8">
-        <AdminFormSection index="01" title="基本信息" description="文章标题和可选分类标签。">
-          <div className="space-y-2">
-            <Label htmlFor="article-title">标题</Label>
-            <input
-              ref={titleRef}
-              id="article-title"
-              value={state.title}
-              onChange={(event) => dispatch({ type: "field", field: "title", value: event.target.value })}
-              className={inputClassName}
-              placeholder="文章标题"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="article-tag">标签（可选）</Label>
+      <fieldset disabled={saving} className="min-w-0 space-y-6">
+        <div className="space-y-3">
+          <Label htmlFor="article-title" className="sr-only">标题</Label>
+          <input
+            ref={titleRef}
+            id="article-title"
+            value={state.title}
+            onChange={(event) => dispatch({ type: "field", field: "title", value: event.target.value })}
+            className="h-12 w-full border-0 border-b border-admin-line bg-transparent px-0 text-[1.375rem] text-white outline-none transition-colors placeholder:text-admin-fg-3 focus-visible:border-admin-accent"
+            placeholder="文章标题"
+          />
+          <div className="flex max-w-xs items-center gap-3">
+            <Label htmlFor="article-tag" className="shrink-0 text-xs text-admin-fg-2">标签</Label>
             <input
               id="article-tag"
               value={state.tag}
               onChange={(event) => dispatch({ type: "field", field: "tag", value: event.target.value })}
               className={inputClassName}
-              placeholder="例如：创作笔记"
+              placeholder="可选，例如：创作笔记"
             />
           </div>
-        </AdminFormSection>
+        </div>
 
-        <AdminFormSection index="02" title="正文与预览" description="使用 Markdown 撰写文章，预览沿用公开内容渲染方式。">
-          <div className="grid min-w-0 gap-5 lg:grid-cols-2">
+        <AdminFormSection index="01" title="正文与预览" description="预览沿用公开页面的渲染方式">
+          <div className="grid min-w-0 gap-5 xl:grid-cols-2">
             <section className="min-w-0 space-y-2" aria-labelledby="article-editor-label">
-              <Label id="article-editor-label" htmlFor="article-body">正文</Label>
+              <Label id="article-editor-label" htmlFor="article-body" className="text-xs text-admin-fg-2">正文（Markdown）</Label>
               <MarkdownEditor
                 value={state.body}
                 onChange={(value) => dispatch({ type: "field", field: "body", value })}
                 textareaProps={{
                   id: "article-body",
-                  rows: 20,
+                  rows: 22,
                   placeholder: "使用 Markdown 撰写正文…",
                   "aria-labelledby": "article-editor-label",
                 }}
@@ -185,9 +180,9 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
             </section>
 
             <section className="min-w-0 space-y-2" aria-labelledby="article-preview-label">
-              <h2 id="article-preview-label" className="text-sm font-medium text-neutral-200">实时预览</h2>
-              <div className="min-h-80 min-w-0 rounded-lg border border-white/10 bg-neutral-950/40 p-4 sm:p-5">
-                {state.body.trim() ? <MarkdownBody content={state.body} /> : <p className="text-sm text-neutral-500">尚无内容可预览。</p>}
+              <h2 id="article-preview-label" className="text-xs text-admin-fg-2">实时预览</h2>
+              <div className="min-h-80 min-w-0 rounded-md bg-admin-panel p-5">
+                {state.body.trim() ? <MarkdownBody content={state.body} /> : <p className="text-sm text-admin-fg-3">尚无内容可预览。</p>}
               </div>
             </section>
           </div>
@@ -198,4 +193,4 @@ export function ArticleEditor({ initialPost }: { initialPost?: PostItem }) {
 }
 
 const inputClassName =
-  "h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30";
+  "h-8 w-full rounded-sm border border-input bg-admin-raised px-2.5 text-[13px] text-admin-fg outline-none transition-colors placeholder:text-admin-fg-3 focus-visible:border-admin-accent";

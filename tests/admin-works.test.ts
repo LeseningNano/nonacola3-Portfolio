@@ -127,24 +127,32 @@ test("Work ordering delegates dirty shell navigation to the shared guard", () =>
   assert.doesNotMatch(source, /document\.addEventListener\("click", confirmLinkExit/);
 });
 
-test("Work editor has one action header and no editable order control", () => {
+test("Work editor has one action header, one media slot per field, and no editable order control", () => {
   const source = readFileSync(resolve(process.cwd(), "components/admin/work-editor.tsx"), "utf8");
   assert.match(source, /AdminEditorHeader/);
   assert.match(source, /AdminFormSection/);
   assert.doesNotMatch(source, /id="work-order"/);
   assert.equal((source.match(/保存并返回/g) ?? []).length, 1);
   assert.equal((source.match(/<WorkCardPreview\b/g) ?? []).length, 1);
-  assert.match(source, /xl:top-24/);
+  assert.equal((source.match(/<MediaField\b/g) ?? []).length, 2);
+  assert.doesNotMatch(source, /id="work-embed-url"/);
+  assert.doesNotMatch(source, /id="work-thumbnail"/);
+  assert.match(source, /xl:sticky xl:top-24/);
   assert.match(source, /<details open/);
   assert.match(source, /statusText/);
   const header = readFileSync(resolve(process.cwd(), "components/admin/admin-editor-header.tsx"), "utf8");
   assert.match(header, /sticky top-14/);
   assert.match(header, /md:top-0/);
+  assert.match(header, /truncate/);
+  assert.match(header, /aria-live="polite"/);
   const preview = readFileSync(resolve(process.cwd(), "components/admin/work-card-preview.tsx"), "utf8");
   assert.match(preview, /setViewport\("mobile"\)/);
   assert.match(preview, /setViewport\("desktop"\)/);
   assert.match(preview, /break-words/);
   assert.doesNotMatch(preview, /overflow-x-auto/);
+  for (const route of ["app/(admin)/dashboard/works/[id]/edit/page.tsx", "app/(admin)/dashboard/works/new/page.tsx", "app/(admin)/dashboard/news/[id]/edit/page.tsx"]) {
+    assert.doesNotMatch(readFileSync(resolve(process.cwd(), route), "utf8"), /AdminPageHeader/, route);
+  }
 });
 
 test("admin works serialization emits ISO dates without mutating nullable fields", () => {
