@@ -75,12 +75,16 @@ test("administrator navigation resolves nested modules", () => {
   assert.equal(getActiveAdminItem("/login"), null);
 });
 
-test("Works uses linked identity, shared badges, and a mobile-safe list", () => {
+test("Works uses linked identity, status dots, and a mobile-safe list", () => {
   const source = readFileSync(resolve(process.cwd(), "components/admin/works-list.tsx"), "utf8");
-  assert.match(source, /AdminStatusBadge/);
+  assert.match(source, /AdminStatus\b/);
   assert.match(source, /href={`\/dashboard\/works\/\$\{work\.id\}\/edit`}/);
-  assert.doesNotMatch(source, /min-w-\[760px\]/);
   assert.match(source, /data-admin-work-row/);
+  assert.match(source, /w-\[7rem\]/);
+  assert.match(source, /min-w-0[^"]*"[\s\S]*truncate/);
+  assert.match(source, /formatAdminDate\(work\.updatedAt\)/);
+  assert.match(source, /没有匹配/);
+  assert.doesNotMatch(source, /min-w-\[760px\]/);
 });
 
 test("Works ordering retains accessible movement and an explicit save-order action", () => {
@@ -88,7 +92,8 @@ test("Works ordering retains accessible movement and an explicit save-order acti
   assert.match(source, /aria-label={`上移 \$\{work\?\.title/);
   assert.match(source, /aria-label={`下移 \$\{work\?\.title/);
   assert.match(source, /保存排序/);
-  assert.match(source, /AdminStatusBadge/);
+  assert.match(source, /padStart\(2, "0"\)/);
+  assert.match(source, /bg-admin-accent/);
 });
 
 test("sign out is cancelled when the active editor declines navigation", () => {

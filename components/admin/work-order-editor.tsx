@@ -1,10 +1,14 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- Thumbnail URLs come from the existing arbitrary-host video record field. */
+
 import { useCallback, useMemo, useReducer, useState } from "react";
-import { ArrowDown, ArrowUp, GripVertical, Save } from "lucide-react";
+import { ArrowDown, ArrowDownUp, ArrowUp, Film, GripVertical, Save } from "lucide-react";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
+import { AdminEmptyState } from "@/components/admin/admin-empty-state";
 import { AdminStatus } from "@/components/admin/admin-status";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/toast";
 import {
   reduceOrderState,
@@ -57,7 +61,6 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
       });
       const result = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(result.error ?? "保存失败");
-
       dispatch({ type: "save-success", items: committed });
       setAnnouncement("作品排序已保存");
       toast.success("作品排序已保存");
@@ -76,25 +79,22 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
   }
 
   if (state.items.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed border-white/15 px-5 py-12 text-center text-sm text-neutral-400">
-        还没有可排序的作品。
-      </div>
-    );
+    return <AdminEmptyState icon={ArrowDownUp} title="还没有可排序的作品" />;
   }
 
   return (
     <>
       <p className="sr-only" role="status" aria-live="polite">{announcement}</p>
       {state.error ? (
-        <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <p role="alert" className="rounded-sm border border-admin-danger/30 bg-admin-danger/10 px-4 py-3 text-sm text-admin-danger">
           {state.error}。你的更改仍保留，可以重试保存。
         </p>
       ) : null}
 
-      <ol className={`divide-y divide-white/10 border-y border-white/10 ${isDirty ? "pb-24" : ""}`}>
+      <ol className={`space-y-1 ${isDirty ? "pb-24" : ""}`}>
         {state.items.map((item, index) => {
           const work = worksById.get(item.id);
+          const title = work?.title ?? item.id;
           const insertionVisible = insertionIndex === index && draggingIndex !== index;
 
           return (
@@ -115,13 +115,13 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
               {insertionVisible ? (
                 <div
                   data-insertion-target="true"
-                  className={`absolute right-0 left-0 h-1 rounded-full bg-white ${
-                    draggingIndex !== null && draggingIndex < index ? "-bottom-1.5" : "-top-1.5"
+                  className={`absolute right-0 left-0 h-0.5 rounded-full bg-admin-accent ${
+                    draggingIndex !== null && draggingIndex < index ? "-bottom-[3px]" : "-top-[3px]"
                   }`}
                   aria-hidden="true"
                 />
               ) : null}
-              <div className="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-3 py-3 sm:grid-cols-[auto_auto_minmax(0,1fr)_auto_auto]">
+              <div className={`grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 rounded-sm p-2 transition-colors hover:bg-admin-raised sm:grid-cols-[auto_auto_5rem_minmax(0,1fr)_auto_auto] ${draggingIndex === index ? "opacity-50" : ""}`}>
                 <button
                   type="button"
                   draggable={!saving}
@@ -136,33 +136,38 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
                     setDraggingIndex(null);
                     setInsertionIndex(null);
                   }}
-                  aria-label={`拖动 ${work?.title ?? item.id} 调整排序`}
-                  className="hidden size-8 cursor-grab items-center justify-center rounded text-neutral-400 hover:bg-white/10 hover:text-white active:cursor-grabbing disabled:opacity-50 sm:inline-flex"
+                  aria-label={`拖动 ${title} 调整排序`}
+                  className="hidden size-8 cursor-grab items-center justify-center rounded-sm text-admin-fg-3 hover:bg-admin-selected hover:text-admin-fg active:cursor-grabbing disabled:opacity-50 sm:inline-flex"
                 >
                   <GripVertical className="size-4" />
                 </button>
 
-                <span className="w-8 text-center text-sm tabular-nums text-neutral-400" aria-label={`当前排序 ${item.order}`}>
-                  {item.order}
+                <span className="w-7 text-center font-admin-mono text-xs text-admin-fg-3" aria-label={`当前排序 ${item.order}`}>
+                  {String(index + 1).padStart(2, "0")}
                 </span>
 
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-white">{work?.title ?? item.id}</p>
-                  <p className="truncate text-xs text-neutral-500">{work?.category ?? "未分类"}</p>
+                <div className="hidden aspect-video w-[5rem] overflow-hidden rounded-[3px] bg-admin-raised sm:block">
+                  {work?.thumbnail
+                    ? <img src={work.thumbnail} alt="" className="size-full object-cover" />
+                    : <span className="grid size-full place-items-center"><Film aria-hidden="true" className="size-4 text-admin-fg-3" /></span>}
                 </div>
 
-                <label className="flex items-center gap-2 text-sm text-neutral-300">
-                  <input
-                    type="checkbox"
+                <div className="min-w-0">
+                  <p className="truncate text-sm text-admin-fg">{title}</p>
+                  <p className="truncate font-admin-mono text-xs text-admin-fg-3">{work?.category ?? "未分类"}</p>
+                </div>
+
+                <label className="col-start-2 row-start-2 flex items-center gap-2 sm:col-auto sm:row-auto">
+                  <Switch
                     checked={item.featured}
                     disabled={saving}
-                    onChange={(event) => dispatch({ type: "featured", index, featured: event.target.checked })}
-                    className="size-4 accent-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    aria-label={`${title} 设为精选`}
+                    onCheckedChange={(checked) => dispatch({ type: "featured", index, featured: checked })}
                   />
                   <AdminStatus tone={item.featured ? "featured" : "ordinary"}>{item.featured ? "精选" : "普通"}</AdminStatus>
                 </label>
 
-                <div className="col-span-4 flex justify-end gap-1 sm:col-span-1">
+                <div className="col-start-3 row-span-2 row-start-1 flex justify-end gap-0.5 sm:col-auto sm:row-span-1 sm:row-auto">
                   <Button
                     type="button"
                     size="icon-sm"
@@ -191,9 +196,9 @@ export function WorkOrderEditor({ initialWorks }: { initialWorks: Video[] }) {
       </ol>
 
       {isDirty ? (
-        <div className="fixed right-0 bottom-0 left-0 z-40 border-t border-white/10 bg-neutral-950/95 px-4 py-3 backdrop-blur md:left-[var(--admin-sidebar-width)]">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-            <p className="text-sm text-neutral-400">排序或精选状态有尚未保存的更改</p>
+        <div className="fixed right-0 bottom-0 left-0 z-40 border-t border-admin-line bg-admin-panel/95 px-4 py-3 backdrop-blur md:left-[var(--admin-sidebar-width)]">
+          <div className="mx-auto flex max-w-[60rem] items-center justify-between gap-4">
+            <AdminStatus tone={state.status === "error" ? "error" : "dirty"}>排序有未保存的更改</AdminStatus>
             <div className="flex gap-2">
               <Button type="button" variant="ghost" disabled={saving} onClick={() => dispatch({ type: "cancel" })}>
                 取消
