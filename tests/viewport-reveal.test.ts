@@ -78,16 +78,17 @@ test("works section stages the title reveal before staggered content", () => {
     createElement(VideoGrid, { videos: [sampleVideo] })
   );
 
-  assert.match(markup, /data-reveal="heading"/);
+  assert.match(markup, /data-section-heading="static"/);
   assert.match(markup, /data-reveal="content"/);
+  assert.match(markup, /data-reveal="card"/);
   // 错峰：内容相对标题的延迟存在
   assert.match(markup, /--reveal-delay:(1[5-9]\d|[2-9]\d\d)ms/);
   // 无 JS 安全：SSR 不带隐藏态
   assert.ok(!markup.includes("data-reveal-pending"));
-  // 现有结构与文案不受影响
   assert.match(markup, /ALL WORKS/);
   assert.match(markup, /href="\/works"/);
   assert.match(markup, /works\./);
+  assert.match(markup, /精选视频作品与创作项目/);
 });
 
 test("news section stages title and content the same way", () => {

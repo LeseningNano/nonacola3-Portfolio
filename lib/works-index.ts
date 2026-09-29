@@ -160,3 +160,10 @@ export function formatWorkMeta(parts: Array<string | null | undefined>): string 
     .filter((part): part is string => Boolean(part))
     .join(" · ");
 }
+
+// 首页作品区：按后台顺序取前 6 个；手机端只显示前 3 个（由组件用 CSS 隐藏）
+export const HOME_WORKS_LIMIT = 6;
+
+export function selectHomeWorks(videos: VideoRow[]): VideoRow[] {
+  return videos.slice(0, HOME_WORKS_LIMIT);
+}
