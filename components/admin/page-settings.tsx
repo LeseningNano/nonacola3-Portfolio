@@ -8,7 +8,7 @@ import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminStatus } from "@/components/admin/admin-status";
-import { MediaPicker } from "@/components/admin/media-picker";
+import { MediaField } from "@/components/admin/media-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -119,11 +119,11 @@ function HeroSettingsCard({
           title="背景视频"
           preview={<MediaAssetPreview kind="video" url={state.saved.videoUrl} label="当前已保存的 Hero 视频" />}
           controls={<div className="min-w-0 space-y-3">
-            <MediaPicker
+            <MediaField size="large"
               kind="video"
               accept="video/mp4"
               value={state.draft.videoUrl}
-              onSelect={(videoUrl) => onChange({ videoUrl })}
+              id="hero-video" onChange={(videoUrl) => onChange({ videoUrl })}
               label="更换 Hero 视频"
               disabled={disabled}
             />
@@ -136,10 +136,10 @@ function HeroSettingsCard({
           title="封面图片"
           preview={<MediaAssetPreview kind="image" url={state.saved.posterUrl} label="当前已保存的 Hero 封面" />}
           controls={<div className="min-w-0 space-y-3">
-            <MediaPicker
+            <MediaField size="large"
               kind="image"
               value={state.draft.posterUrl}
-              onSelect={(posterUrl) => onChange({ posterUrl })}
+              id="hero-poster" onChange={(posterUrl) => onChange({ posterUrl })}
               label="替换封面"
               disabled={disabled}
             />
@@ -211,7 +211,7 @@ function ShowreelSettingsCard({
               />
             }
             controls={<div className="min-w-0 space-y-3">
-              <MediaPicker kind="video" value={value.url} onSelect={(url) => onChange({ url })} label="更换 Showreel 视频" disabled={disabled} />
+              <MediaField id="showreel-video" size="large" kind="video" value={value.url} onChange={(url) => onChange({ url })} label="更换 Showreel 视频" disabled={disabled} />
               {value.url && value.url !== state.saved.url ? (
                 <MediaAssetPreview kind="video" url={value.url} label="待保存的视频预览" />
               ) : null}

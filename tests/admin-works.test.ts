@@ -4,7 +4,8 @@ import { resolve } from "node:path";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { filterMediaPickerFiles, MediaPicker } from "../components/admin/media-picker";
+import { filterMediaPickerFiles } from "../components/admin/media-picker";
+import { MediaField } from "../components/admin/media-field";
 import { installUnsavedAdminHistoryGuard } from "../lib/admin-history-guard";
 import {
   ADMIN_NAV_ITEMS,
@@ -470,28 +471,18 @@ test("Next.js route history state does not make editor cleanup undo client navig
   assert.equal(calls.back, 0);
 });
 
-test("media picker labels identify their distinct trigger buttons", () => {
+test("media field triggers identify which field they change", () => {
   const markup = renderToStaticMarkup(
     createElement("div", null,
-      createElement(MediaPicker, {
-        kind: "video",
-        value: "",
-        onSelect: () => {},
-        label: "从媒体库选择视频",
-      }),
-      createElement(MediaPicker, {
-        kind: "image",
-        value: "",
-        onSelect: () => {},
-        label: "从媒体库选择缩略图",
-      }),
+      createElement(MediaField, { id: "work-video", label: "作品视频", kind: "video", value: "", onChange: () => {} }),
+      createElement(MediaField, { id: "work-thumbnail-field", label: "缩略图", kind: "image", value: "https://x.public.blob.vercel-storage.com/a.webp", onChange: () => {}, optional: true }),
     ),
   );
 
-  assert.match(markup, /<label(?=[^>]+for="media-picker-[^"]+")[^>]*>从媒体库选择视频<\/label>/);
-  assert.match(markup, /<button(?=[^>]+id="media-picker-[^"]+")(?=[^>]+aria-label="从媒体库选择视频")[^>]*>/);
-  assert.match(markup, /<label(?=[^>]+for="media-picker-[^"]+")[^>]*>从媒体库选择缩略图<\/label>/);
-  assert.match(markup, /<button(?=[^>]+id="media-picker-[^"]+")(?=[^>]+aria-label="从媒体库选择缩略图")[^>]*>/);
+  assert.match(markup, /<button(?=[^>]+aria-label="从媒体库选择（作品视频）")[^>]*>从媒体库选择<\/button>/);
+  assert.match(markup, /<button(?=[^>]+aria-label="编辑地址（作品视频）")[^>]*>编辑地址<\/button>/);
+  assert.match(markup, /<button(?=[^>]+aria-label="更换（缩略图）")[^>]*>更换<\/button>/);
+  assert.match(markup, /<button(?=[^>]+aria-label="清除（缩略图）")[^>]*>清除<\/button>/);
 });
 
 test("media picker excludes non-MP4 library videos when the caller accepts only MP4", () => {

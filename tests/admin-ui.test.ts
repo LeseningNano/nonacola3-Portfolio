@@ -8,7 +8,8 @@ import { AdminStatus } from "../components/admin/admin-status";
 import { AdminPageHeader } from "../components/admin/admin-page-header";
 import { AdminFormSection } from "../components/admin/admin-form-section";
 import { AdminEmptyState } from "../components/admin/admin-empty-state";
-import { MediaPicker } from "../components/admin/media-picker";
+import { MediaUploadButton } from "../components/admin/media-picker";
+import { MediaField } from "../components/admin/media-field";
 import { MediaLibrary } from "../components/admin/media-library";
 import DashboardLoading from "../app/(admin)/dashboard/loading";
 import { ADMIN_NAV_GROUPS, formatAdminDate } from "../lib/admin-navigation";
@@ -112,17 +113,26 @@ test("Dashboard content keeps equal desktop gutters beside the sidebar", () => {
   assert.doesNotMatch(mainClasses, /md:pl-\[var\(--admin-sidebar-width\)\]/);
 });
 
-test("media library upload actions name the file type and offer a direct file input", () => {
-  const markup = renderToStaticMarkup(createElement(MediaPicker, {
-    kind: "image",
-    value: "",
-    onSelect: () => {},
-    label: "上传图片",
-    uploadOnly: true,
-  }));
-  assert.match(markup, />上传图片<\/button>/);
+test("media upload buttons name the file type and offer a direct file input", () => {
+  const markup = renderToStaticMarkup(createElement(MediaUploadButton, { kind: "image", label: "上传图片", onUploaded: () => {} }));
+  assert.match(markup, />上传图片</);
   assert.match(markup, /type="file"/);
-  assert.doesNotMatch(markup, /选择媒体/);
+});
+
+test("media fields show one slot per value with the raw address hidden until requested", () => {
+  const empty = renderToStaticMarkup(createElement(MediaField, { id: "t", label: "缩略图", kind: "image", value: "", onChange: () => {}, optional: true }));
+  assert.match(empty, /未设置/);
+  assert.match(empty, /从媒体库选择/);
+  assert.match(empty, /编辑地址/);
+  assert.doesNotMatch(empty, /<input[^>]*type="url"/);
+
+  const embed = renderToStaticMarkup(createElement(MediaField, { id: "v", label: "作品视频", kind: "video", value: "https://www.bilibili.com/video/BV1Vz8E6WEd6/", onChange: () => {}, allowEmbed: true }));
+  assert.match(embed, /Bilibili · BV1Vz8E6WEd6/);
+  assert.equal((embed.match(/BV1Vz8E6WEd6/g) ?? []).length, 1);
+
+  const library = renderToStaticMarkup(createElement(MediaField, { id: "i", label: "缩略图", kind: "image", value: "https://x.public.blob.vercel-storage.com/a.webp", onChange: () => {}, optional: true }));
+  assert.match(library, /<img[^>]*src="https:\/\/x\.public\.blob\.vercel-storage\.com\/a\.webp"/);
+  assert.match(library, />清除</);
 });
 
 test("Dashboard loading mirrors a compact content list rather than oversized generic panels", () => {

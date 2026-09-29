@@ -6,7 +6,7 @@ import { AdminStatus } from "@/components/admin/admin-status";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { AdminToolbar } from "@/components/admin/admin-toolbar";
 import { AdminMediaSkeleton } from "@/components/admin/admin-media-skeleton";
-import { MediaPicker } from "@/components/admin/media-picker";
+import { MediaUploadButton } from "@/components/admin/media-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/toast";
@@ -130,8 +130,8 @@ export function MediaLibrary() {
         meta={<span>{inventory ? `${inventory.count} 个文件 · ${inventory.totalSizeMB} MB` : "正在读取存储信息…"}</span>}
         actions={<>
           <Button type="button" size="sm" variant="outline" onClick={() => void loadInventory()} disabled={Boolean(state.deletingUrl) || loading}>刷新列表</Button>
-          <MediaPicker kind="image" value="" onSelect={onMediaSelected} label="上传图片" uploadOnly disabled={Boolean(state.deletingUrl)} />
-          <MediaPicker kind="video" value="" onSelect={onMediaSelected} label="上传视频" uploadOnly disabled={Boolean(state.deletingUrl)} />
+          <MediaUploadButton kind="image" label="上传图片" onUploaded={onMediaSelected} disabled={Boolean(state.deletingUrl)} />
+          <MediaUploadButton kind="video" label="上传视频" onUploaded={onMediaSelected} disabled={Boolean(state.deletingUrl)} />
         </>}
       />
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAdminNavigationGuard } from "@/components/admin/admin-shell";
 import { AdminEditorHeader } from "@/components/admin/admin-editor-header";
 import { AdminFormSection } from "@/components/admin/admin-form-section";
-import { MediaPicker } from "@/components/admin/media-picker";
+import { MediaField } from "@/components/admin/media-field";
 import { WorkCardPreview } from "@/components/admin/work-card-preview";
 import { MarkdownEditor } from "@/components/markdown-editor";
 import { Button } from "@/components/ui/button";
@@ -164,14 +164,8 @@ export function WorkEditor({
             </AdminFormSection>
 
             <AdminFormSection index="02" title="媒体" description="公开页面使用的视频与封面。">
-              <Field label="视频或嵌入地址" htmlFor="work-embed-url">
-                <Input id="work-embed-url" type="url" required value={state.form.embedUrl} onChange={(event) => setField("embedUrl", event.target.value)} />
-              </Field>
-              <MediaPicker kind="video" value={state.form.embedUrl} onSelect={(url) => setField("embedUrl", url)} label="从媒体库选择视频" />
-              <Field label="缩略图地址" htmlFor="work-thumbnail">
-                <Input id="work-thumbnail" type="url" value={state.form.thumbnail} onChange={(event) => setField("thumbnail", event.target.value)} />
-              </Field>
-              <MediaPicker kind="image" value={state.form.thumbnail} onSelect={(url) => setField("thumbnail", url)} label="从媒体库选择缩略图" />
+              <MediaField id="work-video" label="作品视频" kind="video" allowEmbed value={state.form.embedUrl} onChange={(url) => setField("embedUrl", url)} />
+              <MediaField id="work-thumbnail-field" label="缩略图" kind="image" optional value={state.form.thumbnail} onChange={(url) => setField("thumbnail", url)} />
             </AdminFormSection>
 
             <AdminFormSection index="03" title="卡片信息" description="用于 Works 页面和快速浏览。">
