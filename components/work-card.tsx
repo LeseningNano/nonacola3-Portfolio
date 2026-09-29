@@ -11,8 +11,9 @@ interface WorkCardProps {
   sizes: string;
   ariaLabel?: string;
   summary?: string | null;
-  details?: string | null;
+  details?: string[];
   size?: "default" | "large";
+  index?: string;
 }
 
 // 首页与 /works 共用的作品卡片：缩略图在上、文字在下，不叠字。
@@ -27,6 +28,7 @@ export function WorkCard({
   summary,
   details,
   size = "default",
+  index,
 }: WorkCardProps) {
   const thumbnail = work.thumbnail
     ? createThumbnailProxyPath(work.thumbnail) ?? work.thumbnail
@@ -64,19 +66,32 @@ export function WorkCard({
           ▶ PLAY
         </span>
       </div>
-      <div className="mt-3.5">
-        <h3 className={size === "large" ? "text-lg md:text-xl" : "text-base"}>
-          <span className="relative">
-            {work.title}
-            <span
-              aria-hidden="true"
-              className="absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-white transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:group-hover:scale-x-100 md:group-focus-visible:scale-x-100"
-            />
+      <div className={index ? "mt-4 grid grid-cols-[2.5rem_minmax(0,1fr)] gap-3 md:grid-cols-[3.5rem_minmax(0,1fr)] md:gap-4" : "mt-3.5"}>
+        {index && (
+          <span
+            aria-hidden="true"
+            className="text-xl leading-none text-neutral-500 md:text-2xl"
+            style={{ fontFamily: "var(--font-bitcount)" }}
+          >
+            {index}
           </span>
-        </h3>
-        {meta && <p className="mt-1 text-[13px] text-neutral-400">{meta}</p>}
-        {details && <p className="mt-1 text-[13px] text-neutral-400">{details}</p>}
-        {summary && <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-400">{summary}</p>}
+        )}
+        <div>
+          <h3 className={size === "large" ? "text-lg md:text-xl" : "text-base"}>
+            <span className="relative">
+              {work.title}
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-0 -bottom-0.5 h-px origin-left scale-x-0 bg-white transition-transform duration-[450ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none md:group-hover:scale-x-100 md:group-focus-visible:scale-x-100"
+              />
+            </span>
+          </h3>
+          {meta && <p className="mt-1 text-[13px] text-neutral-400">{meta}</p>}
+          {details?.map((line) => (
+            <p key={line} className="mt-1 text-[13px] text-neutral-400">{line}</p>
+          ))}
+          {summary && <p className="mt-2 max-w-xl text-sm leading-6 text-neutral-400">{summary}</p>}
+        </div>
       </div>
     </IntentPrefetchLink>
   );

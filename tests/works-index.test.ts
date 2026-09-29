@@ -87,7 +87,8 @@ test("selected work keeps authored project data while fixed labels default to En
   assert.match(markup, /原文标题/);
   assert.match(markup, /自主制作 · 2026/);
   assert.match(markup, /作者填写的摘要/);
-  assert.match(markup, /Role Motion Design · Tools After Effects · Blender/);
+  assert.match(markup, />Role: Motion Design</);
+  assert.match(markup, />Tools: After Effects · Blender</);
   assert.match(markup, /aria-label="View case study: 原文标题"/);
 });
 
@@ -106,7 +107,7 @@ test("provider-scoped Chinese localizes fixed labels without touching authored c
     )
   );
   assert.match(markup, /查看项目详情：原文标题/);
-  assert.match(markup, /职责 Motion Design/);
+  assert.match(markup, />职责：Motion Design</);
   assert.match(markup, /Motion Design/);
   assert.match(markup, /lang="zh-CN"/);
 });
@@ -118,8 +119,7 @@ test("works page copy localizes sections while archive data stays authored", () 
   const en = renderToStaticMarkup(createElement(WorksPageCopy, props));
   assert.match(en, /aria-label="selected\."/);
   assert.match(en, /aria-label="archive\."/);
-  assert.match(en, /md:grid-cols-2/);
-  assert.match(en, /data-reveal="card"/);
+  assert.match(en, /data-horizontal-scroll/);
   assert.match(en, /Selected Works/);
   assert.match(en, /All Works/);
   assert.match(en, /work together/);

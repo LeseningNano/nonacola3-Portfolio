@@ -1,11 +1,10 @@
 "use client";
 
 import { WorkArchive } from "./work-archive";
-import { SelectedWorkCard } from "./selected-work-card";
+import { SelectedWorksReel } from "./selected-works-reel";
 import { useWorksLanguage } from "./works-language-provider";
 import { useLocaleFade } from "./use-locale-fade";
 import { SectionHeading } from "@/components/section-heading";
-import { Reveal } from "@/components/viewport-reveal";
 import type { WorkYearGroup } from "@/lib/works-index";
 import type { VideoRow } from "@/lib/types";
 
@@ -25,22 +24,22 @@ export function WorksPageCopy({ selected, groups, email }: WorksPageCopyProps) {
     <>
       {selected.length > 0 && (
         <section aria-labelledby="selected-works-heading" className="mt-24 md:mt-32">
-          <SectionHeading
-            id="selected-works-heading"
-            title="selected."
-            subtitle={copy.selected.heading}
-            subtitleRef={fade}
+          <SelectedWorksReel
+            works={selected}
+            header={
+              <>
+                <SectionHeading
+                  id="selected-works-heading"
+                  title="selected."
+                  subtitle={copy.selected.heading}
+                  subtitleRef={fade}
+                />
+                <p ref={fade} className="mt-3 max-w-xl text-sm leading-6 text-neutral-400 md:text-base">
+                  {copy.selected.description}
+                </p>
+              </>
+            }
           />
-          <p ref={fade} className="mt-3 max-w-xl text-sm leading-6 text-neutral-400 md:text-base">
-            {copy.selected.description}
-          </p>
-          <div className="mt-10 grid gap-x-4 gap-y-14 md:mt-12 md:grid-cols-2">
-            {selected.map((work, index) => (
-              <Reveal key={work.id} variant="card" delay={(index % 2) * 100}>
-                <SelectedWorkCard work={work} />
-              </Reveal>
-            ))}
-          </div>
         </section>
       )}
 

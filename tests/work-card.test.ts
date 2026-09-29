@@ -40,7 +40,7 @@ test("card renders the thumbnail first, then title, meta, details and summary", 
       work: base,
       href: "/works/w1?from=home",
       meta: "PV · 2026",
-      details: "Role Motion Design",
+      details: ["Role: Motion Design", "Tools: After Effects"],
       summary: "One line summary",
       sizes: "100vw",
     })
@@ -50,7 +50,8 @@ test("card renders the thumbnail first, then title, meta, details and summary", 
   assert.ok(markup.indexOf('data-vt-id="w1"') < markup.indexOf("<h3"));
   assert.match(markup, /Night Drive/);
   assert.match(markup, /PV · 2026/);
-  assert.match(markup, /Role Motion Design/);
+  assert.match(markup, />Role: Motion Design</);
+  assert.match(markup, />Tools: After Effects</);
   assert.match(markup, /One line summary/);
 });
 
