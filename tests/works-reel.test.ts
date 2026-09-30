@@ -96,3 +96,26 @@ test("horizontal trackpad gestures inside the reel bypass the custom wheel scrol
   assert.equal(shouldPassWheelToHorizontalScroller(5, 40, true), false);
   assert.equal(shouldPassWheelToHorizontalScroller(40, 5, false), false);
 });
+
+test("progress segments are buttons that jump to their work", () => {
+  const markup = renderToStaticMarkup(
+    createElement(SelectedWorksReel, {
+      works: [work("a"), work("b"), work("c")],
+      header: null,
+    })
+  );
+  assert.equal(markup.match(/<button[^>]*data-reel-segment/g)?.length, 3);
+  assert.match(markup, /aria-label="Show work 2: Work b"/);
+  // 当前段标记为当前项；点击区域比 2px 的线高
+  assert.match(markup, /aria-current="true"[^>]*data-reel-segment|data-reel-segment[^>]*aria-current="true"/);
+  assert.match(markup, /data-reel-segment[^>]*class="[^"]*py-4/);
+
+  const zh = renderToStaticMarkup(
+    createElement(
+      WorksLanguageProvider,
+      { initialLocale: "zh-CN" },
+      createElement(SelectedWorksReel, { works: [work("a"), work("b")], header: null })
+    )
+  );
+  assert.match(zh, /显示第 2 个作品：Work b/);
+});

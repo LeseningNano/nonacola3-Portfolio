@@ -61,9 +61,10 @@ export function WorkCard({
         />
         <span
           aria-hidden="true"
-          className="absolute inset-0 flex translate-y-2 items-center justify-center text-xs tracking-[0.2em] text-white opacity-0 transition-[opacity,transform] duration-300 motion-reduce:transition-none md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100"
+          className="absolute inset-0 flex translate-y-2 items-center justify-center opacity-0 transition-[opacity,translate] duration-300 motion-reduce:transition-none md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-visible:translate-y-0 md:group-focus-visible:opacity-100"
         >
-          ▶ PLAY
+          {/* 深色胶囊底：悬停时去掉了暗化层，浅色封面上也要看得清 */}
+          <span className="rounded-full bg-black/60 px-4 py-2 text-xs tracking-[0.2em] text-white backdrop-blur-sm">▶ PLAY</span>
         </span>
       </div>
       <div className={index ? "mt-4 grid grid-cols-[2.5rem_minmax(0,1fr)] gap-3 md:grid-cols-[3.5rem_minmax(0,1fr)] md:gap-4" : "mt-3.5"}>

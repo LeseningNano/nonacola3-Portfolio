@@ -5,9 +5,9 @@ import type { CSSProperties, ReactNode } from "react";
 import { useWorksLanguage } from "./works-language-provider";
 import styles from "./works-intro.module.css";
 
-// works-intro.module.css 中最后一个动画：supporting 块 1260ms 延迟 + 600ms 淡入。
+// 开场总长：标题对焦点亮约 1.5s，Showreel 黑幕在 1620ms 起拉开 700ms（见 globals.css 的 reel-curtain）。
 // 改 CSS 动画时长时需同步此常量。
-const INTRO_TOTAL_MS = 1900;
+const INTRO_TOTAL_MS = 2320;
 
 export function WorksIntro({ children }: { children: ReactNode }) {
   const { locale, copy } = useWorksLanguage();
@@ -49,9 +49,9 @@ export function WorksIntro({ children }: { children: ReactNode }) {
           >
             {tokens.map((token, index) => (
               <span
-                key={`${token.text}-${index}`}
+                key={`${locale}-${index}`}
                 aria-hidden="true"
-                className={`${styles.word} ${token.highlighted ? "text-white" : "text-neutral-500"}`}
+                className={`${styles.word} ${token.highlighted ? `${styles.lit} text-white` : `${styles.dim} text-neutral-500`}`}
                 style={{ "--word-index": index } as CSSProperties}
               >
                 {token.text}
@@ -59,7 +59,7 @@ export function WorksIntro({ children }: { children: ReactNode }) {
               </span>
             ))}
           </h1>
-          {/* 眉标与简介栏切语言时重播：标题逐词动画期间保持隐藏，1260ms 后一起淡入 */}
+          {/* 眉标与简介栏切语言时重播：标题对焦期间保持隐藏，1100ms 后从左滑入 */}
           <div key={locale} className={styles.supporting}>
             <p className="text-sm leading-6 text-neutral-400 md:text-base">{copy.intro.availability}</p>
             <dl className="mt-5 space-y-2 border-y border-white/10 py-4 text-sm">

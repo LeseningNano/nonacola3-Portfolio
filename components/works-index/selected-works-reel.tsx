@@ -112,15 +112,24 @@ export function SelectedWorksReel({ works, header }: { works: VideoRow[]; header
         </div>
 
         {!single && (
-          <div aria-hidden="true" className="mt-8 flex gap-2">
+          <div className="mt-4 flex gap-2">
             {works.map((work, i) => (
-              <span
+              <button
                 key={work.id}
+                type="button"
                 data-reel-segment=""
-                className={`h-0.5 flex-1 transition-colors duration-500 motion-reduce:transition-none ${
-                  i === index ? "bg-white" : "bg-neutral-800"
-                }`}
-              />
+                aria-label={copy.selected.jumpLabel(i + 1, work.title)}
+                aria-current={i === index ? "true" : undefined}
+                onClick={() => goTo(i)}
+                className="group flex-1 cursor-pointer py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                {/* 线仍是 2px，上下 py-4 扩大点击区域 */}
+                <span
+                  className={`block h-0.5 transition-colors duration-500 motion-reduce:transition-none ${
+                    i === index ? "bg-white" : "bg-neutral-800 group-hover:bg-neutral-500"
+                  }`}
+                />
+              </button>
             ))}
           </div>
         )}
