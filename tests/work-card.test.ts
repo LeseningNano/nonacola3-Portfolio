@@ -115,3 +115,14 @@ test("thumbnail is decorative so the link name does not repeat the title", () =>
   assert.match(markup, /<img[^>]*alt=""/);
   assert.doesNotMatch(markup, /alt="Night Drive"/);
 });
+
+test("play label animates its translate and stays readable on light thumbnails", () => {
+  const markup = renderToStaticMarkup(
+    createElement(WorkCard, { work: base, href: "/works/w1", meta: "", sizes: "100vw" })
+  );
+  // Tailwind 4 的 translate-y-* 写入独立的 translate 属性，过渡必须包含 translate，否则移开时会瞬间跳回
+  assert.match(markup, /transition-\[opacity,translate\]/);
+  assert.doesNotMatch(markup, /transition-\[opacity,transform\]/);
+  // 深色半透明胶囊底：去掉暗化层后，浅色封面上的文字仍可读
+  assert.match(markup, /rounded-full bg-black\/60[^"]*">▶ PLAY</);
+});
