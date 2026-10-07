@@ -10,7 +10,7 @@ const sanitizeSchema = {
   tagNames: [...(defaultSchema.tagNames ?? []), "video", "source"],
   attributes: {
     ...defaultSchema.attributes,
-    video: ["controls", "src", "width", "height", " poster", "muted", "loop", "playsInline"],
+    video: ["controls", "src", "width", "height", "poster", "muted", "loop", "playsInline"],
     source: ["src", "type"],
     img: ["src", "alt", "title", "width", "height", "loading"],
   },
