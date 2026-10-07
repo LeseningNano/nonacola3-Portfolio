@@ -53,7 +53,7 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
         <p className="mt-8 text-xs tracking-[0.24em] text-neutral-500">
           {[video.date ? formatFullDate(video.date) : null, video.category || null].filter(Boolean).join(" · ")}
         </p>
-        <h1 className="mt-4 break-words text-3xl font-normal leading-[1.15] tracking-[-0.03em] text-white md:text-[44px]">
+        <h1 className="mt-2 break-words text-3xl font-normal leading-[1.15] tracking-[-0.03em] text-white md:text-[44px]">
           {video.title}
         </h1>
 

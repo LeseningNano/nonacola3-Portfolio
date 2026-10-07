@@ -38,7 +38,7 @@ export default async function NewsPostPage({ params }: { params: Promise<{ id: s
             {formatFullDate(post.createdAt)}
             {post.tag && <span> · {post.tag}</span>}
           </p>
-          <h1 className="mt-4 break-words text-4xl font-normal leading-[1.12] tracking-[-0.03em] text-white md:text-[56px]">
+          <h1 className="mt-2 break-words text-4xl font-normal leading-[1.12] tracking-[-0.03em] text-white md:text-[56px]">
             {post.title}
           </h1>
           <div className="mt-10 mb-12 h-px bg-neutral-800 md:mt-12 md:mb-14" />
