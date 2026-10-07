@@ -5,7 +5,7 @@ import {
   type ClipboardEvent, type DragEvent, type TextareaHTMLAttributes,
 } from "react";
 import {
-  Bold, Italic, Heading2, List, Link as LinkIcon, Image as ImageIcon,
+  Bold, Italic, Heading2, Heading3, List, ListOrdered, Quote, Minus, Link as LinkIcon, Image as ImageIcon,
   Video, Code, Code2, Eye, EyeOff, HelpCircle, FolderOpen, X,
 } from "lucide-react";
 import { MarkdownBody } from "./markdown-body";
@@ -14,6 +14,8 @@ import { MediaPickerDialog, uploadMediaFile } from "./admin/media-picker";
 import {
   createUploadPlaceholder,
   getBlockInsertion,
+  toggleLineFormat,
+  type LineFormat,
   pickPastedImages,
   replaceUploadPlaceholder,
 } from "@/lib/markdown-editor";
@@ -99,11 +101,11 @@ export function MarkdownEditor({
     });
   }
 
-  function insertLine(prefix: string) {
+  // 标题 / 列表 / 引用：作用于选中的每一行，再点一次取消（规则见 lib/markdown-editor.ts）
+  function formatLines(kind: LineFormat) {
     runInEditor((ta) => {
-      const s = ta.selectionStart;
-      const lineStart = ta.value.lastIndexOf("\n", s - 1) + 1;
-      replaceRange(ta, lineStart, lineStart, prefix, [s + prefix.length, s + prefix.length]);
+      const { from, to, text, selection } = toggleLineFormat(ta.value, ta.selectionStart, ta.selectionEnd, kind);
+      replaceRange(ta, from, to, text, selection);
     });
   }
 
@@ -187,15 +189,23 @@ export function MarkdownEditor({
     <div className="border border-admin-line-strong rounded-sm overflow-hidden bg-admin-raised">
       {/* 工具栏 */}
       <div className="flex items-center gap-1 px-2 py-1.5 border-b border-admin-line bg-admin-panel flex-wrap">
-        <ToolbarBtn icon={Heading2} title="二级标题" onClick={() => insertLine("## ")} />
+        <ToolbarBtn icon={Heading2} title="二级标题（再点取消）" onClick={() => formatLines("h2")} />
+        <ToolbarBtn icon={Heading3} title="三级标题（再点取消）" onClick={() => formatLines("h3")} />
+        <ToolbarDivider />
         <ToolbarBtn icon={Bold} title="加粗 **文字**" onClick={() => apply(["**", "**"], "加粗文字")} />
         <ToolbarBtn icon={Italic} title="斜体 *文字*" onClick={() => apply(["*", "*"], "斜体文字")} />
-        <ToolbarBtn icon={List} title="列表项" onClick={() => insertLine("- ")} />
+        <ToolbarDivider />
+        <ToolbarBtn icon={List} title="无序列表（可多选行，再点取消）" onClick={() => formatLines("ul")} />
+        <ToolbarBtn icon={ListOrdered} title="有序列表（可多选行，再点取消）" onClick={() => formatLines("ol")} />
+        <ToolbarBtn icon={Quote} title="引用（可多选行，再点取消）" onClick={() => formatLines("quote")} />
+        <ToolbarDivider />
         <ToolbarBtn icon={LinkIcon} title="链接" onClick={() => openInsert("link")} />
         <ToolbarBtn icon={ImageIcon} title="图片（也可以直接粘贴或拖入）" onClick={() => openInsert("image")} />
         <ToolbarBtn icon={Video} title="视频" onClick={() => openInsert("video")} />
+        <ToolbarDivider />
         <ToolbarBtn icon={Code} title="行内代码" onClick={() => apply(["`", "`"], "代码")} />
         <ToolbarBtn icon={Code2} title="代码块" onClick={() => insertBlock("```\n代码\n```")} />
+        <ToolbarBtn icon={Minus} title="分隔线" onClick={() => insertBlock("---")} />
         <div className="flex-1" />
         <button
           type="button"
@@ -330,6 +340,10 @@ export function MarkdownEditor({
       )}
     </div>
   );
+}
+
+function ToolbarDivider() {
+  return <span aria-hidden="true" className="mx-0.5 h-4 w-px bg-admin-line" />;
 }
 
 function ToolbarBtn({

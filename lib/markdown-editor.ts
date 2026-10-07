@@ -35,3 +35,55 @@ export function replaceUploadPlaceholder(value: string, token: string, replaceme
   if (!pattern.test(value)) return value;
   return value.replace(pattern, () => replacement ?? "");
 }
+
+export type LineFormat = "h2" | "h3" | "ul" | "ol" | "quote";
+
+const HEADING = /^#{1,6} /;
+const LIST = /^(?:[-*+]|\d+\.) /;
+const QUOTE = /^> /;
+
+const LINE_FORMATS: Record<LineFormat, { strip: RegExp; isOn: (line: string) => boolean; prefix: (n: number) => string }> = {
+  h2: { strip: HEADING, isOn: (line) => line.startsWith("## "), prefix: () => "## " },
+  h3: { strip: HEADING, isOn: (line) => line.startsWith("### "), prefix: () => "### " },
+  ul: { strip: LIST, isOn: (line) => /^[-*+] /.test(line), prefix: () => "- " },
+  ol: { strip: LIST, isOn: (line) => /^\d+\. /.test(line), prefix: (n) => `${n}. ` },
+  quote: { strip: QUOTE, isOn: (line) => QUOTE.test(line), prefix: () => "> " },
+};
+
+// 标题 / 列表 / 引用：作用于选区覆盖的每一整行。
+// 每行都已是该格式 → 取消；否则统一换成该格式（同类的其他前缀会被替换，不会叠加）。
+// 多行时跳过空行；返回要替换的行范围 [from, to)、新文本和替换后的选区。
+export function toggleLineFormat(value: string, start: number, end: number, kind: LineFormat) {
+  const format = LINE_FORMATS[kind];
+  const from = value.lastIndexOf("\n", start - 1) + 1;
+  // 选区恰好停在换行符后面时，不算进下一行
+  const lastPos = end > start && value[end - 1] === "\n" ? end - 1 : end;
+  const lineEnd = value.indexOf("\n", lastPos);
+  const to = lineEnd === -1 ? value.length : lineEnd;
+
+  const lines = value.slice(from, to).split("\n");
+  const isTarget = (line: string) => lines.length === 1 || line.trim() !== "";
+  const targets = lines.filter(isTarget);
+  const allOn = targets.length > 0 && targets.every(format.isOn);
+
+  let counter = 0;
+  const next = lines.map((line) => {
+    if (!isTarget(line)) return line;
+    const body = line.replace(format.strip, "");
+    if (allOn) return body;
+    counter += 1;
+    return format.prefix(counter) + body;
+  });
+  const text = next.join("\n");
+
+  let selection: [number, number];
+  if (lines.length === 1 && start === end) {
+    const oldPrefix = lines[0].length - lines[0].replace(format.strip, "").length;
+    const newPrefix = next[0].length - lines[0].replace(format.strip, "").length;
+    const offset = Math.max(newPrefix, start - from - oldPrefix + newPrefix);
+    selection = [from + offset, from + offset];
+  } else {
+    selection = [from, from + text.length];
+  }
+  return { from, to, text, selection };
+}
