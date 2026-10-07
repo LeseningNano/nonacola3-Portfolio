@@ -414,6 +414,53 @@ body::after {
   clip-path: inset(100% 0 0 0);
 }
 
+/* 首页区块与页脚的内容上限：加上 lg 两侧 64px 内边距共 1920px，
+   更宽的屏幕（2K 以上）两侧留白，避免一行被拉得过长 */
+.page-cap {
+  max-width: 1792px;
+  margin-inline: auto;
+}
+
+/* 向左进入：about. 的简介与联系方式从右侧 32px 淡入左移（移动端 16px） */
+[data-reveal-pending][data-reveal="content-left"] {
+  opacity: 0;
+  transform: translateX(32px);
+}
+@media (max-width: 768px) {
+  [data-reveal-pending][data-reveal="content-left"] {
+    transform: translateX(16px);
+  }
+}
+
+/* about. 头像：中线先从中间横向亮起，随后画面自中线上下拉开、图片从 1.12 回落。
+   与上面的卡片一样，裁切放在子元素 .avatar-frame 上，被观察的外层保持完整可见面积。
+   默认（SSR / 无 JS / 样式缺失）不裁切、中线透明，绝不会遮住头像 */
+[data-reveal="avatar"] .avatar-frame {
+  clip-path: inset(0);
+  transition: clip-path 700ms var(--ease-menu) calc(var(--reveal-delay, 0ms) + 360ms);
+}
+[data-reveal="avatar"] .avatar-image {
+  transition: transform 1100ms var(--ease-menu) calc(var(--reveal-delay, 0ms) + 360ms);
+}
+[data-reveal-pending][data-reveal="avatar"] .avatar-frame {
+  clip-path: inset(50% 0 50% 0);
+}
+[data-reveal-pending][data-reveal="avatar"] .avatar-image {
+  transform: scale(1.12);
+}
+.avatar-seam {
+  opacity: 0;
+  transform-origin: center;
+}
+[data-reveal-visible][data-reveal="avatar"] .avatar-seam {
+  animation: avatar-seam 900ms var(--ease-menu) var(--reveal-delay, 0ms) both;
+}
+@keyframes avatar-seam {
+  0% { opacity: 1; transform: scaleX(0); }
+  40% { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
 /* 区块遮光层：进入视口前压暗，进入后淡出，模拟镜头换段；JS 关闭时默认透明 */
 [data-reveal="dim"] {
   opacity: 0;
@@ -606,5 +653,14 @@ body::after {
   }
   [data-reveal-pending][data-reveal="heading"] .reveal-inner {
     transform: none !important;
+  }
+  [data-reveal="avatar"] .avatar-frame,
+  [data-reveal="avatar"] .avatar-image {
+    transition: none !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+  .avatar-seam {
+    display: none;
   }
 }

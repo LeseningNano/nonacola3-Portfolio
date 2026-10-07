@@ -77,3 +77,12 @@ export function getScrollProgress(scrollTop: number, scrollHeight: number, clien
 export function shouldShowScrollProgress(pathname: string): boolean {
   return pathname === "/" || pathname === "/works";
 }
+
+// 导航栏内容宽度：背景出现前铺满窗口（两侧 24px）；背景淡入时 logo 与链接
+// 平滑收进与正文相同的 1920 上限和左右边距（.page-cap + 区块 lg 64px）。
+// max-width 在 100% 与 1920px 之间可以插值，所以能直接用 transition。
+export function getNavbarInnerClass(barVisible: boolean): string {
+  const base =
+    "mx-auto flex h-16 w-full items-center justify-between px-4 transition-[max-width,padding] duration-500 motion-reduce:transition-none";
+  return barVisible ? `${base} max-w-[1920px] md:px-12 lg:px-16` : `${base} max-w-full md:px-6`;
+}

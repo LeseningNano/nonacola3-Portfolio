@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { CSSProperties, ElementType, ReactNode } from "react";
 
-export type RevealVariant = "heading" | "content" | "dim" | "card";
+export type RevealVariant = "heading" | "content" | "content-left" | "avatar" | "dim" | "card";
 
 export function shouldSkipRevealMotion(reducedMotion: boolean): boolean {
   return reducedMotion;

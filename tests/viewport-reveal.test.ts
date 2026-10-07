@@ -107,7 +107,7 @@ test("about section stages title and content the same way", () => {
   const markup = renderToStaticMarkup(createElement(AboutSection));
 
   assert.match(markup, /data-section-heading="static"/);
-  assert.match(markup, /data-reveal="content"/);
+  assert.match(markup, /data-reveal="content-left"/);
   assert.ok(!markup.includes("data-reveal-pending"));
   assert.match(markup, /about\./);
   assert.match(markup, /了解更多 &amp; 合作洽谈/);
@@ -130,4 +130,26 @@ test("homepage sections get a non-blocking dim transition layer", () => {
   assert.match(works, /section id="works" class="relative/);
   assert.match(news, /section id="news" class="relative/);
   assert.match(about, /section id="about" class="relative/);
+});
+
+test("about section shows a square avatar with its own entrance and slides text in leftward", () => {
+  const markup = renderToStaticMarkup(createElement(AboutSection));
+
+  assert.match(markup, /data-reveal="avatar"/);
+  assert.match(markup, /avatar\.webp/);
+  assert.match(markup, /alt="nonacola3 的头像"/);
+  assert.ok(!markup.includes("rounded-full"), "avatar stays square");
+  // 简介与联系方式都向左进入
+  assert.equal(markup.match(/data-reveal="content-left"/g)?.length, 2);
+  assert.ok(!markup.includes("data-reveal-pending"));
+});
+
+test("leftward content and avatar reveals are defined in CSS with reduced-motion fallbacks", async () => {
+  const { readFileSync } = await import("node:fs");
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.match(css, /\[data-reveal-pending\]\[data-reveal="content-left"\]\s*\{[^}]*translateX\(\d+px\)/);
+  assert.match(css, /\[data-reveal-pending\]\[data-reveal="avatar"\][^{]*\{[^}]*clip-path:\s*inset\(/);
+  assert.match(css, /\.avatar-seam/);
+  assert.match(css, /prefers-reduced-motion[\s\S]*\.avatar-seam[\s\S]*display:\s*none/);
 });

@@ -48,7 +48,7 @@ export function HomeClient({
       <VideoGrid videos={videos} />
       <NewsSection posts={posts} />
       <AboutSection />
-      <Footer />
+      <Footer showSocial={false} />
     </SmoothScrollContainer>
   );
 }

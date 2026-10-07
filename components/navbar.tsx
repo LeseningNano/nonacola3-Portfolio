@@ -8,6 +8,7 @@ import { siteConfig } from "@/lib/config";
 import {
   NAV_SECTION_IDS,
   getActiveNavSection,
+  getNavbarInnerClass,
   getPortfolioMenuPrimary,
   getScrollProgress,
   shouldGateNavbarOnIntro,
@@ -214,6 +215,9 @@ export function Navbar() {
 
   if (isAdminPath(pathname)) return null;
 
+  // 背景出现（滚动、公告横幅、手机菜单）时，内容同时收进 1920 上限
+  const barVisible = noticeOpen || scrolled || mounted;
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 motion-reduce:transition-none ${
@@ -230,79 +234,81 @@ export function Navbar() {
         />
       )}
       <div
-        className={`px-4 md:px-6 h-16 flex items-center justify-between transition-colors duration-300 ${
+        className={`transition-colors duration-300 ${
           noticeOpen
             ? "bg-black border-b border-white/5"
-            : scrolled || mounted
+            : barVisible
               ? "bg-black/80 backdrop-blur-md border-b border-white/5"
               : ""
         }`}
       >
-        <Link href="/" className="font-normal text-base md:text-lg" style={{ fontFamily: "var(--font-bitcount)" }}>
-          {siteConfig.name}
-        </Link>
+        <div className={getNavbarInnerClass(barVisible)} style={{ transitionTimingFunction: "var(--ease-menu)" }}>
+          <Link href="/" className="font-normal text-base md:text-lg" style={{ fontFamily: "var(--font-bitcount)" }}>
+            {siteConfig.name}
+          </Link>
 
-        <div
-          className="relative hidden items-center gap-10 md:flex"
-          onMouseLeave={() => setHoveredSection(null)}
-        >
-          {SECTIONS.map((s) => {
-            const className = `py-2 text-[13px] tracking-[0.2em] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-              activeSection === s.id ? "text-white" : "text-neutral-300 hover:text-white"
-            }`;
-            const hoverProps = {
-              onMouseEnter: () => setHoveredSection(s.id),
-              onFocus: () => setHoveredSection(s.id),
-              onBlur: () => setHoveredSection(null),
-            };
+          <div
+            className="relative hidden items-center gap-10 md:flex"
+            onMouseLeave={() => setHoveredSection(null)}
+          >
+            {SECTIONS.map((s) => {
+              const className = `py-2 text-[13px] tracking-[0.2em] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                activeSection === s.id ? "text-white" : "text-neutral-300 hover:text-white"
+              }`;
+              const hoverProps = {
+                onMouseEnter: () => setHoveredSection(s.id),
+                onFocus: () => setHoveredSection(s.id),
+                onBlur: () => setHoveredSection(null),
+              };
 
-            if (s.id === "works") {
+              if (s.id === "works") {
+                return (
+                  <Link
+                    key={s.id}
+                    ref={(el) => {
+                      linkRefs.current.works = el;
+                    }}
+                    href="/works"
+                    aria-current={pathname === "/works" ? "page" : undefined}
+                    className={className}
+                    {...hoverProps}
+                  >
+                    {s.label}
+                  </Link>
+                );
+              }
+
               return (
-                <Link
+                <a
                   key={s.id}
                   ref={(el) => {
-                    linkRefs.current.works = el;
+                    linkRefs.current[s.id] = el;
                   }}
-                  href="/works"
-                  aria-current={pathname === "/works" ? "page" : undefined}
+                  href={`/#${s.id}`}
+                  onClick={(event) => handleSectionClick(event, s.id)}
                   className={className}
                   {...hoverProps}
                 >
                   {s.label}
-                </Link>
+                </a>
               );
-            }
+            })}
+            <span
+              ref={underlineRef}
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-0 left-0 h-px bg-white opacity-0 transition-[transform,width,opacity] duration-[400ms] motion-reduce:transition-none"
+              style={{ transitionTimingFunction: "var(--ease-menu)" }}
+            />
+          </div>
 
-            return (
-              <a
-                key={s.id}
-                ref={(el) => {
-                  linkRefs.current[s.id] = el;
-                }}
-                href={`/#${s.id}`}
-                onClick={(event) => handleSectionClick(event, s.id)}
-                className={className}
-                {...hoverProps}
-              >
-                {s.label}
-              </a>
-            );
-          })}
-          <span
-            ref={underlineRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 left-0 h-px bg-white opacity-0 transition-[transform,width,opacity] duration-[400ms] motion-reduce:transition-none"
-            style={{ transitionTimingFunction: "var(--ease-menu)" }}
-          />
+          <button
+            aria-label="菜单"
+            className="text-neutral-300 hover:text-white transition-colors p-2 -mr-2 md:hidden"
+            onClick={() => (open ? closeMenu() : openMenu())}
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
-
-        <button
-          aria-label="菜单"
-          className="text-neutral-300 hover:text-white transition-colors p-2 -mr-2 md:hidden"
-          onClick={() => (open ? closeMenu() : openMenu())}
-        >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
       </div>
 
       {/* 移动端：全屏覆盖菜单 */}
