@@ -124,6 +124,9 @@ test("works page copy localizes sections while archive data stays authored", () 
   assert.match(en, /All Works/);
   assert.match(en, /work together/);
   assert.match(en, /s1/);
+  // 社交链接从页脚挪到联系区，邮箱下方
+  assert.match(en, /hi@example\.com<\/a>[\s\S]*Bilibili[\s\S]*YouTube[\s\S]*小红书[\s\S]*<\/section>/);
+  assert.match(en, /target="_blank" rel="noopener noreferrer"[^>]*>Bilibili</);
 
   const zh = renderToStaticMarkup(
     createElement(
