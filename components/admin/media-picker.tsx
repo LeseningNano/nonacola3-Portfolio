@@ -64,7 +64,7 @@ function defaultAccept(kind: MediaKind, accept?: string) {
   return accept ?? (kind === "image" ? IMAGE_MIME_TYPES.join(",") : "video/*");
 }
 
-async function uploadMediaFile(file: File, kind: MediaKind, acceptedTypes: string | undefined, onProgress: (percentage: number) => void): Promise<string> {
+export async function uploadMediaFile(file: File, kind: MediaKind, acceptedTypes: string | undefined, onProgress: (percentage: number) => void): Promise<string> {
   const validMime = kind === "image" ? IMAGE_MIME_TYPES.includes(file.type) : file.type.startsWith("video/");
   const allowedByCaller = !acceptedTypes || acceptedTypes.split(",").map((type) => type.trim()).includes(file.type);
   if (!validMime || !allowedByCaller) {

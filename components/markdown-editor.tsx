@@ -1,14 +1,25 @@
 "use client";
 
-import { useRef, useState, type TextareaHTMLAttributes } from "react";
+import {
+  useEffect, useRef, useState,
+  type ClipboardEvent, type DragEvent, type TextareaHTMLAttributes,
+} from "react";
 import {
   Bold, Italic, Heading2, List, Link as LinkIcon, Image as ImageIcon,
-  Video, Code, Code2, Eye, EyeOff, HelpCircle, Upload, X,
+  Video, Code, Code2, Eye, EyeOff, HelpCircle, FolderOpen, X,
 } from "lucide-react";
 import { MarkdownBody } from "./markdown-body";
 import { useToast } from "./toast";
+import { MediaPickerDialog, uploadMediaFile } from "./admin/media-picker";
+import {
+  createUploadPlaceholder,
+  getBlockInsertion,
+  pickPastedImages,
+  replaceUploadPlaceholder,
+} from "@/lib/markdown-editor";
 
 type InsertKind = "link" | "image" | "video" | null;
+type EditorAction = (ta: HTMLTextAreaElement) => void;
 
 export function MarkdownEditor({
   value,
@@ -20,121 +31,156 @@ export function MarkdownEditor({
   textareaProps?: TextareaHTMLAttributes<HTMLTextAreaElement>;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [insertKind, setInsertKind] = useState<InsertKind>(null);
   const [insertUrl, setInsertUrl] = useState("");
   const [insertText, setInsertText] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const { error: toastError } = useToast();
 
-  function apply(wrap: [string, string], placeholder = "") {
+  // 预览模式下 textarea 不在页面上：记住最后的选区，工具栏操作先切回编辑再执行
+  const lastSelectionRef = useRef<[number, number]>([0, 0]);
+  const pendingActionRef = useRef<EditorAction | null>(null);
+  // 异步上传完成时要基于最新内容替换占位
+  const valueRef = useRef(value);
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  function rememberSelection() {
     const ta = ref.current;
-    if (!ta) return;
-    const { selectionStart: s, selectionEnd: e } = ta;
-    const selected = value.slice(s, e);
-    const insert = selected || placeholder;
-    const next = value.slice(0, s) + wrap[0] + insert + wrap[1] + value.slice(e);
-    onChange(next);
+    if (ta) lastSelectionRef.current = [ta.selectionStart, ta.selectionEnd];
+  }
+
+  function runInEditor(action: EditorAction) {
+    const ta = ref.current;
+    if (!showPreview && ta) {
+      action(ta);
+      return;
+    }
+    pendingActionRef.current = action;
+    setShowPreview(false);
+  }
+
+  useEffect(() => {
+    if (showPreview) return;
+    const action = pendingActionRef.current;
+    const ta = ref.current;
+    if (!action || !ta) return;
+    pendingActionRef.current = null;
+    const [start, end] = lastSelectionRef.current;
+    ta.focus();
+    ta.setSelectionRange(start, end);
+    action(ta);
+  }, [showPreview]);
+
+  // 走浏览器原生的 insertText，编辑会进入 textarea 自己的撤销栈，Ctrl+Z 可以撤销；
+  // 不支持时退回直接改值（不可撤销，但内容正确）
+  function replaceRange(ta: HTMLTextAreaElement, start: number, end: number, text: string, select?: [number, number]) {
+    ta.focus();
+    ta.setSelectionRange(start, end);
+    const inserted = typeof document.execCommand === "function" && document.execCommand("insertText", false, text);
+    if (!inserted) onChange(ta.value.slice(0, start) + text + ta.value.slice(end));
+    const [selStart, selEnd] = select ?? [start + text.length, start + text.length];
     requestAnimationFrame(() => {
       ta.focus();
-      const pos = s + wrap[0].length;
-      ta.setSelectionRange(pos, pos + insert.length);
+      ta.setSelectionRange(selStart, selEnd);
+      rememberSelection();
+    });
+  }
+
+  function apply(wrap: [string, string], placeholder = "") {
+    runInEditor((ta) => {
+      const { selectionStart: s, selectionEnd: e } = ta;
+      const insert = ta.value.slice(s, e) || placeholder;
+      const from = s + wrap[0].length;
+      replaceRange(ta, s, e, wrap[0] + insert + wrap[1], [from, from + insert.length]);
     });
   }
 
   function insertLine(prefix: string) {
-    const ta = ref.current;
-    if (!ta) return;
-    const { selectionStart: s } = ta;
-    const lineStart = value.lastIndexOf("\n", s - 1) + 1;
-    const next = value.slice(0, lineStart) + prefix + value.slice(lineStart);
-    onChange(next);
-    requestAnimationFrame(() => {
-      ta.focus();
-      ta.setSelectionRange(s + prefix.length, s + prefix.length);
+    runInEditor((ta) => {
+      const s = ta.selectionStart;
+      const lineStart = ta.value.lastIndexOf("\n", s - 1) + 1;
+      replaceRange(ta, lineStart, lineStart, prefix, [s + prefix.length, s + prefix.length]);
     });
   }
 
-  function insertBlock(text: string) {
-    const ta = ref.current;
-    if (!ta) return;
-    const { selectionStart: s, selectionEnd: e } = ta;
-    const next = value.slice(0, s) + text + value.slice(e);
-    onChange(next);
-    requestAnimationFrame(() => {
-      ta.focus();
-      ta.setSelectionRange(s + text.length, s + text.length);
+  // 图片 / 视频 / 代码块单独成段，前后自动补空行
+  function insertBlock(block: string) {
+    runInEditor((ta) => {
+      const { selectionStart: s, selectionEnd: e } = ta;
+      const { text, cursor } = getBlockInsertion(ta.value, s, e, block);
+      replaceRange(ta, s, e, text, [cursor, cursor]);
     });
   }
 
   function openInsert(kind: Exclude<InsertKind, null>) {
     const ta = ref.current;
-    const selected = ta ? ta.value.slice(ta.selectionStart, ta.selectionEnd) : "";
-    setInsertText(selected);
+    const [s, e] = !showPreview && ta ? [ta.selectionStart, ta.selectionEnd] : lastSelectionRef.current;
+    setInsertText(value.slice(s, e));
     setInsertUrl("");
     setInsertKind(kind);
+  }
+
+  function closeInsert() {
+    setInsertKind(null);
+    setInsertUrl("");
+    setInsertText("");
   }
 
   function confirmInsert() {
     if (!insertKind) return;
     const url = insertUrl.trim();
     if (!url) return;
-    let md = "";
     if (insertKind === "link") {
-      md = `[${insertText.trim() || "链接文字"}](${url})`;
+      const md = `[${insertText.trim() || "链接文字"}](${url})`;
+      runInEditor((ta) => replaceRange(ta, ta.selectionStart, ta.selectionEnd, md));
     } else if (insertKind === "image") {
-      md = `![${insertText.trim()}](${url})\n`;
-    } else if (insertKind === "video") {
-      md = `\n<video controls src="${url}"></video>\n`;
+      insertBlock(`![${insertText.trim()}](${url})`);
+    } else {
+      insertBlock(`<video controls src="${url}"></video>`);
     }
-    insertBlock(md);
-    setInsertKind(null);
-    setInsertUrl("");
-    setInsertText("");
+    closeInsert();
   }
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !insertKind) return;
-    const isImage = insertKind === "image";
-    const isVideo = insertKind === "video";
-    // 类型校验
-    if (isImage && !file.type.startsWith("image/")) {
-      toastError("请选择图片文件");
-      return;
-    }
-    if (isVideo && !file.type.startsWith("video/")) {
-      toastError("请选择视频文件");
-      return;
-    }
-    setUploading(true);
-    setUploadProgress(0);
-    try {
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").replace(/_+/g, "_");
-      const prefix = isImage ? "md-img" : "md-vid";
-      const pathname = `uploads/${prefix}-${Date.now()}-${safeName}`;
-      const { upload } = await import("@vercel/blob/client");
-      const blob = await upload(pathname, file, {
-        access: "public",
-        handleUploadUrl: "/api/blob-token",
-        onUploadProgress: (p) => setUploadProgress(p.percentage),
-      });
-      setInsertUrl(blob.url);
-      setUploadProgress(100);
-    } catch {
-      toastError("文件上传失败");
-    } finally {
-      setUploading(false);
-      setTimeout(() => setUploadProgress(0), 500);
-      if (fileRef.current) fileRef.current.value = "";
+  // 粘贴 / 拖入图片：先插占位，各自上传完成后替换成图片；失败则移除占位并提示
+  function uploadImages(files: File[]) {
+    const uploads = files.map((file) => ({ file, ...createUploadPlaceholder(file.name) }));
+    insertBlock(uploads.map((upload) => upload.markdown).join("\n\n"));
+
+    for (const upload of uploads) {
+      void uploadMediaFile(upload.file, "image", undefined, () => {})
+        .then((url) => `![](${url})`)
+        .catch(() => {
+          toastError(`图片上传失败：${upload.file.name}`);
+          return null;
+        })
+        .then((replacement) => {
+          const next = replaceUploadPlaceholder(valueRef.current, upload.token, replacement);
+          valueRef.current = next;
+          onChange(next);
+        });
     }
   }
 
-  function handleCodeBlock() {
-    insertBlock("\n```\n代码\n```\n");
+  function handlePaste(event: ClipboardEvent<HTMLTextAreaElement>) {
+    const images = pickPastedImages(Array.from(event.clipboardData.files));
+    if (images.length === 0) return;
+    event.preventDefault();
+    uploadImages(images);
+  }
+
+  function handleDragOver(event: DragEvent<HTMLTextAreaElement>) {
+    if (event.dataTransfer.types.includes("Files")) event.preventDefault();
+  }
+
+  function handleDrop(event: DragEvent<HTMLTextAreaElement>) {
+    const images = pickPastedImages(Array.from(event.dataTransfer.files));
+    if (images.length === 0) return;
+    event.preventDefault();
+    uploadImages(images);
   }
 
   return (
@@ -146,15 +192,18 @@ export function MarkdownEditor({
         <ToolbarBtn icon={Italic} title="斜体 *文字*" onClick={() => apply(["*", "*"], "斜体文字")} />
         <ToolbarBtn icon={List} title="列表项" onClick={() => insertLine("- ")} />
         <ToolbarBtn icon={LinkIcon} title="链接" onClick={() => openInsert("link")} />
-        <ToolbarBtn icon={ImageIcon} title="图片" onClick={() => openInsert("image")} />
+        <ToolbarBtn icon={ImageIcon} title="图片（也可以直接粘贴或拖入）" onClick={() => openInsert("image")} />
         <ToolbarBtn icon={Video} title="视频" onClick={() => openInsert("video")} />
         <ToolbarBtn icon={Code} title="行内代码" onClick={() => apply(["`", "`"], "代码")} />
-        <ToolbarBtn icon={Code2} title="代码块" onClick={handleCodeBlock} />
+        <ToolbarBtn icon={Code2} title="代码块" onClick={() => insertBlock("```\n代码\n```")} />
         <div className="flex-1" />
         <button
           type="button"
           title="预览"
-          onClick={() => setShowPreview((v) => !v)}
+          onClick={() => {
+            if (!showPreview) rememberSelection();
+            setShowPreview((v) => !v);
+          }}
           className="flex items-center gap-1 px-2 h-7 text-xs text-admin-fg-2 hover:text-white hover:bg-admin-selected rounded transition-colors"
         >
           {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -181,7 +230,7 @@ export function MarkdownEditor({
             </span>
             <button
               type="button"
-              onClick={() => setInsertKind(null)}
+              onClick={closeInsert}
               className="text-admin-fg-3 hover:text-white"
             >
               <X className="w-3.5 h-3.5" />
@@ -201,47 +250,43 @@ export function MarkdownEditor({
               type="url"
               value={insertUrl}
               onChange={(e) => setInsertUrl(e.target.value)}
-              placeholder="粘贴 URL…"
+              placeholder={insertKind === "link" ? "粘贴 URL…" : "粘贴 URL，或从媒体库选择…"}
               className="flex-1 bg-admin-raised border border-admin-line-strong rounded-sm px-2 py-1.5 text-sm text-admin-fg focus:outline-none focus:border-admin-accent"
             />
             {(insertKind === "image" || insertKind === "video") && (
-              <>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept={insertKind === "image" ? "image/*" : "video/*"}
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  disabled={uploading}
-                  onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs border border-admin-line-strong hover:border-admin-fg-2 text-admin-fg-2 hover:text-white rounded-sm transition-colors disabled:opacity-50"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  {uploading ? `${uploadProgress}%` : "上传文件"}
-                </button>
-              </>
+              // 从媒体库挑已上传的文件，弹窗里也能上传新文件，避免重复上传
+              <button
+                type="button"
+                onClick={() => setPickerOpen(true)}
+                className="flex items-center gap-1 px-3 py-1.5 text-xs border border-admin-line-strong hover:border-admin-fg-2 text-admin-fg-2 hover:text-white rounded-sm transition-colors"
+              >
+                <FolderOpen className="w-3.5 h-3.5" />
+                媒体库
+              </button>
             )}
             <button
               type="button"
               onClick={confirmInsert}
-              disabled={!insertUrl.trim() || uploading}
+              disabled={!insertUrl.trim()}
               className="px-3 py-1.5 text-xs bg-admin-accent text-admin-accent-fg hover:brightness-110 rounded-sm transition-colors disabled:opacity-50"
             >
               插入
             </button>
           </div>
-          {uploading && (
-            <div className="w-full h-1 bg-admin-selected rounded-full overflow-hidden">
-              <div
-                className="h-full bg-admin-accent transition-all duration-200"
-                style={{ width: `${uploadProgress}%` }}
-              />
-            </div>
-          )}
         </div>
+      )}
+
+      {(insertKind === "image" || insertKind === "video") && (
+        <MediaPickerDialog
+          kind={insertKind}
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          value={insertUrl}
+          onSelect={(url) => {
+            setInsertUrl(url);
+            setPickerOpen(false);
+          }}
+        />
       )}
 
       {/* 编辑区 / 预览区 */}
@@ -259,6 +304,10 @@ export function MarkdownEditor({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           {...textareaProps}
+          onSelect={rememberSelection}
+          onPaste={handlePaste}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
           className={`w-full bg-admin-raised px-3 py-2 text-sm font-admin-mono text-admin-fg focus:outline-none resize-y ${
             textareaProps?.className ?? ""
           }`}
@@ -272,7 +321,7 @@ export function MarkdownEditor({
           <div><span className="text-admin-fg-3">强调：</span><b>**加粗**</b> / <i>*斜体*</i> / `行内代码`</div>
           <div><span className="text-admin-fg-3">列表：</span>- 项目一 / 1. 有序项</div>
           <div><span className="text-admin-fg-3">链接：</span>[文字](https://链接URL)</div>
-          <div><span className="text-admin-fg-3">图片：</span>![描述](https://图片URL)</div>
+          <div><span className="text-admin-fg-3">图片：</span>![描述](https://图片URL)，也可以直接粘贴或拖入图片</div>
           <div><span className="text-admin-fg-3">视频：</span>&lt;video controls src=&quot;https://视频URL.mp4&quot;&gt;&lt;/video&gt;</div>
           <div><span className="text-admin-fg-3">代码块：</span>``` 包裹多行代码</div>
           <div><span className="text-admin-fg-3">引用：</span>&gt; 引用文字</div>
