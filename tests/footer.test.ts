@@ -36,3 +36,19 @@ test("about bio is vertically centred against the avatar on desktop", () => {
   const markup = renderToStaticMarkup(createElement(AboutSection));
   assert.match(markup, /class="flex flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-8"/);
 });
+
+test("about contact column is vertically centred and sized up on desktop", () => {
+  const markup = renderToStaticMarkup(createElement(AboutSection));
+  assert.match(markup, /class="mt-10 flex flex-col md:flex-row md:items-center gap-10 md:gap-16"/);
+  assert.match(markup, /class="text-xl md:text-2xl[^"]*"[^>]*>[^<]*@/);
+  assert.match(markup, /class="px-5 py-2\.5 [^"]*text-sm md:text-base"[^>]*>Bilibili/);
+});
+
+test("about bio uses the new copy, one sentence group per line", () => {
+  const markup = renderToStaticMarkup(createElement(AboutSection));
+  assert.match(
+    markup,
+    /我是nonacola3，曾用名ナノナ。<br\/>进厂打工，业余玩AE，还在努力进步中。<br\/>想把脑海里的画面做成炫酷好看的作品，用它们讲故事。欢迎志同道合的朋友来聊。/
+  );
+  assert.ok(!markup.includes("业余PV师"));
+});
