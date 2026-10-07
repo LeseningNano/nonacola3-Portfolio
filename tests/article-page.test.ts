@@ -149,3 +149,10 @@ test("the page transition records return intent for return links it intercepts",
   assert.match(transition, /dataset\.returnPage/);
   assert.match(transition, /planReturn\(/);
 });
+
+// 标题区：日期小字与大标题贴近一些（两页一致）
+test("meta line sits close to the title on both detail pages", () => {
+  for (const file of ["app/news/[id]/page.tsx", "app/works/[id]/page.tsx"]) {
+    assert.match(read(file), /<h1 className="mt-2 /, file);
+  }
+});

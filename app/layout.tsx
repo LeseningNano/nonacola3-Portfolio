@@ -8,13 +8,18 @@ import { ServerNotice } from "@/components/server-notice";
 import { ChunkRecovery } from "@/components/chunk-recovery";
 import { ToastProvider } from "@/components/toast";
 import "./globals.css";
+import "./misans.css";
 
-const inter = Inter({ subsets: ["latin"] });
-const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat" });
+// Inter / Montserrat / Bitcount 都没有中文字形：中文统一落到自托管的 MiSans（app/misans.css），
+// 再退到各系统的中文字体。next/font 的参数必须是字面量，所以三处各写一遍。
+
+const inter = Inter({ subsets: ["latin"], fallback: ["MiSans", "PingFang SC", "Microsoft YaHei", "sans-serif"] });
+const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat", fallback: ["MiSans", "PingFang SC", "Microsoft YaHei", "sans-serif"] });
 const bitcount = Bitcount_Grid_Single({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-bitcount",
+  fallback: ["MiSans", "PingFang SC", "Microsoft YaHei", "sans-serif"],
 });
 // 后台等宽字；前台不使用，关闭预加载避免前台下载
 const jetbrainsMono = JetBrains_Mono({

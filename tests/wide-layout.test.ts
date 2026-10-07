@@ -68,3 +68,7 @@ test("navbar content stays full width until its background appears, then glides 
     assert.match(cls, /motion-reduce:transition-none/);
   }
 });
+
+test("post excerpt drops horizontal rules", () => {
+  assert.equal(getPostExcerpt("具体如下：\n\n---\n\n1. 新增作品页面\n\n***\n\n结尾"), "具体如下： 新增作品页面 结尾");
+});

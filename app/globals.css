@@ -157,6 +157,11 @@
 }
 
 /* Portal 渲染在 body 下，所以覆盖写在 :root 上，只在后台界面挂载时生效 */
+/* 后台界面保持系统字体（不用 MiSans）；后台里的正文预览 .article-prose 仍用 MiSans，与前台一致 */
+:root:has([data-admin-theme]) body {
+  font-family: Inter, "Inter Fallback", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
 :root:has([data-admin-theme]) {
   --background: #0b0b0c;
   --foreground: #ededee;
@@ -183,16 +188,11 @@
    Inter 没有中文字形，显式补上各平台的中文字体，避免各系统回落效果不一；
    图片 / 视频按出现顺序编号，图注前显示等宽的 FIG. 01 */
 .article-prose {
-  font-family: Inter, "Inter Fallback", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-family: Inter, "Inter Fallback", MiSans, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   counter-reset: article-figure;
 }
 .article-prose figure {
   counter-increment: article-figure;
-}
-/* 粗体：常规字重 + 极细描边。微软雅黑只有常规 / 粗体两档，semibold 会直接跳到最粗，
-   medium 又和常规一样；描边让笔画略粗一点，各平台效果接近 */
-.article-prose strong {
-  -webkit-text-stroke: 0.3px currentColor;
 }
 .article-prose figcaption::before {
   content: "FIG. " counter(article-figure, decimal-leading-zero);

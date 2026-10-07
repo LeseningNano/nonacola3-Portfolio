@@ -80,7 +80,7 @@ export function MarkdownBody({ content }: { content: string }) {
             ) : (
               <p className="mb-[1.1em]" {...withoutNode(p)} />
             ),
-          strong: (p) => <strong className="font-normal text-white" {...withoutNode(p)} />,
+          strong: (p) => <strong className="font-semibold text-white" {...withoutNode(p)} />,
           a: (p) => <a className="text-white underline decoration-neutral-600 underline-offset-4 transition-colors hover:decoration-white" target="_blank" rel="noopener noreferrer" {...withoutNode(p)} />,
           ul: (p) => <ul className="mb-[1.1em] list-outside list-disc space-y-[0.4em] pl-5 marker:text-neutral-600" {...withoutNode(p)} />,
           ol: (p) => <ol className="mb-[1.1em] list-outside list-decimal space-y-[0.4em] pl-5 marker:text-neutral-600" {...withoutNode(p)} />,
