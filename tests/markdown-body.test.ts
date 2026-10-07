@@ -70,3 +70,18 @@ test("videos get the same frame and numbering as images, outside any paragraph",
   assert.doesNotMatch(markup, /<p[^>]*>(?:(?!<\/p>)[\s\S])*<figure/);
 });
 
+
+// 图组：同一段里连续的图片（中间不空行）左右并排；空一行则照常上下排
+test("adjacent images in one paragraph form a side-by-side gallery", () => {
+  const markup = render("![甲](https://e.com/a.png)\n![乙](https://e.com/b.png)");
+  assert.match(markup, /<div data-gallery="" class="[^"]*grid[^"]*md:grid-cols-2/);
+  const gallery = markup.match(/<div data-gallery=""[\s\S]*?<\/figure>\s*<figure[\s\S]*?<\/figure>/)?.[0] ?? "";
+  assert.equal(gallery.match(/<figure/g)?.length, 2, "both figures sit in the gallery");
+  assert.doesNotMatch(markup, /<p[^>]*>(?:(?!<\/p>)[\s\S])*<figure/);
+});
+
+test("images separated by a blank line, or mixed with text, are not a gallery", () => {
+  assert.doesNotMatch(render("![甲](https://e.com/a.png)\n\n![乙](https://e.com/b.png)"), /data-gallery/);
+  assert.doesNotMatch(render("说明文字\n![甲](https://e.com/a.png)\n![乙](https://e.com/b.png)"), /data-gallery/);
+  assert.doesNotMatch(render("![只有一张](https://e.com/a.png)"), /data-gallery/);
+});

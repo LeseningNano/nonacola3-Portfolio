@@ -150,7 +150,8 @@ export function MarkdownEditor({
   // 粘贴 / 拖入图片：先插占位，各自上传完成后替换成图片；失败则移除占位并提示
   function uploadImages(files: File[]) {
     const uploads = files.map((file) => ({ file, ...createUploadPlaceholder(file.name) }));
-    insertBlock(uploads.map((upload) => upload.markdown).join("\n\n"));
+    // 一次粘贴多张：只隔一个换行，落在同一段里成为图组（左右并排）
+    insertBlock(uploads.map((upload) => upload.markdown).join("\n"));
 
     for (const upload of uploads) {
       void uploadMediaFile(upload.file, "image", undefined, () => {})
@@ -332,6 +333,7 @@ export function MarkdownEditor({
           <div><span className="text-admin-fg-3">列表：</span>- 项目一 / 1. 有序项</div>
           <div><span className="text-admin-fg-3">链接：</span>[文字](https://链接URL)</div>
           <div><span className="text-admin-fg-3">图片：</span>![描述](https://图片URL)，也可以直接粘贴或拖入图片</div>
+          <div><span className="text-admin-fg-3">图组：</span>两张图片上下相邻、中间不空行，就会左右并排（手机上仍上下排）</div>
           <div><span className="text-admin-fg-3">视频：</span>&lt;video controls src=&quot;https://视频URL.mp4&quot;&gt;&lt;/video&gt;</div>
           <div><span className="text-admin-fg-3">代码块：</span>``` 包裹多行代码</div>
           <div><span className="text-admin-fg-3">引用：</span>&gt; 引用文字</div>

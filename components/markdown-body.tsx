@@ -33,6 +33,20 @@ function containsMedia(node: Element | undefined): boolean {
   );
 }
 
+// 图组：段落里只有图片（两张及以上，中间只隔换行）→ 左右并排。
+// Markdown 里两张图片之间不空行就会落在同一段；空一行则各自成段、上下排列。
+function isGallery(node: Element | undefined): boolean {
+  if (!node) return false;
+  let images = 0;
+  for (const child of node.children) {
+    if (child.type === "element" && child.tagName === "img") images += 1;
+    else if (child.type === "text" && child.value.trim() === "") continue;
+    else if (child.type === "element" && child.tagName === "br") continue;
+    else return false;
+  }
+  return images >= 2;
+}
+
 // 图片与视频共用的框：细边框 + 淡底色，和深色背景分开；
 // 图注前的 FIG. 01 编号由 globals.css 的 .article-prose 计数器生成，没写图注时只显示编号
 function MediaFigure({ caption, children }: { caption?: string; children: ReactNode }) {
@@ -58,7 +72,10 @@ export function MarkdownBody({ content }: { content: string }) {
           h2: (p) => <h2 className="mt-14 mb-4 text-2xl font-normal leading-snug tracking-tight text-white first:mt-0 md:text-[28px]" {...withoutNode(p)} />,
           h3: (p) => <h3 className="mt-10 mb-3 text-[19px] font-medium leading-snug text-white first:mt-0 md:text-xl" {...withoutNode(p)} />,
           p: (p) =>
-            containsMedia(p.node) ? (
+            isGallery(p.node) ? (
+              // 手机上下排，md 起两列；图组内的 figure 不再各自留上下外边距
+              <div data-gallery="" className="my-10 grid items-start gap-4 md:grid-cols-2 [&>figure]:my-0" {...withoutNode(p)} />
+            ) : containsMedia(p.node) ? (
               <div className="mb-[1.1em]" {...withoutNode(p)} />
             ) : (
               <p className="mb-[1.1em]" {...withoutNode(p)} />
