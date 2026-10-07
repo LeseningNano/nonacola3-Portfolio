@@ -33,7 +33,7 @@ test("article prose uses roomier type with a CJK font fallback", () => {
 
   const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   const block = css.match(/\.article-prose\s*\{[^}]*\}/)?.[0] ?? "";
-  assert.match(block, /MiSans, "PingFang SC"[^;]*"Microsoft YaHei"/);
+  assert.match(block, /"Noto Sans SC", "PingFang SC"[^;]*"Microsoft YaHei"/);
 });
 
 test("headings separate by size and space rather than bold", () => {
