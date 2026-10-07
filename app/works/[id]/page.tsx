@@ -90,7 +90,7 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
             <h2 className="text-2xl md:text-3xl font-normal tracking-tight" style={{ fontFamily: "var(--font-bitcount)" }}>
               more.
             </h2>
-            <p className="text-sm md:text-base text-neutral-400 font-light mt-1">相关作品</p>
+            <p className="text-sm md:text-base text-neutral-400 mt-1">相关作品</p>
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1">
               {related.map((v) => (
                 <VideoCard key={v.id} video={v} />
