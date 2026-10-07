@@ -93,7 +93,7 @@ export function SectionHeading({
       {subtitle && (
         <p
           ref={subtitleRef}
-          className="section-heading-sub mt-1 text-base font-light text-neutral-400 md:text-lg"
+          className="section-heading-sub mt-1 text-base text-neutral-400 md:text-lg"
           style={{ "--sub-delay": `${getSubtitleDelayMs(title)}ms` } as CSSProperties}
         >
           {subtitle}

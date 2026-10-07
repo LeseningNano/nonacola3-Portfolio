@@ -5,6 +5,7 @@ import { SelectedWorksReel } from "./selected-works-reel";
 import { useWorksLanguage } from "./works-language-provider";
 import { useLocaleFade } from "./use-locale-fade";
 import { SectionHeading } from "@/components/section-heading";
+import { socialLinks } from "@/lib/config";
 import type { WorkYearGroup } from "@/lib/works-index";
 import type { VideoRow } from "@/lib/types";
 
@@ -65,6 +66,20 @@ export function WorksPageCopy({ selected, groups, email }: WorksPageCopyProps) {
         <a href={`mailto:${email}`} className="mt-7 inline-block text-neutral-300 underline decoration-neutral-700 underline-offset-4 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
           {email}
         </a>
+        {/* 与首页 about. 同款方框按钮；页脚不再重复列出 */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {socialLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 border border-neutral-400 hover:border-white text-neutral-300 hover:text-white transition-all duration-300 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
       </section>
     </>
   );

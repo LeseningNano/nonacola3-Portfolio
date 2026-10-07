@@ -62,7 +62,7 @@ export default async function WorksPage() {
 
           <WorksPageCopy selected={selected} groups={groups} email={siteConfig.email} />
         </main>
-        <Footer />
+        <Footer width="works" />
       </WorksLanguageProvider>
     </SmoothScrollContainer>
   );
