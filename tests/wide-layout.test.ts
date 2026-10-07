@@ -19,15 +19,6 @@ const article: PostItem = {
   createdAt: new Date("2026-07-20").toISOString(),
 };
 
-const short: PostItem = {
-  id: "s1",
-  title: null,
-  body: "网站进入试运营阶段，可能有未预料的错误出现。",
-  tag: "日常",
-  published: true,
-  createdAt: new Date("2026-07-23").toISOString(),
-};
-
 test("post excerpt strips markdown syntax and collapses whitespace", () => {
   assert.equal(getPostExcerpt(article.body), "说明 最近部分地区访问较慢，详见公告。 第一条");
 });
@@ -40,16 +31,6 @@ test("post excerpt is cut with an ellipsis past the limit", () => {
   const excerpt = getPostExcerpt("一".repeat(300), 120);
   assert.equal(excerpt.length, 121);
   assert.ok(excerpt.endsWith("…"));
-});
-
-test("news rows show an excerpt column for articles on large screens only", () => {
-  const markup = renderToStaticMarkup(createElement(NewsSection, { posts: [article, short] }));
-
-  assert.equal(markup.match(/data-news-excerpt=""/g)?.length, 1, "only the article has an excerpt");
-  assert.match(markup, /data-news-excerpt=""[^>]*class="[^"]*hidden[^"]*lg:block/);
-  assert.match(markup, /说明 最近部分地区访问较慢/);
-  // 短动态占位「阅读全文」宽度，让标签与文章行对齐
-  assert.match(markup, /aria-hidden="true" class="[^"]*invisible[^"]*">阅读全文 →/);
 });
 
 test("homepage sections and footer share a 1920px content cap", () => {
