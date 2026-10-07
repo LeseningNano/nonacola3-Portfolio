@@ -196,3 +196,16 @@ test("media fields preview images and video files hosted outside the media libra
   const page = renderToStaticMarkup(createElement(MediaField, { id: "g", label: "视频", kind: "video", value: "https://vimeo.com/123", onChange: () => {}, allowEmbed: true }));
   assert.doesNotMatch(page, /<video/);
 });
+
+// 快速切换（数据在 300ms 内返回）时不闪骨架屏，只有真的慢才淡入
+test("dashboard loading skeletons wait 300ms before fading in", async () => {
+  for (const route of ["", "media/", "settings/"]) {
+    const file = new URL(`../app/(admin)/dashboard/${route}loading.tsx`, import.meta.url);
+    const loadingRoute = await import(file.href) as { default: () => React.ReactNode };
+    const markup = renderToStaticMarkup(createElement(loadingRoute.default));
+    assert.match(markup, /^<div class="admin-loading-delay"/, `${route || "dashboard"} root delays its skeleton`);
+  }
+
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(css, /\.admin-loading-delay\s*\{[^}]*animation:[^;]*300ms[^;]*both/);
+});
