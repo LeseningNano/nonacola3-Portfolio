@@ -9,6 +9,7 @@ import { AdminFormSection } from "@/components/admin/admin-form-section";
 import { MediaField } from "@/components/admin/media-field";
 import { WorkCardPreview } from "@/components/admin/work-card-preview";
 import { MarkdownEditor } from "@/components/markdown-editor";
+import { MarkdownBody } from "@/components/markdown-body";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -182,10 +183,19 @@ export function WorkEditor({
               </div>
             </AdminFormSection>
 
-            <AdminFormSection index="04" title="Case Study" description="作品详情页的 Markdown 内容">
-              <Field label="详细说明" htmlFor="work-description">
-                <MarkdownEditor value={state.form.description} onChange={(value) => setField("description", value)} textareaProps={{ id: "work-description", rows: 14 }} />
-              </Field>
+            <AdminFormSection index="04" title="Case Study" description="作品详情页的 Markdown 内容，预览沿用公开页面的渲染方式">
+              {/* 与文章编辑器一致：宽屏左写右看，窄屏预览排在下方 */}
+              <div className="grid min-w-0 gap-5 2xl:grid-cols-2">
+                <Field label="详细说明" htmlFor="work-description">
+                  <MarkdownEditor value={state.form.description} onChange={(value) => setField("description", value)} textareaProps={{ id: "work-description", rows: 14 }} />
+                </Field>
+                <section className="min-w-0 space-y-2" aria-labelledby="work-preview-label">
+                  <h2 id="work-preview-label" className="text-xs text-admin-fg-2">实时预览</h2>
+                  <div className="min-h-60 min-w-0 rounded-md bg-admin-panel p-5">
+                    {state.form.description.trim() ? <MarkdownBody content={state.form.description} /> : <p className="text-sm text-admin-fg-3">尚无内容可预览。</p>}
+                  </div>
+                </section>
+              </div>
             </AdminFormSection>
           </fieldset>
 

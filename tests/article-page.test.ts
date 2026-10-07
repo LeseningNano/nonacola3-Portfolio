@@ -14,15 +14,14 @@ const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.ur
 const page = read("app/news/[id]/page.tsx");
 const css = read("app/globals.css");
 
-// ---- 第 2 步：正文 38rem、媒体 52rem（只在文章页开启）----
-test("wide media layout is opt-in and only the article page enables it", () => {
+// ---- 版心：和作品详情页一样的单栏（max-w-5xl），文字与图片同宽 ----
+test("article page uses the same single column as the work detail page", () => {
+  assert.match(page, /max-w-5xl mx-auto/);
+  assert.match(read("app/works/[id]/page.tsx"), /max-w-5xl mx-auto/);
+  assert.match(page, /<MarkdownBody content=\{post\.body\} \/>/);
+  assert.doesNotMatch(page, /max-w-\[(38|52)rem\]/);
+  assert.doesNotMatch(css, /wide-media/);
   assert.doesNotMatch(renderToStaticMarkup(createElement(MarkdownBody, { content: "段落" })), /data-layout/);
-  const markup = renderToStaticMarkup(createElement(MarkdownBody, { content: "段落", wideMedia: true }));
-  assert.match(markup, /class="article-prose[^"]*" data-layout="wide-media"/);
-  assert.match(page, /max-w-\[52rem\]/);
-  assert.match(page, /<MarkdownBody content=\{post\.body\} wideMedia \/>/);
-  assert.match(css, /\.article-prose\[data-layout="wide-media"\] > \*\s*\{[^}]*max-width:\s*38rem[^}]*margin-inline:\s*auto/);
-  assert.match(css, /\.article-prose\[data-layout="wide-media"\] > :has\(figure\)\s*\{[^}]*max-width:\s*52rem/);
 });
 
 // ---- 第 3 步：标题区 ----
