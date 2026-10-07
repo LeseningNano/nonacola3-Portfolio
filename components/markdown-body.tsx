@@ -61,13 +61,9 @@ function MediaFigure({ caption, children }: { caption?: string; children: ReactN
 // 文章与作品说明的正文排版（文章页改版第 1 步）：
 // 中文行高 1.85、靠字号与留白区分小标题、列表悬挂对齐、媒体加框编号。
 // 后台的两个预览也用这里，所见即所得；媒体能否突破正文栏宽由页面容器决定，不写在这里。
-// wideMedia：文章页专用，文字收窄到 38rem，图片 / 视频 / 图组放宽到 52rem（规则在 globals.css）
-export function MarkdownBody({ content, wideMedia = false }: { content: string; wideMedia?: boolean }) {
+export function MarkdownBody({ content }: { content: string }) {
   return (
-    <div
-      className="article-prose text-base md:text-[17px] leading-[1.85] text-neutral-300"
-      data-layout={wideMedia ? "wide-media" : undefined}
-    >
+    <div className="article-prose text-base md:text-[17px] leading-[1.85] text-neutral-300">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
@@ -84,7 +80,7 @@ export function MarkdownBody({ content, wideMedia = false }: { content: string; 
             ) : (
               <p className="mb-[1.1em]" {...withoutNode(p)} />
             ),
-          strong: (p) => <strong className="font-medium text-white" {...withoutNode(p)} />,
+          strong: (p) => <strong className="font-semibold text-white" {...withoutNode(p)} />,
           a: (p) => <a className="text-white underline decoration-neutral-600 underline-offset-4 transition-colors hover:decoration-white" target="_blank" rel="noopener noreferrer" {...withoutNode(p)} />,
           ul: (p) => <ul className="mb-[1.1em] list-outside list-disc space-y-[0.4em] pl-5 marker:text-neutral-600" {...withoutNode(p)} />,
           ol: (p) => <ol className="mb-[1.1em] list-outside list-decimal space-y-[0.4em] pl-5 marker:text-neutral-600" {...withoutNode(p)} />,

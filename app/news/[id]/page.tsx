@@ -31,9 +31,9 @@ export default async function NewsPostPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-28 pb-20 px-6 md:px-12 md:pt-36">
-      {/* 版心 52rem：标题区、正文文字和结尾收在居中的 38rem，图片和视频可以放宽到 52rem */}
-      <div className="mx-auto max-w-[52rem]">
-        <header className="mx-auto max-w-[38rem]">
+      {/* 版心与作品详情页一致：单栏 max-w-5xl，文字和图片同宽 */}
+      <div className="max-w-5xl mx-auto">
+        <header>
           <p className={META}>
             {formatFullDate(post.createdAt)}
             {post.tag && <span> · {post.tag}</span>}
@@ -44,9 +44,9 @@ export default async function NewsPostPage({ params }: { params: Promise<{ id: s
           <div className="mt-10 mb-12 h-px bg-neutral-800 md:mt-12 md:mb-14" />
         </header>
 
-        <MarkdownBody content={post.body} wideMedia />
+        <MarkdownBody content={post.body} />
 
-        <footer className="mx-auto mt-16 max-w-[38rem] border-t border-neutral-800 pt-8">
+        <footer className="mt-16 border-t border-neutral-800 pt-8">
           {/* 上一篇（更早）/ 下一篇（更新），只在文章之间切换；没有的一侧留空 */}
           {(older || newer) && (
             <nav aria-label="文章导航" className="grid grid-cols-2 gap-6">
