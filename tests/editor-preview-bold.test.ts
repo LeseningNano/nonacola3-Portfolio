@@ -1,9 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-import { MarkdownBody } from "../components/markdown-body";
 
 const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
@@ -15,13 +12,7 @@ test("work editor shows a live preview of the case study", () => {
   assert.match(source, /aria-labelledby="work-preview-label"/);
 });
 
-// 粗体：常规字重 + 0.3px 描边（微软雅黑没有中间字重，semibold 会直接跳到最粗一档）
-test("bold text is a touch heavier via a thin stroke, not the heaviest weight", () => {
-  const markup = renderToStaticMarkup(createElement(MarkdownBody, { content: "普通 **加粗** 普通" }));
-  assert.match(markup, /<strong class="[^"]*font-normal[^"]*text-white/);
-  assert.doesNotMatch(markup, /font-semibold/);
-  assert.match(read("app/globals.css"), /\.article-prose strong\s*\{[^}]*-webkit-text-stroke:\s*0\.3px currentColor/);
-});
+// 粗体规则见 tests/misans.test.ts（MiSans 有真正的中等字重，不再用描边）
 
 // 标题统一（方案 1）：作品详情页与文章页同一套标题区，作品标题略小
 test("work detail header matches the article header with a slightly smaller title", () => {
