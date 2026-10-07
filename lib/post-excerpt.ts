@@ -5,6 +5,7 @@ export const POST_EXCERPT_LENGTH = 120;
 export function getPostExcerpt(body: string, max = POST_EXCERPT_LENGTH): string {
   const text = body
     .replace(/```[\s\S]*?```/g, " ") // 代码块整段去掉
+    .replace(/^\s{0,3}([-*_])(?:\s*\1){2,}\s*$/gm, " ") // 分隔线 --- / *** / ___
     .replace(/<[^>]+>/g, " ") // 内嵌 HTML 标签
     .replace(/!\[[^\]]*\]\([^)]*\)/g, " ") // 图片
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // 链接只留文字
