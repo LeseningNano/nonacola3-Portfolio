@@ -15,9 +15,9 @@ const post: PostItem = {
   createdAt: new Date("2026-01-01").toISOString(),
 };
 
-test("news rows use the shared sweep hover instead of the old side bar", () => {
+// news. 已改为时间轴（不再用 row-sweep），只保留不回退旧侧边条的断言
+test("news entries never fall back to the old side bar hover", () => {
   const markup = renderToStaticMarkup(createElement(NewsSection, { posts: [post] }));
-  assert.match(markup, /row-sweep/);
   assert.doesNotMatch(markup, /hover:bg-white\/5/);
   assert.doesNotMatch(markup, /before:bg-white/);
 });

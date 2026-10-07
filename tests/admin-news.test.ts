@@ -117,7 +117,7 @@ test("post endpoints and public News treat only null titles as short updates", (
   const source = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
   const createRoute = source("app/api/posts/route.ts");
   const updateRoute = source("app/api/posts/[id]/route.ts");
-  const newsSection = source("components/news-section.tsx");
+  const newsSection = source("lib/news-timeline.ts");
   const articlePage = source("app/news/[id]/page.tsx");
 
   assert.match(createRoute, /normalizeAdminPostTitle\(b\.title\)/);
