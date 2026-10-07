@@ -6,6 +6,7 @@ import { VideoGrid } from "@/components/video-grid";
 import { NewsSection } from "@/components/news-section";
 import { AboutSection } from "@/components/about-section";
 import { Footer } from "@/components/footer";
+import { ScrollMemory } from "@/components/scroll-memory";
 import type { VideoRow, PostItem } from "@/lib/types";
 import {
   SCROLL_CONTAINER_ID,
@@ -44,6 +45,7 @@ export function HomeClient({
 
   return (
     <SmoothScrollContainer>
+      <ScrollMemory page="home" />
       <HeroVideo videoUrl={heroVideoUrl} posterUrl={heroPosterUrl} />
       <VideoGrid videos={videos} />
       <NewsSection posts={posts} />

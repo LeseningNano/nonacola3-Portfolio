@@ -61,9 +61,13 @@ function MediaFigure({ caption, children }: { caption?: string; children: ReactN
 // 文章与作品说明的正文排版（文章页改版第 1 步）：
 // 中文行高 1.85、靠字号与留白区分小标题、列表悬挂对齐、媒体加框编号。
 // 后台的两个预览也用这里，所见即所得；媒体能否突破正文栏宽由页面容器决定，不写在这里。
-export function MarkdownBody({ content }: { content: string }) {
+// wideMedia：文章页专用，文字收窄到 38rem，图片 / 视频 / 图组放宽到 52rem（规则在 globals.css）
+export function MarkdownBody({ content, wideMedia = false }: { content: string; wideMedia?: boolean }) {
   return (
-    <div className="article-prose text-base md:text-[17px] leading-[1.85] text-neutral-300">
+    <div
+      className="article-prose text-base md:text-[17px] leading-[1.85] text-neutral-300"
+      data-layout={wideMedia ? "wide-media" : undefined}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
