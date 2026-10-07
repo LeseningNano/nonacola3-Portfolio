@@ -15,8 +15,21 @@ test("work editor shows a live preview of the case study", () => {
   assert.match(source, /aria-labelledby="work-preview-label"/);
 });
 
-// 粗体要看得出来
-test("bold text is clearly heavier than body text", () => {
+// 粗体：常规字重 + 0.3px 描边（微软雅黑没有中间字重，semibold 会直接跳到最粗一档）
+test("bold text is a touch heavier via a thin stroke, not the heaviest weight", () => {
   const markup = renderToStaticMarkup(createElement(MarkdownBody, { content: "普通 **加粗** 普通" }));
-  assert.match(markup, /<strong class="[^"]*font-semibold[^"]*text-white/);
+  assert.match(markup, /<strong class="[^"]*font-normal[^"]*text-white/);
+  assert.doesNotMatch(markup, /font-semibold/);
+  assert.match(read("app/globals.css"), /\.article-prose strong\s*\{[^}]*-webkit-text-stroke:\s*0\.3px currentColor/);
+});
+
+// 标题统一（方案 1）：作品详情页与文章页同一套标题区，作品标题略小
+test("work detail header matches the article header with a slightly smaller title", () => {
+  const page = read("app/works/[id]/page.tsx");
+  assert.match(page, /formatFullDate\(video\.date\)/);
+  assert.match(page, /tracking-\[0\.24em\]/);
+  assert.match(page, /<h1 className="[^"]*font-normal[^"]*tracking-\[-0\.03em\][^"]*md:text-\[44px\]/);
+  assert.doesNotMatch(page, /font-bold/);
+  assert.doesNotMatch(page, /border border-neutral-700 px-2/, "category no longer boxed");
+  assert.doesNotMatch(page, /toLocaleDateString/);
 });

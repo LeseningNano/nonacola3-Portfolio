@@ -189,6 +189,11 @@
 .article-prose figure {
   counter-increment: article-figure;
 }
+/* 粗体：常规字重 + 极细描边。微软雅黑只有常规 / 粗体两档，semibold 会直接跳到最粗，
+   medium 又和常规一样；描边让笔画略粗一点，各平台效果接近 */
+.article-prose strong {
+  -webkit-text-stroke: 0.3px currentColor;
+}
 .article-prose figcaption::before {
   content: "FIG. " counter(article-figure, decimal-leading-zero);
   margin-right: 0.9em;
