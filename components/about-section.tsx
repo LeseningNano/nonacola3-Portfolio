@@ -10,7 +10,7 @@ export function AboutSection() {
       <div className="page-cap">
         <SectionHeading title="about." subtitle="了解更多 & 合作洽谈" />
 
-        <div className="mt-10 flex flex-col md:flex-row gap-10 md:gap-16">
+        <div className="mt-10 flex flex-col md:flex-row md:items-center gap-10 md:gap-16">
           {/* 头像与简介成组，组内间距更紧；Contact 栏仍用较大间距隔开 */}
           <div className="flex flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-8">
             {/* 头像：中线亮起后上下拉开，与首页加载画面、Showreel 同一母题 */}
@@ -33,15 +33,19 @@ export function AboutSection() {
               delay={420}
               className="text-base md:text-lg 2xl:text-xl text-neutral-300 leading-relaxed max-w-2xl 2xl:max-w-3xl flex-1"
             >
-              我是nonacola3，是一名业余PV师，正在努力进步中。热爱影像创作（也爱打游戏），喜欢用视觉语言讲述故事。期待通过每一个作品不断打磨技术，也希望能与更多志同道合的朋友交流合作。
+              我是nonacola3，曾用名ナノナ。
+              <br />
+              进厂打工，业余玩AE，还在努力进步中。
+              <br />
+              想把脑海里的画面做成炫酷好看的作品，用它们讲故事。欢迎志同道合的朋友来聊。
             </Reveal>
           </div>
 
           <Reveal variant="content-left" delay={540} className="md:border-l md:border-neutral-800 md:pl-12 flex-shrink-0">
-            <p className="text-xs text-neutral-500 uppercase tracking-widest mb-3">Contact</p>
+            <p className="text-xs md:text-sm text-neutral-500 uppercase tracking-widest mb-3 md:mb-4">Contact</p>
             <a
               href={`mailto:${siteConfig.email}`}
-              className="text-lg md:text-xl hover:text-neutral-300 transition-colors block mb-6"
+              className="text-xl md:text-2xl hover:text-neutral-300 transition-colors block mb-6 md:mb-8"
             >
               {siteConfig.email}
             </a>
@@ -52,7 +56,7 @@ export function AboutSection() {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 border border-neutral-400 hover:border-white text-neutral-300 hover:text-white transition-all duration-300 text-sm"
+                  className="px-5 py-2.5 border border-neutral-400 hover:border-white text-neutral-300 hover:text-white transition-all duration-300 text-sm md:text-base"
                 >
                   {link.name}
                 </a>
