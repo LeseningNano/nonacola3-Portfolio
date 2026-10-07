@@ -12,7 +12,7 @@ export function AboutSection() {
 
         <div className="mt-10 flex flex-col md:flex-row md:items-center gap-10 md:gap-16">
           {/* 头像与简介成组，组内间距更紧；Contact 栏仍用较大间距隔开 */}
-          <div className="flex flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-8">
+          <div className="flex flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-12">
             {/* 头像：中线亮起后上下拉开，与首页加载画面、Showreel 同一母题 */}
             <Reveal variant="avatar" delay={240} className="relative h-32 w-32 shrink-0 md:h-52 md:w-52 2xl:h-60 2xl:w-60">
               <div className="avatar-frame absolute inset-0 overflow-hidden border border-neutral-800 bg-neutral-900">

@@ -34,7 +34,7 @@ test("footer width follows the page it sits on", () => {
 
 test("about bio is vertically centred against the avatar on desktop", () => {
   const markup = renderToStaticMarkup(createElement(AboutSection));
-  assert.match(markup, /class="flex flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-8"/);
+  assert.match(markup, /class="flex flex-1 flex-col gap-6 md:flex-row md:items-center md:gap-12"/);
 });
 
 test("about contact column is vertically centred and sized up on desktop", () => {
