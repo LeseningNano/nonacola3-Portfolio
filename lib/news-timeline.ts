@@ -37,3 +37,9 @@ export function buildNewsTimeline(posts: PostItem[], limit = HOME_NEWS_LIMIT): N
     };
   });
 }
+
+// 文章页标题区的完整日期：2026.10.07（与时间轴的 10.07 同一套写法）
+export function formatFullDate(value: string | Date): string {
+  const d = new Date(value);
+  return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
+}

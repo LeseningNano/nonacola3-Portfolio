@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat, Bitcount_Grid_Single, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/navbar";
+import { BackNavigationFlag } from "@/components/scroll-memory";
 import { PageTransition } from "@/components/progress-bar";
 
 import { ServerNotice } from "@/components/server-notice";
@@ -58,6 +59,7 @@ export default function RootLayout({
           <PageTransition />
           <ServerNotice />
           <Navbar />
+          <BackNavigationFlag />
           {children}
         </ToastProvider>
       </body>

@@ -141,3 +141,8 @@ test("toolbar offers the extra formats", () => {
   }
   assert.match(editorSource, /toggleLineFormat/);
 });
+
+test("pasting several images at once lands them as one gallery", () => {
+  assert.match(editorSource, /\.join\("\\n"\)/);
+  assert.match(editorSource, /图组/);
+});

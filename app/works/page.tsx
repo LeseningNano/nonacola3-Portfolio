@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/footer";
+import { ScrollMemory } from "@/components/scroll-memory";
 import { WorksIntro } from "@/components/works-index/works-intro";
 import { ShowreelFeature } from "@/components/works-index/showreel-feature";
 import { SmoothScrollContainer } from "@/components/smooth-scroll-container";
@@ -45,6 +46,7 @@ export default async function WorksPage() {
   return (
     <SmoothScrollContainer className="min-h-screen bg-[#0a0a0a] text-white">
       <WorksLanguageProvider>
+        <ScrollMemory page="works" />
         <main className="mx-auto max-w-[1200px] px-5 pb-20 pt-28 sm:px-8 md:px-12 md:pt-36">
           <div className="flex justify-end" data-works-language-toggle="">
             <WorksLanguageToggle />

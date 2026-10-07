@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { shouldUseBlackTransition } from "@/lib/portfolio-navigation";
+import { planReturn } from "@/lib/return-navigation";
 
 const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
@@ -185,6 +186,17 @@ export function PageTransition() {
       if (href.includes("#")) return;
 
       if (href.startsWith("/") && !href.startsWith("//")) {
+        // 「返回」链接（ReturnLink）：这里会 stopPropagation，链接自己的 onClick 不会执行，
+        // 所以先替它记下返回意图（回原位置或所属板块）；planReturn 重复调用无副作用
+        const returnPage = anchor.dataset.returnPage;
+        if (returnPage === "home" || returnPage === "works") {
+          try {
+            planReturn(window.sessionStorage, returnPage, anchor.dataset.returnSection);
+          } catch {
+            // 隐私模式等禁用存储时，退回普通跳转
+          }
+        }
+
         if (!shouldUseBlackTransition(pathname, href)) return;
         // Don't intercept if already on this page
         if (href === pathname) return;
