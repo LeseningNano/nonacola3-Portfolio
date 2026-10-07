@@ -7,6 +7,7 @@ import { MarkdownBody } from "@/components/markdown-body";
 import { VideoCard } from "@/components/video-card";
 import { WorkReturnLink } from "@/components/work-return-link";
 import { pickRelatedVideos } from "@/lib/utils";
+import { formatFullDate } from "@/lib/news-timeline";
 import type { VideoRow } from "@/lib/types";
 
 export const dynamic = "force-static";
@@ -48,17 +49,13 @@ export default async function WorkPage({ params }: { params: Promise<{ id: strin
       <div className="max-w-5xl mx-auto">
         <WorkPlayer videoId={video.id} embedUrl={video.embedUrl} title={video.title} />
 
-        <h1 className="text-2xl md:text-4xl font-bold text-white mt-8 break-words">{video.title}</h1>
-        <div className="flex items-center gap-3 mt-3">
-          <span className="text-xs font-medium text-neutral-400 border border-neutral-700 px-2 py-0.5">
-            {video.category}
-          </span>
-          {video.date && (
-            <span className="text-xs text-neutral-500">
-              {new Date(video.date).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
-            </span>
-          )}
-        </div>
+        {/* 标题区与文章页同一套：等宽小字的日期 · 分类，常规字重大标题（作品标题常较长，比文章页略小） */}
+        <p className="mt-8 text-xs tracking-[0.24em] text-neutral-500">
+          {[video.date ? formatFullDate(video.date) : null, video.category || null].filter(Boolean).join(" · ")}
+        </p>
+        <h1 className="mt-4 break-words text-3xl font-normal leading-[1.15] tracking-[-0.03em] text-white md:text-[44px]">
+          {video.title}
+        </h1>
 
         {video.summary && (
           <p className="text-neutral-300 mt-6 text-base md:text-lg leading-relaxed break-words">{video.summary}</p>
