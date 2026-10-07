@@ -90,3 +90,54 @@ test("editor uploads pasted and dropped images", () => {
   assert.match(editorSource, /onDrop=/);
   assert.match(editorSource, /uploadMediaFile/);
 });
+
+// 8 / 9. 行级格式：作用于选区覆盖的每一行，再点一次取消
+import { toggleLineFormat } from "../lib/markdown-editor";
+
+const apply = (value: string, start: number, end: number, kind: Parameters<typeof toggleLineFormat>[3]) => {
+  const r = toggleLineFormat(value, start, end, kind);
+  return value.slice(0, r.from) + r.text + value.slice(r.to);
+};
+
+test("heading buttons add, remove and switch levels instead of stacking", () => {
+  assert.equal(apply("标题", 1, 1, "h2"), "## 标题");
+  assert.equal(apply("## 标题", 4, 4, "h2"), "标题");
+  assert.equal(apply("## 标题", 4, 4, "h3"), "### 标题");
+  assert.equal(apply("### 标题", 4, 4, "h2"), "## 标题");
+});
+
+test("list buttons apply to every selected line and skip blank lines", () => {
+  const value = "苹果\n香蕉\n\n橘子";
+  assert.equal(apply(value, 0, value.length, "ul"), "- 苹果\n- 香蕉\n\n- 橘子");
+  assert.equal(apply(value, 0, value.length, "ol"), "1. 苹果\n2. 香蕉\n\n3. 橘子");
+  // 只覆盖到第二行的一部分，也作用于这两整行
+  assert.equal(apply(value, 1, 4, "ul"), "- 苹果\n- 香蕉\n\n橘子");
+});
+
+test("list buttons toggle off and convert between list types", () => {
+  assert.equal(apply("- 苹果\n- 香蕉", 0, 9, "ul"), "苹果\n香蕉");
+  assert.equal(apply("1. 苹果\n2. 香蕉", 0, 11, "ol"), "苹果\n香蕉");
+  assert.equal(apply("- 苹果\n- 香蕉", 0, 9, "ol"), "1. 苹果\n2. 香蕉");
+  assert.equal(apply("1. 苹果\n2. 香蕉", 0, 11, "ul"), "- 苹果\n- 香蕉");
+  // 混合：不是每行都是无序列表 → 全部变成无序列表
+  assert.equal(apply("- 苹果\n香蕉", 0, 7, "ul"), "- 苹果\n- 香蕉");
+});
+
+test("quote button toggles a > prefix on each line", () => {
+  assert.equal(apply("一句\n两句", 0, 5, "quote"), "> 一句\n> 两句");
+  assert.equal(apply("> 一句\n> 两句", 0, 9, "quote"), "一句\n两句");
+});
+
+test("caret stays on the same text after a single-line toggle", () => {
+  const r = toggleLineFormat("前一行\n标题文字", 6, 6, "h2");
+  assert.deepEqual(r.selection, [9, 9]);
+  const back = toggleLineFormat("前一行\n## 标题文字", 9, 9, "h2");
+  assert.deepEqual(back.selection, [6, 6]);
+});
+
+test("toolbar offers the extra formats", () => {
+  for (const title of ["三级标题", "有序列表", "引用", "分隔线"]) {
+    assert.match(editorSource, new RegExp(`title="${title}`), title);
+  }
+  assert.match(editorSource, /toggleLineFormat/);
+});
