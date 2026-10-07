@@ -179,6 +179,22 @@
   --radius: 0.25rem;
 }
 
+/* 后台骨架屏延迟显示：后台页面每次都查（新加坡的）数据库，切换时 Next 会先渲染
+   loading.tsx。数据 300ms 内返回就直接出内容、不闪骨架屏；更慢时骨架屏再淡入 */
+.admin-loading-delay {
+  animation: admin-loading-in 200ms ease-out 300ms both;
+}
+@keyframes admin-loading-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* 仍然延迟（不是动效），只是不做淡入 */
+  .admin-loading-delay {
+    animation-duration: 1ms;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
