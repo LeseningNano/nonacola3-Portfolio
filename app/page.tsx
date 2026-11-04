@@ -3,6 +3,9 @@ import { resolveHeroMedia } from "@/lib/hero";
 import { HomeClient } from "@/components/home-client";
 import type { VideoRow, PostItem } from "@/lib/types";
 
+export const dynamic = "force-static";
+export const revalidate = 300;
+
 export default async function Home() {
   const [heroRecord, videos, posts] = await Promise.all([getHero(), getVideos(), getPublishedPosts()]);
   const hero = resolveHeroMedia(heroRecord);

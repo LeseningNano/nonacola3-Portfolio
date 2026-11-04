@@ -74,3 +74,9 @@ test("breathing ring CSS respects reduced motion and marquee styles are gone", (
   assert.doesNotMatch(css, /animate-marquee/);
   assert.doesNotMatch(css, /works-expand/);
 });
+
+test("home page regenerates on a timer so new posts and works show up without a redeploy", () => {
+  const source = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /dynamic = "force-static"/);
+  assert.match(source, /revalidate = 300/);
+});
