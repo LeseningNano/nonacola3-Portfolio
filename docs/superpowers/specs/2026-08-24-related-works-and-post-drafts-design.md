@@ -13,6 +13,7 @@
 
 - 标题 `more.`（复用站内 Bitcount 展示字体风格，`text-2xl md:text-3xl` 级别即可，小于首页板块标题）+ 副标「相关作品」
 - 网格：`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1`，复用 `components/video-card.tsx` 的 `VideoCard`（自带 hover 缩放与简介展开动效）
+- 相关作品链接沿用当前详情页的 `?from=home` 标记。连续浏览时，从首页进入的访客始终看到「返回主页」，从作品列表进入或直接打开详情页的访客看到「返回作品列表」。
 
 ### 选取逻辑
 

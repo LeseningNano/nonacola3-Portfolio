@@ -1,9 +1,14 @@
+"use client";
+
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { Play } from "lucide-react";
 import type { VideoRow } from "@/lib/types";
 import { IntentPrefetchLink } from "@/components/intent-prefetch-link";
 
-export function VideoCard({ video, returnToHome = false }: { video: VideoRow; returnToHome?: boolean }) {
+export function VideoCard({ video }: { video: VideoRow }) {
+  const returnToHome = useSearchParams().get("from") === "home";
+
   return (
     <IntentPrefetchLink
       href={`/works/${video.id}${returnToHome ? "?from=home" : ""}`}

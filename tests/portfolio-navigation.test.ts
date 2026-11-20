@@ -3,6 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 import { HeroVideo } from "../components/hero-video";
 import { VideoGrid } from "../components/video-grid";
 import { VideoCard } from "../components/video-card";
@@ -115,13 +116,28 @@ test("server notice shows only on the homepage", () => {
   assert.equal(shouldShowServerNotice("/news/example"), false);
 });
 
-test("homepage work cards carry a home return source without changing other work cards", () => {
-  const homeMarkup = renderToStaticMarkup(createElement(VideoGrid, { videos: [sampleVideo] }));
-  const otherMarkup = renderToStaticMarkup(createElement(VideoCard, { video: sampleVideo }));
+test("homepage work cards carry a home return source", () => {
+  const markup = renderToStaticMarkup(createElement(VideoGrid, { videos: [sampleVideo] }));
 
-  assert.match(homeMarkup, /href="\/works\/v1\?from=home"/);
-  assert.match(otherMarkup, /href="\/works\/v1"/);
-  assert.doesNotMatch(otherMarkup, /from=home/);
+  assert.match(markup, /href="\/works\/v1\?from=home"/);
+});
+
+test("related work links preserve the homepage source across detail pages", () => {
+  for (const [search, expectedHref] of [
+    ["from=home", "/works/v1?from=home"],
+    ["", "/works/v1"],
+    ["from=works", "/works/v1"],
+  ]) {
+    const markup = renderToStaticMarkup(
+      createElement(
+        SearchParamsContext.Provider,
+        { value: new URLSearchParams(search) },
+        createElement(VideoCard, { video: sampleVideo }),
+      ),
+    );
+
+    assert.ok(markup.includes(`href="${expectedHref}"`), `related link for ?${search}`);
+  }
 });
 
 test("Dashboard navigation never uses the global black transition", () => {
