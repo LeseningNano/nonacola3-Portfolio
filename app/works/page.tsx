@@ -9,6 +9,7 @@ import { WorksLanguageToggle } from "@/components/works-index/works-language-tog
 import { WorksPageCopy } from "@/components/works-index/works-page-copy";
 import { siteConfig } from "@/lib/config";
 import { getShowreel, getVideos } from "@/lib/data";
+import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/metadata";
 import type { VideoRow } from "@/lib/types";
 import {
   groupWorksByYear,
@@ -22,6 +23,20 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Works",
   description: "Selected PV, motion design, compositing and 3D work by nonacola3.",
+  openGraph: {
+    title: "Works — nonacola3",
+    description: "Selected PV, motion design, compositing and 3D work by nonacola3.",
+    type: "website",
+    url: "/works",
+    siteName: SITE_NAME,
+    images: [{ url: DEFAULT_OG_IMAGE, alt: "Works — nonacola3" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Works — nonacola3",
+    description: "Selected PV, motion design, compositing and 3D work by nonacola3.",
+    images: [DEFAULT_OG_IMAGE],
+  },
 };
 
 export default async function WorksPage() {

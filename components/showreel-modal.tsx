@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { getEmbedUrl } from "@/lib/utils";
 
@@ -24,11 +24,11 @@ export function ShowreelModal({ onClose }: ShowreelModalProps) {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (isClosing) return;
     setIsClosing(true);
     setTimeout(() => onClose(), 250);
-  };
+  }, [isClosing, onClose]);
 
   useEffect(() => {
     function handleEscape(e: KeyboardEvent) {
@@ -36,7 +36,7 @@ export function ShowreelModal({ onClose }: ShowreelModalProps) {
     }
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
-  }, [isClosing]);
+  }, [handleClose]);
 
   return (
     <div

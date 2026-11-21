@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const jsonResponse = await handleUpload({
     body,
     request: req,
-    onBeforeGenerateToken: async (pathname) => {
+    onBeforeGenerateToken: async () => {
       return {
         allowOverwrite: true,
         maximumSizeInBytes: 500 * 1024 * 1024, // 500MB

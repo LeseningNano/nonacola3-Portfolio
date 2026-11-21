@@ -5,6 +5,7 @@ import { MarkdownBody } from "@/components/markdown-body";
 import { ReturnLink } from "@/components/scroll-memory";
 import { formatFullDate } from "@/lib/news-timeline";
 import { getArticleNeighbors } from "@/lib/news-neighbors";
+import { buildNewsMetadata } from "@/lib/metadata";
 import type { PostItem } from "@/lib/types";
 
 export const dynamic = "force-static";
@@ -14,7 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const post = await getPost(id);
   if (!post || post.title === null || !post.published) return {};
-  return { title: post.title };
+  return buildNewsMetadata({
+    id: post.id,
+    title: post.title,
+    body: post.body,
+    createdAt: post.createdAt,
+  });
 }
 
 const META = "text-xs tracking-[0.24em] text-neutral-500";

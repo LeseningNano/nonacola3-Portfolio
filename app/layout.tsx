@@ -7,6 +7,13 @@ import { PageTransition } from "@/components/progress-bar";
 import { ServerNotice } from "@/components/server-notice";
 import { ChunkRecovery } from "@/components/chunk-recovery";
 import { ToastProvider } from "@/components/toast";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_TITLE,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/metadata";
 import "./globals.css";
 
 // 中文字体：思源黑体（可变字重，一套文件覆盖常规到半粗）。构建时由 next/font 下载并随站点发布，
@@ -32,17 +39,26 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.nonacola3.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "nonacola3 — Video Portfolio",
+    default: DEFAULT_TITLE,
     template: "%s — nonacola3",
   },
-  description: "nonacola3 的视频作品集：精选 PV / 影像创作项目。",
+  description: DEFAULT_DESCRIPTION,
   openGraph: {
-    title: "nonacola3 — Video Portfolio",
-    description: "nonacola3 的视频作品集：精选 PV / 影像创作项目。",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
     type: "website",
     locale: "zh_CN",
+    images: [{ url: DEFAULT_OG_IMAGE, alt: DEFAULT_TITLE }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
   },
 };
 

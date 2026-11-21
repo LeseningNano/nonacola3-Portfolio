@@ -31,7 +31,7 @@ export function HomeClient({
     sessionStorage.removeItem("pending-scroll");
     // 等渲染完成后计算位置
     setTimeout(() => {
-      const container = document.getElementById("main-scroll");
+      const container = document.getElementById(SCROLL_CONTAINER_ID);
       const el = document.getElementById(id);
       if (container && el) {
         container.dispatchEvent(

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdmin } from "@/lib/api-auth";
-import { ok, success, fail, revalidateTags } from "@/lib/api-utils";
+import { success, fail, revalidateTags } from "@/lib/api-utils";
 import { showreelMutateSchema } from "@/lib/schemas";
 
 export async function GET() {
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   const b = parsed.data;
 
   try {
-    const showreel = await db.showreel.upsert({
+    await db.showreel.upsert({
       where: { id: "singleton" },
       update: { showreelUrl: b.showreelUrl, videoType: b.videoType ?? "url" },
       create: { id: "singleton", showreelUrl: b.showreelUrl, videoType: b.videoType ?? "url" },

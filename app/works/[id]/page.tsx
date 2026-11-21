@@ -8,6 +8,7 @@ import { VideoCard } from "@/components/video-card";
 import { WorkReturnLink } from "@/components/work-return-link";
 import { pickRelatedVideos } from "@/lib/utils";
 import { formatFullDate } from "@/lib/news-timeline";
+import { buildWorkMetadata } from "@/lib/metadata";
 import type { VideoRow } from "@/lib/types";
 
 export const dynamic = "force-static";
@@ -17,10 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const video = await getVideo(id);
   if (!video) return {};
-  return {
-    title: video.title,
-    description: video.summary ?? video.description ?? undefined,
-  };
+  return buildWorkMetadata(video);
 }
 
 export default async function WorkPage({ params }: { params: Promise<{ id: string }> }) {
