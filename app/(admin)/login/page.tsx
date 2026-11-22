@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { CircleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,10 +26,10 @@ export default function LoginPage() {
 
     if (result?.error) {
       setError("用户名或密码错误");
+      setLoading(false);
     } else {
-      router.push("/dashboard");
+      window.location.assign("/dashboard");
     }
-    setLoading(false);
   }
 
   return (

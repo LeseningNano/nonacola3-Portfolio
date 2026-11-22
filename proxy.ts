@@ -1,32 +1,26 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const SECURE_COOKIE_NAME = "__Secure-authjs.session-token";
+const SESSION_COOKIE_NAMES = [
+  "__Secure-authjs.session-token",
+  "__Secure-authjs.session-token.0",
+  "authjs.session-token",
+  "authjs.session-token.0",
+] as const;
 
-async function hasValidAdminToken(req: NextRequest): Promise<boolean> {
-  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
-  if (!secret) return false;
-
-  const cookieHeader = req.headers.get("cookie") ?? "";
-  const secureCookie =
-    cookieHeader.includes(SECURE_COOKIE_NAME) ||
-    req.nextUrl.protocol === "https:" ||
-    req.headers.get("x-forwarded-proto") === "https";
-
-  try {
-    const token = await getToken({ req, secret, secureCookie });
-    return token?.role === "admin";
-  } catch {
-    return false;
-  }
+function hasSessionCookie(req: NextRequest): boolean {
+  return SESSION_COOKIE_NAMES.some((name) => Boolean(req.cookies.get(name)?.value));
 }
 
-export async function proxy(req: NextRequest) {
+// 边缘中间件只做快速乐观拦截（无会话 cookie 直接跳 /login）：
+// 1. 避免 next-auth 的 auth() 中间件包装器在 EdgeOne 运行时触发 RequestInit.eo 报错；
+// 2. 避免边缘运行时缺少 NEXTAUTH_SECRET 或 WebCrypto 差异导致合法会话被误拦。
+// 真正的 JWT 解密与 role === "admin" 校验由 Node.js 端的 DashboardLayout（auth()）
+// 以及所有写接口的 requireAdmin() 完成。
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (pathname.startsWith("/dashboard") || pathname.startsWith("/videos")) {
-    const authenticated = await hasValidAdminToken(req);
-    if (!authenticated) {
+    if (!hasSessionCookie(req)) {
       const loginUrl = new URL("/login", req.url);
       return NextResponse.redirect(loginUrl);
     }
